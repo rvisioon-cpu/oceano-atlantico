@@ -6,7 +6,7 @@ import { getAssetUrl } from '@/utils/assets';
 import { useStore } from '@/store/useStore';
 import { preloadImages, preloadVideo } from '@/utils/preload';
 import { buildingFaces as staticBuildingFaces } from '@/data/buildingData';
-import { floorsData as staticFloorsData } from '@/data/floors';
+import { floorsData as staticFloorsData, getEntryFloorId } from '@/data/floors';
 import config from '@/config/config';
 import { getFeatures } from '@/app/actions/features';
 import defaultFeatures from '@/data/features.json';
@@ -112,7 +112,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             }
 
             // Default Floor 9 Image
-            const defaultFloor = floorsData.find(f => f.id === '9');
+            const defaultFloor = floorsData.find(f => f.id === getEntryFloorId(floorsData));
             if (defaultFloor) {
                 preloadImages([defaultFloor.floorPlanImage]).catch(() => { });
             }
@@ -163,7 +163,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         else if (key === 'floors' && buildingFacesData.length > 0) {
             if (currentAssetSet?.introVideo) preloadVideo(currentAssetSet.introVideo).catch(() => { });
 
-            const defaultFloor = floorsData.find(f => f.id === '9');
+            const defaultFloor = floorsData.find(f => f.id === getEntryFloorId(floorsData));
             if (defaultFloor) {
                 preloadImages([defaultFloor.floorPlanImage]).catch(() => { });
             }

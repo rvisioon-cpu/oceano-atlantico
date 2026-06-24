@@ -5,10 +5,10 @@ pages_build_output_dir = ".open-next/assets"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "santafe-db"
-database_id = "dfac957d-f9e4-4866-9e7c-967521be6e15"
+database_name = "oceano-atlantico-db"
+database_id = "7e148e34-a56c-4c94-8edd-5bdd419bc0e4"
 migrations_dir = "drizzle"
 
 [[r2_buckets]]
 binding = "R2"
-bucket_name = "santa-fe"
+bucket_name = "oceano-atlantico-showroom"

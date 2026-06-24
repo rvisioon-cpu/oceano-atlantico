@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from '@/store/useStore';
 import gsap from 'gsap';
 import { preloadImages } from '@/utils/preload';
+import { getEntryFloorId } from '@/data/floors';
 
 interface SceneControllerProps {
   isHighlighted?: boolean;
@@ -22,7 +23,7 @@ export default function SceneController({ isHighlighted }: SceneControllerProps)
   // Preload the first floor plan while the "enter building" walk video plays.
   useEffect(() => {
     if (viewState === 'TRANSITION_VIDEO' && targetDestination === 'Floors') {
-      const targetFloor = floorsData.find(f => f.id === '9');
+      const targetFloor = floorsData.find(f => f.id === getEntryFloorId(floorsData));
       if (targetFloor) preloadImages([targetFloor.floorPlanImage]).catch(() => { });
     }
   }, [viewState, targetDestination, floorsData]);
