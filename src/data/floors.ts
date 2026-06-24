@@ -38,22 +38,176 @@ export interface Floor {
 export const floorsData: Floor[] = [
   {
     id: "1",
-    name: "1",
+    name: "Piso 1",
     floorPlanImage: "/plants/floor_1.png",
     units: [
       { 
         id: "101", 
         floorId: "1", 
-        price: 1000, 
-        dimensions: 52.9, 
+        price: 0, 
+        dimensions: 108.42, 
+        bedrooms: 1, 
+        bathrooms: 2.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      },
+      { 
+        id: "102", 
+        floorId: "1", 
+        price: 0, 
+        dimensions: 80.11, 
+        bedrooms: 1, 
+        bathrooms: 1.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      }
+    ]
+  },
+  {
+    id: "2",
+    name: "Piso 2",
+    floorPlanImage: "/plants/floor_2.png",
+    units: [
+      { 
+        id: "201", 
+        floorId: "2", 
+        price: 0, 
+        dimensions: 122.82, 
+        bedrooms: 2, 
+        bathrooms: 2.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      },
+      { 
+        id: "202", 
+        floorId: "2", 
+        price: 0, 
+        dimensions: 134.03, 
+        bedrooms: 2, 
+        bathrooms: 2.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      }
+    ]
+  },
+  {
+    id: "3",
+    name: "Piso 3",
+    floorPlanImage: "/plants/floor_3.png",
+    units: [
+      { 
+        id: "301", 
+        floorId: "3", 
+        price: 0, 
+        dimensions: 122.82, 
+        bedrooms: 2, 
+        bathrooms: 2.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      },
+      { 
+        id: "302", 
+        floorId: "3", 
+        price: 0, 
+        dimensions: 134.03, 
+        bedrooms: 2, 
+        bathrooms: 2.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      }
+    ]
+  },
+  {
+    id: "4",
+    name: "Piso 4",
+    floorPlanImage: "/plants/floor_4.png",
+    units: [
+      { 
+        id: "401", 
+        floorId: "4", 
+        price: 0, 
+        dimensions: 122.82, 
+        bedrooms: 2, 
+        bathrooms: 2.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      },
+      { 
+        id: "402", 
+        floorId: "4", 
+        price: 0, 
+        dimensions: 134.03, 
+        bedrooms: 2, 
+        bathrooms: 2.5, 
+        status: 'available', 
+        subtitle: 'Flat', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      }
+    ]
+  },
+  {
+    id: "5",
+    name: "Piso 5",
+    floorPlanImage: "/plants/floor_5.png",
+    units: [
+      { 
+        id: "501", 
+        floorId: "5", 
+        price: 0, 
+        dimensions: 250.95, 
+        bedrooms: 3, 
+        bathrooms: 2, 
+        status: 'available', 
+        subtitle: 'Dúplex', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
+      },
+      { 
+        id: "502", 
+        floorId: "5", 
+        price: 0, 
+        dimensions: 267.89, 
         bedrooms: 2, 
         bathrooms: 2, 
-        status: 'sold', 
-        subtitle: 'Flat', 
-        x: 30, 
-        y: 40, 
-        path: "M 62,39.5 L 30.6,39.1 L 31,61 L 62.4,61.2 Z",
-        tourUrl: "https://kuula.co/share/collection/7HQ9d?logo=1&card=1&info=0&logosize=175&fs=1&vr=1&zoom=1&initload=0&thumbs=3&alpha=0.91&inst=es"
+        status: 'available', 
+        subtitle: 'Dúplex', 
+        x: 0, 
+        y: 0, 
+        path: "",
+        tourUrl: ""
       }
     ]
   }
