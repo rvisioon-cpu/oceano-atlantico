@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-const fileContent = fs.readFileSync('/Users/andrespluska/Documents/santafe/showroom-virtual/src/data/floors.ts', 'utf8');
+const fileContent = fs.readFileSync('./src/data/floors.ts', 'utf8');
 
 // Extract the floorsData array text
 let floorsDataStr = fileContent.substring(fileContent.indexOf('export const floorsData: Floor[] = [') + 'export const floorsData: Floor[] = '.length);
@@ -48,4 +48,6 @@ for (const floor of floorsData) {
 }
 
 fs.writeFileSync('seed.sql', sql);
+fs.writeFileSync('src/lib/db/seed.sql', sql);
+console.log('Generated seed.sql and src/lib/db/seed.sql from src/data/floors.ts');
 console.log('seed.sql generated!');
