@@ -5,7 +5,7 @@
       "properties": {
         "nombre": "Scotiabank",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/scotiabank.png"
+        "imagen": "ICONOS/finanzas/logo-scotiabank.png"
       },
       "geometry": {
         "coordinates": [
@@ -21,7 +21,7 @@
       "properties": {
         "nombre": "Oxxo",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/oxxo.png"
+        "imagen": "ICONOS/comercio/logo-oxxo.png"
       },
       "geometry": {
         "coordinates": [
@@ -37,7 +37,7 @@
       "properties": {
         "nombre": "Inkafarma",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/inkafarma.png"
+        "imagen": "ICONOS/salud/logo-inkafarma.png"
       },
       "geometry": {
         "coordinates": [
@@ -53,7 +53,7 @@
       "properties": {
         "nombre": "BBVA",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/bbva.png"
+        "imagen": "ICONOS/finanzas/logo-bbva.png"
       },
       "geometry": {
         "coordinates": [
@@ -69,7 +69,7 @@
       "properties": {
         "nombre": "Equilibria Perú",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/hospital.png"
+        "imagen": "ICONOS/salud/logo-hospital.png"
       },
       "geometry": {
         "coordinates": [
@@ -85,7 +85,7 @@
       "properties": {
         "nombre": "Popeyes",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/norkys.png"
+        "imagen": "ICONOS/restaurantes/logo-popeyes.png"
       },
       "geometry": {
         "coordinates": [
@@ -101,7 +101,7 @@
       "properties": {
         "nombre": "Centro de Salud Salamanca",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/hospital.png"
+        "imagen": "ICONOS/salud/logo-hospital.png"
       },
       "geometry": {
         "coordinates": [
@@ -117,7 +117,7 @@
       "properties": {
         "nombre": "Edo Sushi Bar",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/master_kong.png"
+        "imagen": "ICONOS/restaurantes/logo-edo.png"
       },
       "geometry": {
         "coordinates": [
@@ -133,7 +133,7 @@
       "properties": {
         "nombre": "Banco de la Nación",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/cajeros.png"
+        "imagen": "ICONOS/finanzas/logo-bancodelanacion.png"
       },
       "geometry": {
         "coordinates": [
@@ -149,7 +149,7 @@
       "properties": {
         "nombre": "Ripley",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/tottus.png"
+        "imagen": "ICONOS/comercio/logo-ripley.png"
       },
       "geometry": {
         "coordinates": [
@@ -165,7 +165,7 @@
       "properties": {
         "nombre": "UNIFE",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/pucp.png"
+        "imagen": "ICONOS/educacion/logo-unife.png"
       },
       "geometry": {
         "coordinates": [
@@ -181,7 +181,7 @@
       "properties": {
         "nombre": "Hipódromo de Monterrico",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/LIFESTYLE/estadio.png"
+        "imagen": "ICONOS/areas-verdes/logo-hipodromo.png"
       },
       "geometry": {
         "coordinates": [
@@ -197,7 +197,7 @@
       "properties": {
         "nombre": "Madam Tusan",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/master_kong.png"
+        "imagen": "ICONOS/restaurantes/logo-madamtusan.png"
       },
       "geometry": {
         "coordinates": [
@@ -213,7 +213,7 @@
       "properties": {
         "nombre": "Clínica AUNA ONCOSALUD",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/hospital.png"
+        "imagen": "ICONOS/salud/logo-hospital.png"
       },
       "geometry": {
         "coordinates": [
@@ -229,7 +229,7 @@
       "properties": {
         "nombre": "ICPNA",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/pacifico.png"
+        "imagen": "ICONOS/educacion/logo-icpna.png"
       },
       "geometry": {
         "coordinates": [
@@ -245,7 +245,7 @@
       "properties": {
         "nombre": "Universidad de Lima",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/pacifico.png"
+        "imagen": "ICONOS/educacion/logo-udelima.png"
       },
       "geometry": {
         "coordinates": [
@@ -261,7 +261,7 @@
       "properties": {
         "nombre": "Colegio Odontológico del Perú",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/colegio_2.png"
+        "imagen": "ICONOS/educacion/logo-colegioodontologos.png"
       },
       "geometry": {
         "coordinates": [
@@ -277,7 +277,7 @@
       "properties": {
         "nombre": "CEBA San Agustín",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/colegio_1.png"
+        "imagen": "ICONOS/educacion/logo-colegio.png"
       },
       "geometry": {
         "coordinates": [
@@ -293,7 +293,7 @@
       "properties": {
         "nombre": "Shalom Los Sauces",
         "categoria": "Lifestyle",
-        "imagen": "icons/LIFESTYLE/shalom.png"
+        "imagen": "ICONOS/lifestyle/logo-shalom.png"
       },
       "geometry": {
         "coordinates": [
@@ -309,7 +309,7 @@
       "properties": {
         "nombre": "Mercado El Palmar",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/mercado.png"
+        "imagen": "ICONOS/comercio/mercado.png"
       },
       "geometry": {
         "coordinates": [
@@ -325,7 +325,7 @@
       "properties": {
         "nombre": "Globalnet",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/cajeros.png"
+        "imagen": "ICONOS/finanzas/logo-globalnet.png"
       },
       "geometry": {
         "coordinates": [
@@ -341,7 +341,7 @@
       "properties": {
         "nombre": "Tambo",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/tambo.png"
+        "imagen": "ICONOS/comercio/logo-tambo.png"
       },
       "geometry": {
         "coordinates": [
@@ -357,7 +357,7 @@
       "properties": {
         "nombre": "Museo Oro del Perú",
         "categoria": "Lifestyle",
-        "imagen": "icons/RESTAURANTES/museo_larco.png"
+        "imagen": "ICONOS/lifestyle/logo-museo.png"
       },
       "geometry": {
         "coordinates": [
@@ -373,7 +373,7 @@
       "properties": {
         "nombre": "El Hornero La Molina",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/bolivariano.png"
+        "imagen": "ICONOS/restaurantes/logo-elhornero.png"
       },
       "geometry": {
         "coordinates": [
@@ -389,7 +389,7 @@
       "properties": {
         "nombre": "Oxxo",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/oxxo.png"
+        "imagen": "ICONOS/comercio/logo-oxxo.png"
       },
       "geometry": {
         "coordinates": [
@@ -405,7 +405,7 @@
       "properties": {
         "nombre": "Parque de La Felicidad",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/AREAS_VERDES_Y_RECREACION/parque_1.png"
+        "imagen": "ICONOS/areas-verdes/logo-parque.png"
       },
       "geometry": {
         "coordinates": [
@@ -421,7 +421,7 @@
       "properties": {
         "nombre": "Colegio Peruano Británico",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/colegio_1.png"
+        "imagen": "ICONOS/educacion/logo-colegio.png"
       },
       "geometry": {
         "coordinates": [
@@ -437,7 +437,7 @@
       "properties": {
         "nombre": "Instituto Nacional de Salud del NIño",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/hospital.png"
+        "imagen": "ICONOS/salud/logo-hospital.png"
       },
       "geometry": {
         "coordinates": [
@@ -453,7 +453,7 @@
       "properties": {
         "nombre": "Oxxo",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/oxxo.png"
+        "imagen": "ICONOS/comercio/logo-oxxo.png"
       },
       "geometry": {
         "coordinates": [
@@ -469,7 +469,7 @@
       "properties": {
         "nombre": "Mercado Salamanca",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/mercado.png"
+        "imagen": "ICONOS/comercio/mercado.png"
       },
       "geometry": {
         "coordinates": [
@@ -485,7 +485,7 @@
       "properties": {
         "nombre": "Smart Fit",
         "categoria": "Lifestyle",
-        "imagen": "icons/LIFESTYLE/smartfit.png"
+        "imagen": "ICONOS/lifestyle/logo-smartfit.png"
       },
       "geometry": {
         "coordinates": [
@@ -501,7 +501,7 @@
       "properties": {
         "nombre": "Western Union",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/cajeros.png"
+        "imagen": "ICONOS/finanzas/logo-westernunion.png"
       },
       "geometry": {
         "coordinates": [
@@ -517,7 +517,7 @@
       "properties": {
         "nombre": "Universidad Nacional Agraria",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/pucp.png"
+        "imagen": "ICONOS/educacion/logo-agraria.png"
       },
       "geometry": {
         "coordinates": [
@@ -533,7 +533,7 @@
       "properties": {
         "nombre": "UPC",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/upc.png"
+        "imagen": "ICONOS/educacion/logo-upc.png"
       },
       "geometry": {
         "coordinates": [
@@ -549,7 +549,7 @@
       "properties": {
         "nombre": "Chili's",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/bembos.png"
+        "imagen": "ICONOS/restaurantes/logo-chilis2.png"
       },
       "geometry": {
         "coordinates": [
@@ -565,7 +565,7 @@
       "properties": {
         "nombre": "Polideportivo San Borja Limatambo",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/LIFESTYLE/estadio.png"
+        "imagen": "ICONOS/areas-verdes/logo-deporte.png"
       },
       "geometry": {
         "coordinates": [
@@ -581,7 +581,7 @@
       "properties": {
         "nombre": "Centro de Convenciones de Lima",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/LIFESTYLE/municipalidad.png"
+        "imagen": "ICONOS/areas-verdes/logo-social.png"
       },
       "geometry": {
         "coordinates": [
@@ -597,7 +597,7 @@
       "properties": {
         "nombre": "Colegio Rousseau",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/colegio_1.png"
+        "imagen": "ICONOS/educacion/logo-colegio.png"
       },
       "geometry": {
         "coordinates": [
@@ -613,7 +613,7 @@
       "properties": {
         "nombre": "Fridays Ovalo Monitor",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/bembos.png"
+        "imagen": "ICONOS/restaurantes/logo-fridays.png"
       },
       "geometry": {
         "coordinates": [
@@ -629,7 +629,7 @@
       "properties": {
         "nombre": "Jockey Plaza",
         "categoria": "Lifestyle",
-        "imagen": "icons/COMERCIO/plaza_san_miguel.png"
+        "imagen": "ICONOS/comercio/logo-jockeyplaza.png"
       },
       "geometry": {
         "coordinates": [
@@ -645,7 +645,7 @@
       "properties": {
         "nombre": "Smart Fit",
         "categoria": "Lifestyle",
-        "imagen": "icons/LIFESTYLE/smartfit.png"
+        "imagen": "ICONOS/lifestyle/logo-smartfit.png"
       },
       "geometry": {
         "coordinates": [
@@ -661,7 +661,7 @@
       "properties": {
         "nombre": "Tambo Evitamiento",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/tambo.png"
+        "imagen": "ICONOS/comercio/logo-tambo.png"
       },
       "geometry": {
         "coordinates": [
@@ -677,7 +677,7 @@
       "properties": {
         "nombre": "Tambo",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/tambo.png"
+        "imagen": "ICONOS/comercio/logo-tambo.png"
       },
       "geometry": {
         "coordinates": [
@@ -693,7 +693,7 @@
       "properties": {
         "nombre": "Cinemark",
         "categoria": "Lifestyle",
-        "imagen": "icons/LIFESTYLE/cineplanet.png"
+        "imagen": "ICONOS/lifestyle/logo-cinemark.png"
       },
       "geometry": {
         "coordinates": [
@@ -709,7 +709,7 @@
       "properties": {
         "nombre": "Banco Pichincha",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/pichincha.png"
+        "imagen": "ICONOS/finanzas/logo-pichincha.png"
       },
       "geometry": {
         "coordinates": [
@@ -725,7 +725,7 @@
       "properties": {
         "nombre": "Universidad San Ignacio de Loyola",
         "categoria": "Educación",
-        "imagen": "icons/EDUCACION/san_martin.png"
+        "imagen": "ICONOS/educacion/logo-usil.png"
       },
       "geometry": {
         "coordinates": [
@@ -741,7 +741,7 @@
       "properties": {
         "nombre": "Farmavet",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/huron_azul.png"
+        "imagen": "ICONOS/salud/logo-veterinaria.png"
       },
       "geometry": {
         "coordinates": [
@@ -757,7 +757,7 @@
       "properties": {
         "nombre": "BCP",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/bcp.png"
+        "imagen": "ICONOS/finanzas/logo-bcp.png"
       },
       "geometry": {
         "coordinates": [
@@ -773,7 +773,7 @@
       "properties": {
         "nombre": "Villa Chicken",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/villa_chicken.png"
+        "imagen": "ICONOS/restaurantes/logo-villachicken1.png"
       },
       "geometry": {
         "coordinates": [
@@ -789,7 +789,7 @@
       "properties": {
         "nombre": "KFC",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/norkys.png"
+        "imagen": "ICONOS/restaurantes/logo-kfc.png"
       },
       "geometry": {
         "coordinates": [
@@ -805,7 +805,7 @@
       "properties": {
         "nombre": "Gimnasio b2",
         "categoria": "Lifestyle",
-        "imagen": "icons/LIFESTYLE/smartfit.png"
+        "imagen": "ICONOS/lifestyle/logo-gimnasio.png"
       },
       "geometry": {
         "coordinates": [
@@ -821,7 +821,7 @@
       "properties": {
         "nombre": "Parque de Los Anillos",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/AREAS_VERDES_Y_RECREACION/parque_1.png"
+        "imagen": "ICONOS/areas-verdes/logo-parque.png"
       },
       "geometry": {
         "coordinates": [
@@ -837,7 +837,7 @@
       "properties": {
         "nombre": "Mass",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/mass_1.png"
+        "imagen": "ICONOS/comercio/logo-mass.png"
       },
       "geometry": {
         "coordinates": [
@@ -853,7 +853,7 @@
       "properties": {
         "nombre": "Mifarma",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/mifarma.png"
+        "imagen": "ICONOS/salud/logo-mifarma.png"
       },
       "geometry": {
         "coordinates": [
@@ -869,7 +869,7 @@
       "properties": {
         "nombre": "Mall Aventura Santa Anita",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/plaza_san_miguel.png"
+        "imagen": "ICONOS/comercio/logo-mallaventura.png"
       },
       "geometry": {
         "coordinates": [
@@ -885,7 +885,7 @@
       "properties": {
         "nombre": "Tambo",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/tambo.png"
+        "imagen": "ICONOS/comercio/logo-tambo.png"
       },
       "geometry": {
         "coordinates": [
@@ -901,7 +901,7 @@
       "properties": {
         "nombre": "Parque Paul Harris",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/AREAS_VERDES_Y_RECREACION/parque_1.png"
+        "imagen": "ICONOS/areas-verdes/logo-parque.png"
       },
       "geometry": {
         "coordinates": [
@@ -917,7 +917,7 @@
       "properties": {
         "nombre": "Parque Neptuno",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/AREAS_VERDES_Y_RECREACION/parque_1.png"
+        "imagen": "ICONOS/areas-verdes/logo-parque.png"
       },
       "geometry": {
         "coordinates": [
@@ -933,7 +933,7 @@
       "properties": {
         "nombre": "Falabella",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/tottus.png"
+        "imagen": "ICONOS/comercio/logo-falabella.png"
       },
       "geometry": {
         "coordinates": [
@@ -949,7 +949,7 @@
       "properties": {
         "nombre": "Tambo",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/tambo.png"
+        "imagen": "ICONOS/comercio/logo-tambo.png"
       },
       "geometry": {
         "coordinates": [
@@ -965,7 +965,7 @@
       "properties": {
         "nombre": "Villa Chicken",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/villa_chicken.png"
+        "imagen": "ICONOS/restaurantes/logo-villachicken2.png"
       },
       "geometry": {
         "coordinates": [
@@ -981,7 +981,7 @@
       "properties": {
         "nombre": "Chili's",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/bembos.png"
+        "imagen": "ICONOS/restaurantes/logo-chilis1.png"
       },
       "geometry": {
         "coordinates": [
@@ -997,7 +997,7 @@
       "properties": {
         "nombre": "Parque Stella Maris",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/AREAS_VERDES_Y_RECREACION/parque_1.png"
+        "imagen": "ICONOS/areas-verdes/logo-parque.png"
       },
       "geometry": {
         "coordinates": [
@@ -1013,7 +1013,7 @@
       "properties": {
         "nombre": "Plaza Vea",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/plaza_vea.png"
+        "imagen": "ICONOS/comercio/logo-plazavea.png"
       },
       "geometry": {
         "coordinates": [
@@ -1029,7 +1029,7 @@
       "properties": {
         "nombre": "Clínica Montefiori",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/hospital.png"
+        "imagen": "ICONOS/salud/logo-hospital.png"
       },
       "geometry": {
         "coordinates": [
@@ -1045,7 +1045,7 @@
       "properties": {
         "nombre": "Smart Fit Panorama",
         "categoria": "Lifestyle",
-        "imagen": "icons/LIFESTYLE/smartfit.png"
+        "imagen": "ICONOS/lifestyle/logo-smartfit.png"
       },
       "geometry": {
         "coordinates": [
@@ -1061,7 +1061,7 @@
       "properties": {
         "nombre": "Don Pablo Restaurant",
         "categoria": "Restaurantes",
-        "imagen": "icons/RESTAURANTES/bolivariano.png"
+        "imagen": "ICONOS/restaurantes/logo-donpablo.png"
       },
       "geometry": {
         "coordinates": [
@@ -1077,7 +1077,7 @@
       "properties": {
         "nombre": "Mass",
         "categoria": "Comercio",
-        "imagen": "icons/COMERCIO/mass_1.png"
+        "imagen": "ICONOS/comercio/logo-mass.png"
       },
       "geometry": {
         "coordinates": [
@@ -1093,7 +1093,7 @@
       "properties": {
         "nombre": "SANNA",
         "categoria": "Salud y bienestar",
-        "imagen": "icons/SALUD_Y_BIENESTAR/hospital.png"
+        "imagen": "ICONOS/salud/logo-hospital.png"
       },
       "geometry": {
         "coordinates": [
@@ -1109,7 +1109,7 @@
       "properties": {
         "nombre": "Banco Falabella",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/cajeros.png"
+        "imagen": "ICONOS/finanzas/logo-bancofalabella.png"
       },
       "geometry": {
         "coordinates": [
@@ -1125,7 +1125,7 @@
       "properties": {
         "nombre": "VIDENA",
         "categoria": "Áreas verdes y recreación",
-        "imagen": "icons/LIFESTYLE/estadio.png"
+        "imagen": "ICONOS/areas-verdes/logo-deporte.png"
       },
       "geometry": {
         "coordinates": [
@@ -1141,7 +1141,7 @@
       "properties": {
         "nombre": "Interbank",
         "categoria": "Finanzas",
-        "imagen": "icons/FINANZAS/interbank.png"
+        "imagen": "ICONOS/finanzas/logo-interbank.png"
       },
       "geometry": {
         "coordinates": [
