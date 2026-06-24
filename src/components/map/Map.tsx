@@ -269,7 +269,7 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
                         'line-cap': 'round'
                     }}
                     paint={{
-                        'line-color': '#ff6b00', // Brand Orange
+                        'line-color': config.colors.main, // Brand blue (Océano Atlántico)
                         'line-width': 4,
                         'line-opacity': 0.8
                     }}
