@@ -1,14 +1,16 @@
 import { X } from 'lucide-react';
 import { useState } from 'react';
+import { createProspectAction } from '@/app/actions/calendar';
 
 interface RequestInfoModalProps {
   isOpen: boolean;
   onClose: () => void;
   unitId: string;
+  unitIdentifier?: string;
   floorId: string;
 }
 
-export default function RequestInfoModal({ isOpen, onClose, unitId, floorId }: RequestInfoModalProps) {
+export default function RequestInfoModal({ isOpen, onClose, unitId, unitIdentifier, floorId }: RequestInfoModalProps) {
   const [formData, setFormData] = useState({
     nombres: '',
     apellido: '',
@@ -77,10 +79,19 @@ export default function RequestInfoModal({ isOpen, onClose, unitId, floorId }: R
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validate()) {
-        console.log('Form Submitted', { ...formData, unitId, floorId });
+        try {
+            await createProspectAction({
+                name: `${formData.nombres} ${formData.apellido}`,
+                email: formData.email,
+                phone: formData.celular,
+                unitId: unitId
+            });
+        } catch (err) {
+            console.error("Error storing prospect:", err);
+        }
         onClose();
         alert('Gracias, nos pondremos en contacto contigo.');
     }
@@ -102,7 +113,7 @@ export default function RequestInfoModal({ isOpen, onClose, unitId, floorId }: R
           <div>
             <h2 className="text-xl font-bold text-neutral-900 uppercase tracking-wide">Solicita información</h2>
             <p className="text-sm text-brand-primary mt-1 font-medium">
-              Interés en Unidad {unitId}, Piso {floorId}
+              Interés en Unidad {unitIdentifier || unitId.replace(/^unit_\d+_/, '').replace(/^unit_pb_/, 'PB ').toUpperCase()}, Piso {floorId}
             </p>
           </div>
           <button 

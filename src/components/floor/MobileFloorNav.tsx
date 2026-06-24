@@ -1,5 +1,4 @@
 import { useRouter } from 'next/navigation';
-import { floorsData } from '@/data/floors';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 
@@ -10,6 +9,7 @@ interface MobileFloorNavProps {
 const MobileFloorNav = ({ currentFloorId }: MobileFloorNavProps) => {
     const router = useRouter();
     const setFloor = useStore(state => state.setFloor);
+    const floorsData = useStore(state => state.floorsData);
 
     // Sort floors: 9, 8, ... 1, PB (Top to Bottom visually)
     // We want "Up" to go to a higher index in this sorted array? 
@@ -21,7 +21,13 @@ const MobileFloorNav = ({ currentFloorId }: MobileFloorNavProps) => {
     // Let's sort simply by numerical value to find neighbors easily
     // Standard sort: PB (0), 1, 2, ... 9.
     const sortedFloorsAsc = [...floorsData].sort((a, b) => {
-        const getVal = (id: string) => id.toLowerCase() === 'pb' ? 0 : Number(id);
+        const getVal = (id: string | undefined) => {
+            if (!id) return 0;
+            const cleanId = id.toLowerCase();
+            if (cleanId === 'pb') return 0;
+            const num = Number(cleanId);
+            return isNaN(num) ? 0 : num;
+        };
         return getVal(a.id) - getVal(b.id);
     });
 
@@ -58,7 +64,7 @@ const MobileFloorNav = ({ currentFloorId }: MobileFloorNavProps) => {
 
             {/* Current Floor Label */}
             <div className="bg-gray-800/90 text-white font-bold text-lg rounded-xl h-12 w-12 flex items-center justify-center shadow-xl border border-white/10 pointer-events-auto">
-                {currentFloor.name}
+                {currentFloor.name.replace(/Piso\s+/gi, '')}
             </div>
 
             {/* Down Arrow */}

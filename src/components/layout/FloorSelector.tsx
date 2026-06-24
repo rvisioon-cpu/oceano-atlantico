@@ -1,6 +1,5 @@
 "use client";
 import { useRouter, useParams } from 'next/navigation';
-import { floorsData } from '../../data/floors';
 import { Maximize2 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 
@@ -8,10 +7,17 @@ const FloorSelector = () => {
     const router = useRouter();
     const params = useParams();
     const floorId = params.floorId as string;
+    const floorsData = useStore(state => state.floorsData);
 
     // Sort floors descending (e.g. 9 down to 1, then PB)
     const sortedFloors = [...floorsData].sort((a, b) => {
-        const getVal = (id: string) => id.toLowerCase() === 'pb' ? 0 : Number(id);
+        const getVal = (id: string | undefined) => {
+            if (!id) return 0;
+            const cleanId = id.toLowerCase();
+            if (cleanId === 'pb') return 0;
+            const num = Number(cleanId);
+            return isNaN(num) ? 0 : num;
+        };
         return getVal(b.id) - getVal(a.id);
     });
     
@@ -50,8 +56,7 @@ const FloorSelector = () => {
                                 }
                             `}
                         >
-                            <span className="md:hidden">Piso {floor.name}</span>
-                            <span className="hidden md:inline">{floor.name}</span>
+                            <span>{floor.name.replace(/Piso\s+/gi, '')}</span>
                         </button>
                     );
                 })}

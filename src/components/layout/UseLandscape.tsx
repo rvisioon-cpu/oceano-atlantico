@@ -1,8 +1,13 @@
+"use client";
 import { useState, useEffect } from 'react';
 import { RotateCcw } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useStore } from '../../store/useStore';
 
+const SESSION_KEY = 'santafe-landscape-shown';
+
 const UseLandscape = () => {
+    const pathname = usePathname();
     const [isPortrait, setIsPortrait] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [showOverlay, setShowOverlay] = useState(false);
@@ -35,13 +40,31 @@ const UseLandscape = () => {
     }, []);
 
     useEffect(() => {
+        // Exclude dashboard, login, and ubicacion routes
+        if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/login') || pathname?.startsWith('/ubicacion')) {
+            setShowOverlay(false);
+            setForcedLandscape(false);
+            return;
+        }
+
         if (isMobile && isPortrait) {
+            const alreadyShown = sessionStorage.getItem(SESSION_KEY) === 'true';
+
+            if (alreadyShown) {
+                // Already shown this session — skip overlay, go straight to forced landscape
+                setShowOverlay(false);
+                setForcedLandscape(true);
+                return;
+            }
+
+            // First time this session — show the overlay
             setShowOverlay(true);
             setForcedLandscape(false);
             
             const timer = setTimeout(() => {
                 setShowOverlay(false);
                 setForcedLandscape(true);
+                sessionStorage.setItem(SESSION_KEY, 'true');
             }, 3000);
 
             return () => clearTimeout(timer);
@@ -49,7 +72,7 @@ const UseLandscape = () => {
             setShowOverlay(false);
             setForcedLandscape(false);
         }
-    }, [isMobile, isPortrait, setForcedLandscape]);
+    }, [isMobile, isPortrait, setForcedLandscape, pathname]);
 
     if (!showOverlay) return null;
 

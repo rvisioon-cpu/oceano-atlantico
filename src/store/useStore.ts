@@ -1,30 +1,38 @@
 import { create } from 'zustand';
-import { buildingFaces } from '../data/buildingData';
+import { buildingFaces, type BuildingFace } from '../data/buildingData';
 import { preloadVideo, preloadImages } from '../utils/preload';
-import { floorsData } from '../data/floors';
+import { type Floor } from '../data/floors';
+import { getAssetUrl } from '../utils/assets';
 
 interface ShowroomState {
   currentFloor: number | null;
   currentRoom: string;
-  viewState: string; // 'IDLE' | 'TRANSITION_VIDEO' | 'TRANSITION_ROTATION' | 'TRANSITION_TIMELAPSE'
-  isLoading: boolean;
+  viewState: string;
   currentFace: number;
   nextFace: number | null;
   transitionUrl: string | null;
-  targetDestination: string | null; // e.g. 'Lobby', 'Floors'
+  targetDestination: string | null;
   timeOfDay: 'day' | 'night';
-  
+
+  // Building Faces Data
+  buildingFacesData: BuildingFace[];
+  setBuildingFacesData: (faces: BuildingFace[]) => void;
+
+  // Floors Inventory Data
+  floorsData: Floor[];
+  setFloorsData: (floors: Floor[]) => void;
+
   // Actions
   setFloor: (floor: number | string) => Promise<void>;
   preloadAllFloors: () => Promise<void>;
-  startTransition: (destination: string) => void;
+  startTransition: (destination: string) => Promise<void>;
   endTransition: (newRoom: string) => void;
   rotateBuilding: (direction: 'left' | 'right') => Promise<void>;
   confirmRotation: () => void;
   finishRotation: () => void;
   toggleTimeOfDay: () => Promise<void>;
   finishTimeLapse: () => void;
-  
+
   // Loading State
   isLoadingAssets: boolean;
   setLoading: (loading: boolean) => void;
@@ -32,7 +40,7 @@ interface ShowroomState {
   // Global Loader
   isGlobalLoading: boolean;
   setGlobalLoading: (loading: boolean) => void;
-  
+
   // Brochure
   isBrochureOpen: boolean;
   toggleBrochure: (isOpen?: boolean) => void;
@@ -55,11 +63,15 @@ export const useStore = create<ShowroomState>((set, get) => ({
   isLoadingAssets: false,
   isGlobalLoading: false,
   isBrochureOpen: false,
-  
+  floorsData: [],
+  buildingFacesData: buildingFaces,
+
+  setBuildingFacesData: (faces) => set({ buildingFacesData: faces }),
+  setFloorsData: (floors) => set({ floorsData: floors }),
   setLoading: (loading) => set({ isLoadingAssets: loading }),
   setGlobalLoading: (loading) => set({ isGlobalLoading: loading }),
-  toggleBrochure: (isOpen) => set((state) => ({ 
-      isBrochureOpen: isOpen !== undefined ? isOpen : !state.isBrochureOpen 
+  toggleBrochure: (isOpen) => set((state) => ({
+    isBrochureOpen: isOpen !== undefined ? isOpen : !state.isBrochureOpen
   })),
 
   // Landscape Mode
@@ -68,44 +80,65 @@ export const useStore = create<ShowroomState>((set, get) => ({
 
   setFloor: async (floorId) => {
     // 1. Find the floor to get the image
-    const floor = floorsData.find(f => f.id === String(floorId));
-    
+    const floor = get().floorsData.find(f => f.id === String(floorId));
+
     if (floor) {
-        set({ isLoadingAssets: true });
-        try {
-            await preloadImages([floor.floorPlanImage]);
-        } catch(e) { console.warn("Floor preload failed", e); }
-        set({ isLoadingAssets: false });
+      set({ isLoadingAssets: true });
+      try {
+        await preloadImages([getAssetUrl(floor.floorPlanImage)]);
+      } catch (e) { console.warn("Floor preload failed", e); }
+      set({ isLoadingAssets: false });
     }
 
     set({ currentFloor: Number(floorId) });
   },
 
   preloadAllFloors: async () => {
-    const allFloorImages = floorsData.map(f => f.floorPlanImage);
+    const allFloorImages = get().floorsData.map(f => getAssetUrl(f.floorPlanImage));
     try {
-        // Preload efficiently in background
-        await preloadImages(allFloorImages);
+      // Preload efficiently in background
+      await preloadImages(allFloorImages);
     } catch (e) {
-        console.warn("Batch floor preload failed", e);
+      console.warn("Batch floor preload failed", e);
     }
   },
-  
-  startTransition: (destination) => {
+
+  startTransition: async (destination) => {
     const state = get();
-    const face = buildingFaces[state.currentFace];
+    const face = state.buildingFacesData[state.currentFace] || state.buildingFacesData[0];
+    if (!face) return;
     const assetSet = face[state.timeOfDay];
     // Use the introWalk video for the current face/time as the transition to inside
     const videoUrl = assetSet.introVideo;
 
-    set({ 
+    let targetImage: string | undefined;
+    if (destination === 'Floors') {
+      const targetFloor = state.floorsData.find(f => f.id === '9');
+      if (targetFloor) {
+        targetImage = getAssetUrl(targetFloor.floorPlanImage);
+      }
+    }
+
+    if (videoUrl) {
+      set({ isLoadingAssets: true });
+      try {
+        const promises: Promise<void | HTMLImageElement>[] = [preloadVideo(videoUrl)];
+        if (targetImage) {
+          promises.push(preloadImages([targetImage]));
+        }
+        await Promise.all(promises);
+      } catch (e) { console.warn('Failed to preload transition video and image', e); }
+      set({ isLoadingAssets: false });
+    }
+
+    set({
       viewState: 'TRANSITION_VIDEO',
       targetDestination: destination,
       transitionUrl: videoUrl
     });
   },
-  
-  endTransition: (newRoom) => set({ 
+
+  endTransition: (newRoom) => set({
     viewState: 'IDLE',
     currentRoom: newRoom,
     targetDestination: null
@@ -113,13 +146,15 @@ export const useStore = create<ShowroomState>((set, get) => ({
 
   rotateBuilding: async (direction) => {
     const state = get();
-    const totalFaces = buildingFaces.length;
+    const totalFaces = state.buildingFacesData.length;
     if (totalFaces <= 1) return;
 
     let nextFaceIndex: number;
     let videoUrl: string = '';
 
-    const currentFaceData = buildingFaces[state.currentFace];
+    const currentFaceData = state.buildingFacesData[state.currentFace] || state.buildingFacesData[0];
+    if (!currentFaceData) return;
+
     // Access transitions based on current time of day
     const timeOfDayData = currentFaceData[state.timeOfDay];
 
@@ -130,12 +165,12 @@ export const useStore = create<ShowroomState>((set, get) => ({
       nextFaceIndex = (state.currentFace - 1 + totalFaces) % totalFaces;
       videoUrl = timeOfDayData.transitions.toLeft;
     }
-    
+
     console.log('[Store] rotateBuilding', {
-        direction,
-        currentFace: state.currentFace,
-        nextFaceIndex,
-        videoUrl
+      direction,
+      currentFace: state.currentFace,
+      nextFaceIndex,
+      videoUrl
     });
 
     // If no video URL is defined, just snap
@@ -144,95 +179,77 @@ export const useStore = create<ShowroomState>((set, get) => ({
       return;
     }
 
-    // Preload Logic
+    const nextFaceData = state.buildingFacesData[nextFaceIndex];
+    const nextBackgroundUrl = nextFaceData ? nextFaceData[state.timeOfDay]?.background : undefined;
+
+    // Preload Logic (Blocking, like Unit details page)
     set({ isLoadingAssets: true });
-    
-    // Determine the next background image to preload
-    const nextFaceData = buildingFaces[nextFaceIndex];
-    const nextTimeData = nextFaceData[state.timeOfDay]; // 'day' or 'night'
-    const nextBackgroundUrl = nextTimeData.background;
-
     try {
-        // OPTIMIZATION:
-        // We only STRICTLY need the video to start the transition.
-        // The background image is needed ONLY when the video ends.
-        
-        // 1. Race: Video Load vs Timeout (1.5s)
-        // If the video is already cached, preloadVideo resolves instantly.
-        // If it takes too long (network lag), we skip the video to preserve flow.
-        let videoReady = false;
-        try {
-            await Promise.race([
-                preloadVideo(videoUrl).then(() => { videoReady = true; }),
-                new Promise(resolve => setTimeout(resolve, 1500))
-            ]);
-        } catch(e) {}
-        
-        if (!videoReady) {
-             console.warn("Transition video slow/not ready - Skipping for instant feedback");
-             // Just snap to the next face immediately
-             set({ currentFace: nextFaceIndex, isLoadingAssets: false });
-             return;
-        }
-        
-        // 2. Start preloading the image in the background (fire and forget)
-        // We don't await this because the video duration usually covers the download time.
-        // Even if it doesn't, the browser will render it as it arrives.
-        preloadImages([nextBackgroundUrl]).catch((e) => console.warn('Background image preload failed', e));
-
+      const promises: Promise<void | HTMLImageElement>[] = [preloadVideo(videoUrl)];
+      if (nextBackgroundUrl) {
+        promises.push(preloadImages([nextBackgroundUrl]));
+      }
+      await Promise.all(promises);
     } catch (e) {
-        console.warn('Failed to preload rotation video', e);
-        // If video fails, we might just snap? For now we proceed to try.
+      console.warn('Failed to preload rotation video and image', e);
     }
-    
-    set({ 
-      isLoadingAssets: false,
-      nextFace: nextFaceIndex, 
+    set({ isLoadingAssets: false });
+
+    set({
+      nextFace: nextFaceIndex,
       transitionUrl: videoUrl,
-      viewState: 'TRANSITION_ROTATION' 
+      viewState: 'TRANSITION_ROTATION'
     });
   },
 
   confirmRotation: () => set((state) => {
     console.log('[Store] confirmRotation', {
-        nextFace: state.nextFace,
-        currentFace: state.currentFace,
-        resolvedFace: state.nextFace !== null ? state.nextFace : state.currentFace
+      nextFace: state.nextFace,
+      currentFace: state.currentFace,
+      resolvedFace: state.nextFace !== null ? state.nextFace : state.currentFace
     });
-    return { 
-        currentFace: state.nextFace !== null ? state.nextFace : state.currentFace,
-        nextFace: null 
+    return {
+      currentFace: state.nextFace !== null ? state.nextFace : state.currentFace,
+      nextFace: null
     };
   }),
 
-  finishRotation: () => set({ 
-    viewState: 'IDLE', 
-    transitionUrl: null 
+  finishRotation: () => set({
+    viewState: 'IDLE',
+    transitionUrl: null
   }),
 
   toggleTimeOfDay: async () => {
     const state = get();
-    const currentFaceData = buildingFaces[state.currentFace];
+    const currentFaceData = state.buildingFacesData[state.currentFace] || state.buildingFacesData[0];
+    if (!currentFaceData) return;
     const isDay = state.timeOfDay === 'day';
     const videoUrl = isDay ? currentFaceData.dayToNightTransition : currentFaceData.nightToDayTransition;
-    
+    const targetBackground = isDay ? currentFaceData.night?.background : currentFaceData.day?.background;
+    const nextTimeOfDay = isDay ? 'night' : 'day';
+
     if (videoUrl) {
-        set({ isLoadingAssets: true });
-        try {
-            await preloadVideo(videoUrl);
-        } catch (e) { console.warn('Failed to preload timelapse', e); }
-        set({ isLoadingAssets: false });
+      set({ isLoadingAssets: true });
+      try {
+        const promises: Promise<void | HTMLImageElement>[] = [preloadVideo(videoUrl)];
+        if (targetBackground) {
+          promises.push(preloadImages([targetBackground]));
+        }
+        await Promise.all(promises);
+      } catch (e) { console.warn('Failed to preload timelapse', e); }
+      set({ isLoadingAssets: false });
     }
 
-    set({ 
+    set({
       viewState: 'TRANSITION_TIMELAPSE',
       transitionUrl: videoUrl
     });
   },
 
-  finishTimeLapse: () => set((state) => ({ 
+  finishTimeLapse: () => set((state) => ({
     timeOfDay: state.timeOfDay === 'day' ? 'night' : 'day',
     viewState: 'IDLE',
     transitionUrl: null
   })),
 }));
+

@@ -1,0 +1,14 @@
+name = "santa-fe"
+compatibility_date = "2026-06-01"
+compatibility_flags = [ "nodejs_compat" ]
+pages_build_output_dir = ".open-next/assets"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "santafe-db"
+database_id = "dfac957d-f9e4-4866-9e7c-967521be6e15"
+migrations_dir = "drizzle"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "santa-fe"

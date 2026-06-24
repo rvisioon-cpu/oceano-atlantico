@@ -4,7 +4,7 @@ import { type Unit, UnitStatusString } from '@/data/floors';
 interface UnitCardProps {
   unit: Unit;
   floorId: string;
-  onOpenConsultation: (e: React.MouseEvent, unitId: string) => void;
+  onOpenConsultation: (e: React.MouseEvent, unitId: string, unitIdentifier?: string) => void;
   onNavigate: (path: string) => void;
 }
 
@@ -18,7 +18,7 @@ const UnitCard = ({
     unit.status === 'available' ? 'bg-green-500' : 
     unit.status === 'reserved' ? 'bg-amber-500' : 'bg-red-500';
 
-  const isStorage = unit.type === 'storage' || (!unit.bedrooms && !unit.bathrooms);
+  const isStorage = unit.type === 'storage' || (unit.type !== 'apartment' && !unit.bedrooms && !unit.bathrooms);
 
   return (
     <div className="bg-white overflow-hidden w-full">
@@ -32,7 +32,10 @@ const UnitCard = ({
                   </span>
               </div>
               )}
-              <h2 className="text-lg font-light text-gray-900 leading-tight">{unit.id}</h2>
+              <h2 className="text-lg font-light text-gray-900 leading-tight">{unit.identifier || unit.id}</h2>
+              {unit.subtitle && (
+                  <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider mt-0.5">{unit.subtitle}</p>
+              )}
            </div>
         </div>
         
@@ -66,7 +69,7 @@ const UnitCard = ({
                             e.stopPropagation();
                             onNavigate(`/unidad/${unit.id}`);
                         } else {
-                            onOpenConsultation(e, unit.id);
+                            onOpenConsultation(e, unit.id, unit.identifier);
                         }
                     }}
                     className="flex-1 py-2 px-2 rounded bg-gray-100 hover:bg-gray-200 text-[10px] font-bold uppercase tracking-wider transition-colors text-gray-700"

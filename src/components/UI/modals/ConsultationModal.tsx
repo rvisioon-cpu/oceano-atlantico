@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { X, Send } from 'lucide-react';
+import { createProspectAction } from '@/app/actions/calendar';
 
 interface ConsultationModalProps {
   isOpen: boolean;
   onClose: () => void;
   unitId: string;
+  unitIdentifier?: string;
 }
 
-const ConsultationModal: React.FC<ConsultationModalProps> = ({ isOpen, onClose, unitId }) => {
+const ConsultationModal: React.FC<ConsultationModalProps> = ({ isOpen, onClose, unitId, unitIdentifier }) => {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -19,21 +21,30 @@ const ConsultationModal: React.FC<ConsultationModalProps> = ({ isOpen, onClose, 
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await createProspectAction({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        address: formData.message,
+        unitId: unitId
+      });
       setIsSubmitting(false);
       setSubmitted(true);
-      // Reset after showing success
       setTimeout(() => {
         setSubmitted(false);
         setFormData({ name: '', phone: '', email: '', message: '' });
         onClose();
       }, 2000);
-    }, 1000);
+    } catch (err) {
+      console.error("Error storing prospect:", err);
+      setIsSubmitting(false);
+      alert("Hubo un error al enviar la consulta. Por favor intente de nuevo.");
+    }
   };
 
   return (
@@ -61,7 +72,7 @@ const ConsultationModal: React.FC<ConsultationModalProps> = ({ isOpen, onClose, 
                     Consulta
                 </span>
                 <h2 className="text-2xl font-light text-gray-900">
-                   Unidad <span className="font-semibold">{unitId}</span>
+                   Unidad <span className="font-semibold">{unitIdentifier || unitId.replace(/^unit_\d+_/, '').replace(/^unit_pb_/, 'PB ').toUpperCase()}</span>
                 </h2>
                 <p className="text-sm text-gray-500 mt-1">
                     Déjanos tus datos y un asesor te contactará a la brevedad.

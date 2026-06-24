@@ -22,6 +22,7 @@ export interface ConfigProps {
     buildingAddress: string;
     email: string;
     website: string;
+    maquetaUrl?: string;
     buildingSocials: {
       facebook: string;
       instagram: string;

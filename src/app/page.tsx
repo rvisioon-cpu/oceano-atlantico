@@ -9,11 +9,21 @@ import { preloadVideo, preloadImages } from '@/utils/preload';
 import Loader from '@/components/UI/Loader';
 import FullScreenToggle from '@/components/UI/FullScreenToggle';
 import { homepageData } from '@/data/homepage';
+import { getActiveMedia } from '@/app/actions/media';
 
 const Homepage = () => {
   const router = useRouter();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isPlayingIntro, setIsPlayingIntro] = useState(false);
+  const [introVideo, setIntroVideo] = useState(homepageData.intro.video);
+
+  useEffect(() => {
+    getActiveMedia("VIDEO_PORTADA").then((media) => {
+      if (media && media.length > 0) {
+        setIntroVideo(getAssetUrl(media[0].url));
+      }
+    }).catch(console.error);
+  }, []);
 
   // Animation Refs
   const logoRef = useRef<HTMLImageElement>(null);
@@ -28,6 +38,13 @@ const Homepage = () => {
     // Preload the poster immediately to avoid gray screen
     const img = new Image();
     img.src = homepageData.intro.poster;
+
+    // Background preloading of transition assets so they are ready when the user clicks 'Ingresar'
+    preloadVideo(getAssetUrl('videos/walks/trans_intro_to_0.mp4')).catch(() => {});
+    preloadImages([
+       getAssetUrl('building/photos/face_0_daylight.png'),
+       getAssetUrl('building/photos/face_0_nightlight.png')
+    ]).catch(() => {});
     
     // Create timeline but don't auto-repeat infinitely (we handle restart via video sync)
     const tl = gsap.timeline({ defaults: { ease: "power2.out" }, paused: false });
@@ -40,7 +57,7 @@ const Homepage = () => {
     tl.to({}, { duration: 3 })
     
       .to(logoRef.current, { 
-        y: '-25vh', 
+        y: window.innerWidth < 600 ? '-14vh' : '-25vh', 
         duration: 2, 
         ease: "power3.inOut" 
       }, "moveUp")
@@ -81,25 +98,9 @@ const Homepage = () => {
     };
   }, []);
 
-  // Store actions
-  const setLoading = useStore(state => state.setLoading);
-  const isLoadingAssets = useStore(state => state.isLoadingAssets);
-
-  const handleStartIntro = async () => {
-    setLoading(true);
-    
-    try {
-        await preloadVideo(getAssetUrl('videos/walks/trans_intro_to_0.mp4'));
-        await preloadImages([
-           getAssetUrl('building/photos/face_0_daylight.png'),
-           getAssetUrl('building/photos/face_0_nightlight.png')
-        ]);
-    } catch (error) {
-        console.error("Preloading failed:", error);
-    } finally {
-        setLoading(false);
-        setIsPlayingIntro(true);
-    }
+  const handleStartIntro = () => {
+    // Start playing intro transition video immediately for instant UX feedback
+    setIsPlayingIntro(true);
   };
 
   const handleVideoEnd = () => {
@@ -131,6 +132,7 @@ const Homepage = () => {
       <div className="absolute inset-0 z-0">
         
         <video 
+          key={introVideo}
           ref={videoRef}
           autoPlay 
           muted 
@@ -146,7 +148,7 @@ const Homepage = () => {
               preloadImages([getAssetUrl('building/photos/face_0_daylight.png')]).catch(() => {});
           }}
         >
-          <source src={homepageData.intro.video} type="video/mp4" />
+          <source src={introVideo} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-black/20" />
@@ -191,14 +193,13 @@ const Homepage = () => {
                  <button 
                     ref={buttonRef}
                     onClick={handleStartIntro}
-                    disabled={isPlayingIntro || isLoadingAssets}
+                    disabled={isPlayingIntro}
                     className={`group relative px-8 lg:px-12 py-3 lg:py-4 bg-brand-primary/80 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white text-xs lg:text-sm font-medium tracking-widest uppercase rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl font-secondary shrink-0 
                         ${(isPlayingIntro) ? 'opacity-0 pointer-events-none' : 'opacity-100'}
-                        ${isLoadingAssets ? 'cursor-wait opacity-80' : ''}
                     `}
                   >
                     <span className="relative z-10 font-bold tracking-[0.2em] flex items-center gap-2">
-                        {isLoadingAssets ? <Loader /> : homepageData.hero.button}
+                        {homepageData.hero.button}
                     </span>
                   </button>
              </div>

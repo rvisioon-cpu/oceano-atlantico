@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useMemo, useState, useEffect } from 'react';
+import { useStore } from '@/store/useStore';
 import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, Source, Layer, Popup } from 'react-map-gl/mapbox';
 // import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
@@ -71,7 +72,7 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
             const modes = ['driving', 'walking', 'cycling'] as const;
             const requests = modes.map(mode => 
                 fetch(`https://api.mapbox.com/directions/v5/mapbox/${mode}/${start[0]},${start[1]};${end[0]},${end[1]}?steps=true&geometries=geojson&access_token=${MAPBOX_TOKEN}`)
-                .then(res => res.json())
+                .then(res => res.json() as Promise<any>)
             );
 
             const results = await Promise.all(requests);
@@ -161,13 +162,11 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
             {feature.properties.imagen ? (
                 <div className="w-12 h-12 bg-white rounded-full p-2 shadow-md flex items-center justify-center hover:scale-125 transition-transform border border-brand-orange/20">
                     <img 
-                        src={`/${feature.properties.imagen}`}
+                        src={feature.properties.imagen.startsWith('http') || feature.properties.imagen.startsWith('/') ? feature.properties.imagen : `/${feature.properties.imagen}`}
                         alt={feature.properties.nombre}
                         className="w-full h-full object-contain"
                         onError={(e) => {
                             e.currentTarget.style.display = 'none';
-                            // If we wanted a fallback, we'd need state or a different structure. 
-                            // For now, if missing, it will show empty white circle.
                         }}
                     />
                 </div>
@@ -200,30 +199,44 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
       return list;
   }, [onMarkerClick, origin, displayLocations]);
 
-  // Force Resize on Mount and Window Resize (Fix for gray areas)
-  useEffect(() => {
-    const handleResize = () => {
-        if (mapRef.current) {
-            mapRef.current.resize();
-        }
-    };
+    const isForcedLandscape = useStore(state => state.isForcedLandscape);
 
-    // Initial resize after mount (with small delay to ensure container is ready)
-    const timer = setTimeout(() => {
-        handleResize();
-    }, 100);
+    // Force Resize on Mount and Window Resize (Fix for gray areas)
+    useEffect(() => {
+        const handleResize = () => {
+            if (mapRef.current) {
+                mapRef.current.resize();
+            }
+        };
 
-    // Listen for window resize events (includes orientation change)
-    window.addEventListener('resize', handleResize);
+        // Initial resize after mount (with small delay to ensure container is ready)
+        const timer = setTimeout(() => {
+            handleResize();
+        }, 100);
 
-    return () => {
-        clearTimeout(timer);
-        window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+        // Listen for window resize events (includes orientation change)
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
+    // Force resize when forced landscape CSS transform is applied/removed.
+    // CSS rotate(90deg) doesn't fire a window resize event, so Mapbox
+    // would otherwise render at the wrong dimensions.
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (mapRef.current) {
+                mapRef.current.resize();
+            }
+        }, 300); // wait for CSS transform to settle
+        return () => clearTimeout(timer);
+    }, [isForcedLandscape]);
 
   return (
-    <div className="w-full h-full relative touch-none">
+    <div className="w-full h-full relative">
       <Map
         ref={mapRef}
         initialViewState={INITIAL_VIEW_STATE}
@@ -236,6 +249,8 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
         dragPan={true}
         dragRotate={true}
         doubleClickZoom={true}
+        touchZoomRotate={true}
+        touchPitch={true}
       >
         <NavigationControl position="top-right" />
         <FullscreenControl position="top-right" />
