@@ -15,7 +15,7 @@ export interface HomepageData {
 
 export const homepageData: HomepageData = {
   hero: {
-    logo: "/identity/logo_homepage.png",
+    logo: "/identity/identity_logo_white.png",
     button: "Entrar"
   },
   intro: {

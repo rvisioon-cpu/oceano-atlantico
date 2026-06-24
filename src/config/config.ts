@@ -46,8 +46,8 @@ export interface ConfigProps {
 }
 
 const config: ConfigProps = {
-  appName: "Project Name",
-  appDescription: "Short project description goes here.",
+  appName: "Residencial Océano Atlántico",
+  appDescription: "Experiencia virtual del Residencial Océano Atlántico.",
   domainName: "project-domain.com",
   resend: {
     fromNoReply: `Project Name <noreply@project-domain.com>`,
@@ -56,16 +56,16 @@ const config: ConfigProps = {
   },
   colors: {
     theme: "light",
-    main: "#F59C1D", // Brand main color
+    main: "#0E86C7", // Brand main color (Océano Atlántico ocean blue)
   },
   auth: {
     loginUrl: "/api/auth/signin",
     callbackUrl: "/dashboard",
   },
   company: {
-    name: "Company Name",
+    name: "Residencial Océano Atlántico",
     address: "Company Address",
-    buildingName: "Building Name",
+    buildingName: "Residencial Océano Atlántico",
     buildingAddress: "Building Address",
     email: "sales@project-domain.com",
     website: "https://project-domain.com/",
@@ -74,19 +74,19 @@ const config: ConfigProps = {
       instagram: "https://instagram.com/project",
       tiktok: "https://tiktok.com/@project"
     },
-    realStateName: "Real Estate Group",
+    realStateName: "RM Promotora Inmobiliaria",
     realStateSlogan: "Slogan of the real estate company",
     realStateSocials: {
       facebook: "https://facebook.com/realestate",
       instagram: "https://instagram.com/realestate",
       tiktok: "https://tiktok.com/@realestate"
     },
-    developer: "Developer Name",
-    developerSlogan: "Slogan of the developer",
+    developer: "Rvisioon",
+    developerSlogan: "Creamos experiencias visuales que conectan, inspiran y venden.",
     developerSocials: {
-      facebook: "https://facebook.com/developer",
-      instagram: "https://instagram.com/developer",
-      tiktok: "https://tiktok.com/@developer"
+      facebook: "https://facebook.com/rvisioon",
+      instagram: "https://instagram.com/rvisioon",
+      tiktok: "https://tiktok.com/@rvisioon"
     }
   }
 };

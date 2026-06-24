@@ -36,6 +36,41 @@ const IconMap: Record<string, any> = {
     Home, Building2, Box, Layers, Image, Rotate3D, Mountain, Video, Download, MapPin, Construction, Phone, Facebook, Instagram
 };
 
+// Decorative layered ocean waves that crest along the top edge of the navigation.
+// Paths run from x=-80 to x=1520 so the subtle horizontal drift never exposes a gap.
+const WaveCrest = ({ className = "" }: { className?: string }) => (
+    <div className={`pointer-events-none relative h-[46px] w-full overflow-hidden ${className}`}>
+        <svg
+            className="absolute inset-0 h-full w-full"
+            viewBox="0 0 1440 46"
+            preserveAspectRatio="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                className="animate-wave-slow"
+                fill="#62cdde"
+                fillOpacity="0.55"
+                d="M-80,18 C 160,4 320,28 560,18 S 980,2 1200,18 S 1480,26 1520,18 L1520,46 L-80,46 Z"
+            />
+            <path
+                className="animate-wave-fast"
+                fill="#2fb4cd"
+                fillOpacity="0.8"
+                d="M-80,26 C 180,14 360,34 600,26 S 1020,14 1240,26 S 1500,32 1520,26 L1520,46 L-80,46 Z"
+            />
+            <path
+                fill="#1593c2"
+                fillOpacity="0.9"
+                d="M-80,32 C 200,24 380,40 640,32 S 1040,24 1260,32 S 1500,36 1520,32 L1520,46 L-80,46 Z"
+            />
+            <path
+                fill="#0e74a3"
+                d="M-80,38 C 220,32 420,44 700,38 S 1080,32 1300,38 S 1500,40 1520,38 L1520,46 L-80,46 Z"
+            />
+        </svg>
+    </div>
+);
+
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     const router = useRouter();
     const pathname = usePathname();
@@ -145,184 +180,151 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
     const isForcedLandscape = useStore(state => state.isForcedLandscape);
 
+    const SocialLinks = ({ size = 16 }: { size?: number }) => (
+        <div className="flex gap-3">
+            {config.company?.buildingSocials?.facebook && (
+                <a href={config.company.buildingSocials.facebook} target="_blank" rel="noopener noreferrer"
+                    className="w-9 h-9 border border-white/25 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:border-white hover:bg-white/10 transition-all cursor-pointer">
+                    <Facebook size={size} />
+                </a>
+            )}
+            {config.company?.buildingSocials?.instagram && (
+                <a href={config.company.buildingSocials.instagram} target="_blank" rel="noopener noreferrer"
+                    className="w-9 h-9 border border-white/25 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:border-white hover:bg-white/10 transition-all cursor-pointer">
+                    <Instagram size={size} />
+                </a>
+            )}
+            {config.company?.buildingSocials?.tiktok && (
+                <a href={config.company.buildingSocials.tiktok} target="_blank" rel="noopener noreferrer"
+                    className="w-9 h-9 border border-white/25 rounded-full flex items-center justify-center text-white/80 hover:text-white hover:border-white hover:bg-white/10 transition-all cursor-pointer">
+                    <TikTokIcon size={size} />
+                </a>
+            )}
+        </div>
+    );
+
+    // ── FORCED LANDSCAPE (rotated frame): bottom positioning is unreliable, so we
+    // use a full-screen ocean overlay that fades in instead of sliding from the bottom.
+    if (isForcedLandscape) {
+        return (
+            <div
+                className={`fixed inset-0 z-[70] flex flex-col bg-gradient-to-b from-ocean-600 via-ocean-700 to-ocean-800 transition-opacity duration-400
+                    ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            >
+                <WaveCrest className="rotate-180 shrink-0" />
+
+                <button onClick={onClose} className="absolute top-5 right-5 p-2 bg-white/10 border border-white/25 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-colors z-20 cursor-pointer">
+                    <X size={22} />
+                </button>
+
+                <div className="absolute top-5 left-6 z-20">
+                    <img src="/identity/identity_logo_white.png" alt={config.appName} className="h-9 object-contain" />
+                </div>
+
+                <div className="flex-1 flex items-center justify-center w-full px-8">
+                    <div className="grid grid-cols-5 gap-5 w-full max-w-4xl">
+                        {menuItems.map((item) => {
+                            const active = isItemActive(item.path);
+                            const IconComponent = IconMap[item.icon] || Box;
+                            return (
+                                <button
+                                    key={item.label}
+                                    onClick={() => handleNavigation(item.path, (item as any).action)}
+                                    onMouseEnter={() => handleMouseEnter((item as any).preloadKey)}
+                                    className={`flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border transition-all group cursor-pointer
+                                        ${active
+                                            ? 'border-white bg-white text-ocean-700 shadow-lg'
+                                            : 'border-white/20 bg-white/5 text-white/85 hover:bg-white/15 hover:text-white'}`}
+                                >
+                                    <IconComponent size={26} strokeWidth={1.75} className="transition-transform group-hover:scale-110" />
+                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-center leading-tight">
+                                        {item.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="shrink-0 px-8 pb-6 flex items-center justify-center gap-6">
+                    <SocialLinks />
+                    <div className="h-5 w-px bg-white/25" />
+                    <img src="/identity/logo_inmobiliaria_white.png" alt={config.company?.realStateName} className="h-7 w-auto object-contain opacity-90" />
+                    <div className="h-5 w-px bg-white/25" />
+                    <p className="text-[10px] text-white/60 font-secondary select-none">
+                        {new Date().getFullYear()}© {config.company?.developer}
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
+    // ── STANDARD WEB: bottom navigation bar that slides up, crested with ocean waves.
     return (
         <>
             {/* Backdrop */}
-            {!isForcedLandscape && (
-                <div
-                    className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                    onClick={onClose}
-                />
-            )}
-            {/* Sidebar Panel */}
-            <div className={`fixed top-0 left-0 bg-[#FCFBF9] border-r border-[#E5E3DF] z-[70] shadow-2xl transform transition-transform duration-300 ease-in-out flex flex-col 
-        ${isForcedLandscape ? 'w-full h-full' : 'h-full w-[320px]'}
-        ${isOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'}
-      `}>
-                {/* Header (Common) */}
-                {!isForcedLandscape && (
-                    <div className="pt-8 pb-4 px-6 flex justify-between items-start relative bg-transparent shrink-0 z-10">
-                        <div className="w-full flex justify-center">
-                            <img src={getAssetUrl('identity/logo_full_black.png')} alt="Logo" className="h-24 object-contain" />
-                        </div>
-                        <button onClick={onClose} className="absolute top-6 right-6 text-zinc-400 hover:text-zinc-800 hover:scale-110 transition-all cursor-pointer">
-                            <X size={20} />
+            <div
+                className={`fixed inset-0 bg-ocean-900/40 backdrop-blur-[2px] z-[60] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                onClick={onClose}
+            />
+
+            {/* Bottom Wave Navigation */}
+            <nav
+                aria-label="Navegación principal"
+                className={`fixed bottom-0 left-0 w-full z-[70] transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+                    ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}
+            >
+                <WaveCrest />
+
+                <div className="relative bg-gradient-to-b from-ocean-600 via-ocean-700 to-ocean-800 px-4 pt-1 pb-5 shadow-[0_-14px_40px_rgba(8,40,60,0.35)]">
+                    {/* Header row: building logo + close */}
+                    <div className="flex items-center justify-between px-1 pb-2">
+                        <img src="/identity/identity_logo_white.png" alt={config.appName} className="h-9 object-contain" />
+                        <button onClick={onClose} className="p-2 -mr-1 text-white/70 hover:text-white hover:scale-110 transition-all cursor-pointer">
+                            <X size={22} />
                         </button>
                     </div>
-                )}
 
-                {/* FORCED LANDSCAPE LAYOUT (Grid) */}
-                {isForcedLandscape ? (
-                    <div className="flex-1 flex flex-col p-6 relative">
-                        {/* Controls Container */}
-                        <div className="absolute top-6 right-6 flex items-center gap-3 z-20">
+                    {/* Menu items: centered on wide screens, horizontally scrollable on narrow */}
+                    <ul className="flex gap-2 overflow-x-auto scrollbar-thin pb-1 justify-start lg:justify-center">
+                        {menuItems.map((item) => {
+                            const active = isItemActive(item.path);
+                            const IconComponent = IconMap[item.icon] || Box;
+                            return (
+                                <li key={item.label} className="shrink-0">
+                                    <button
+                                        onClick={() => handleNavigation(item.path, (item as any).action)}
+                                        onMouseEnter={() => handleMouseEnter((item as any).preloadKey)}
+                                        className={`group w-[80px] flex flex-col items-center gap-1.5 rounded-2xl px-2 py-2.5 transition-all duration-300 cursor-pointer
+                                            ${active
+                                                ? 'bg-white text-ocean-700 shadow-lg'
+                                                : 'text-white/85 hover:bg-white/12 hover:text-white'}`}
+                                    >
+                                        <div className="w-7 h-7 flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
+                                            <IconComponent size={20} strokeWidth={2} />
+                                        </div>
+                                        <span className="font-primary text-[11px] font-semibold tracking-wide text-center leading-tight whitespace-nowrap">
+                                            {item.label}
+                                        </span>
+                                    </button>
+                                </li>
+                            );
+                        })}
+                    </ul>
 
-                            <button onClick={onClose} className="p-2 bg-white/80 border border-[#E5E3DF] rounded-full text-zinc-500 hover:text-zinc-800 hover:bg-white transition-colors z-20 cursor-pointer">
-                                <X size={24} />
-                            </button>
-                        </div>
-
-                        {/* Logo - Smaller, Top Left or Center */}
-                        <div className="absolute top-6 left-6 z-20">
-                            <img src={getAssetUrl('identity/logo_full_black.png')} alt="Logo" className="h-10 object-contain" />
-                        </div>
-
-                        {/* Grid Content */}
-                        <div className="flex-1 flex items-center justify-center w-full h-full mt-4 relative z-10">
-                            <div className="grid grid-cols-5 gap-6 w-full max-w-4xl px-8">
-                                {menuItems.map((item) => {
-                                    const active = isItemActive(item.path);
-                                    const IconComponent = IconMap[item.icon] || Box;
-                                    return (
-                                        <button
-                                            key={item.label}
-                                            onClick={() => handleNavigation(item.path, (item as any).action)}
-                                            className={`flex flex-col items-center justify-center gap-3 p-4 rounded-xl border transition-all hover:bg-white/95 group cursor-pointer
-                                        ${active ? 'border-brand-primary bg-brand-primary/10 shadow-[0_4px_12px_rgba(12,90,91,0.08)]' : 'border-[#E5E3DF] bg-white/70'}
-                                    `}
-                                        >
-                                            <div className={`p-3 rounded-full transition-all group-hover:scale-110
-                                         ${active ? 'text-brand-primary' : 'text-zinc-400 group-hover:text-zinc-600'}
-                                    `}>
-                                                <IconComponent size={26} strokeWidth={1.5} />
-                                            </div>
-                                            <span className={`text-xs font-semibold uppercase tracking-wider ${active ? 'text-brand-primary font-bold' : 'text-zinc-500 group-hover:text-zinc-800'}`}>
-                                                {item.label}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Footer - Bottom Row */}
-                        <div className="absolute bottom-6 left-0 w-full flex justify-center items-center gap-6 text-zinc-500 z-10">
-                            <div className="flex gap-4">
-                                {config.company?.buildingSocials?.facebook && (
-                                    <a href={config.company.buildingSocials.facebook} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 border border-[#E5E3DF] rounded-full hover:border-brand-primary flex items-center justify-center text-zinc-500 hover:text-brand-primary hover:bg-brand-primary/5 transition-all cursor-pointer">
-                                        <Facebook size={16} />
-                                    </a>
-                                )}
-                                {config.company?.buildingSocials?.instagram && (
-                                    <a href={config.company.buildingSocials.instagram} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 border border-[#E5E3DF] rounded-full hover:border-brand-primary flex items-center justify-center text-zinc-500 hover:text-brand-primary hover:bg-brand-primary/5 transition-all cursor-pointer">
-                                        <Instagram size={16} />
-                                    </a>
-                                )}
-                                {config.company?.buildingSocials?.tiktok && (
-                                    <a href={config.company.buildingSocials.tiktok} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 border border-[#E5E3DF] rounded-full hover:border-brand-primary flex items-center justify-center text-zinc-500 hover:text-brand-primary hover:bg-brand-primary/5 transition-all cursor-pointer">
-                                        <TikTokIcon size={16} />
-                                    </a>
-                                )}
-                            </div>
-                            <div className="h-4 w-px bg-[#E5E3DF]" />
-                            <img
-                                src={getAssetUrl('identity/LOGO_INMOBILIARIA.png')}
-                                alt={config.company?.realStateName || 'Inmobiliaria Logo'}
-                                className="h-6 w-auto object-contain opacity-85 hover:opacity-100 transition-opacity"
-                            />
-                            <div className="h-4 w-px bg-[#E5E3DF]" />
-                            <p className="text-[10px] text-zinc-400 font-secondary select-none">
-                                {new Date().getFullYear()}© {config.company?.developer || 'RIVISION.pe'}
+                    {/* Footer: socials · inmobiliaria logo · credit */}
+                    <div className="mt-3 pt-3 border-t border-white/15 flex items-center justify-between gap-4">
+                        <SocialLinks />
+                        <div className="flex items-center gap-3">
+                            <img src="/identity/logo_inmobiliaria_white.png" alt={config.company?.realStateName} className="h-7 w-auto object-contain opacity-90" />
+                            <div className="hidden sm:block h-5 w-px bg-white/20" />
+                            <p className="hidden sm:block text-[10px] text-white/55 font-secondary select-none whitespace-nowrap">
+                                {new Date().getFullYear()}© {config.company?.developer}
                             </p>
                         </div>
                     </div>
-                ) : (
-                    /* STANDARD PORTRAIT / DESKTOP LAYOUT (List) */
-                    <>
-                        {/* Menu Items */}
-                        <div className="flex-1 overflow-y-auto py-2 scrollbar-thin relative z-10">
-                            <ul className="flex flex-col gap-2 px-4">
-                                {menuItems.map((item) => {
-                                    const active = isItemActive(item.path);
-                                    const IconComponent = IconMap[item.icon] || Box;
-                                    return (
-                                        <li key={item.label}>
-                                            <button
-                                                onClick={() => handleNavigation(item.path, (item as any).action)}
-                                                onMouseEnter={() => handleMouseEnter((item as any).preloadKey)}
-                                                className={`w-full flex items-center gap-4 px-4 py-2 rounded-xl border text-sm font-semibold transition-all duration-300 cursor-pointer group 
-                                                ${active
-                                                        ? 'border-brand-primary/30 bg-brand-primary/10 text-brand-primary shadow-[0_4px_12px_rgba(12,90,91,0.06)]'
-                                                        : 'border-transparent bg-transparent text-zinc-600 hover:bg-brand-primary/5 hover:border-brand-primary/15 hover:text-brand-primary'
-                                                    }`}
-                                            >
-                                                {/* Icon container */}
-                                                <div className={`w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-300 group-hover:scale-105
-                                                    ${active
-                                                        ? 'text-brand-primary'
-                                                        : 'text-zinc-400 group-hover:text-brand-primary'
-                                                    }`}
-                                                >
-                                                    <IconComponent
-                                                        size={18}
-                                                        strokeWidth={2}
-                                                    />
-                                                </div>
-                                                <span className="font-primary tracking-wide text-[14px] transition-colors duration-300">
-                                                    {item.label}
-                                                </span>
-                                            </button>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="p-8 pb-10 mt-auto text-center bg-transparent shrink-0 relative z-10">
-                            {/* Social circles */}
-                            <div className="flex justify-center gap-4 mb-6 border-t border-[#E5E3DF] pt-6">
-                                {config.company?.buildingSocials?.facebook && (
-                                    <a href={config.company.buildingSocials.facebook} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 border border-[#E5E3DF] rounded-full hover:border-brand-primary flex items-center justify-center text-zinc-500 hover:text-brand-primary hover:bg-brand-primary/5 transition-all cursor-pointer">
-                                        <Facebook size={16} />
-                                    </a>
-                                )}
-                                {config.company?.buildingSocials?.instagram && (
-                                    <a href={config.company.buildingSocials.instagram} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 border border-[#E5E3DF] rounded-full hover:border-brand-primary flex items-center justify-center text-zinc-500 hover:text-brand-primary hover:bg-brand-primary/5 transition-all cursor-pointer">
-                                        <Instagram size={16} />
-                                    </a>
-                                )}
-                                {config.company?.buildingSocials?.tiktok && (
-                                    <a href={config.company.buildingSocials.tiktok} target="_blank" rel="noopener noreferrer"
-                                        className="w-9 h-9 border border-[#E5E3DF] rounded-full hover:border-brand-primary flex items-center justify-center text-zinc-500 hover:text-brand-primary hover:bg-brand-primary/5 transition-all cursor-pointer">
-                                        <TikTokIcon size={16} />
-                                    </a>
-                                )}
-                            </div>
-
-                            <div className="flex flex-col items-center gap-2">
-                                <p className='text-base font-primary text-[#787570] font-light uppercase'>Kayen Inmobiliaria</p>
-                                <p className="text-[10px] text-zinc-400 font-secondary select-none">{new Date().getFullYear()}© {config.company?.developer || 'RIVISION.pe'}</p>
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>
+                </div>
+            </nav>
         </>
     );
 };

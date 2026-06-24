@@ -26,11 +26,23 @@
 }
 
 @theme {
-  --color-brand-orange: #F59C1D;
-  --color-brand-dark-orange: #D68310;
-  --color-brand-light-orange: #FAB428;
-  --color-brand-yellow: #FAE200;
-  --color-brand-primary: #F59C1D;
+  /* Océano Atlántico brand — ocean blues */
+  --color-brand-orange: #0E86C7;
+  --color-brand-dark-orange: #0C6FA6;
+  --color-brand-light-orange: #19A7DE;
+  --color-brand-yellow: #F2C53D;
+  --color-brand-primary: #0E86C7;
+
+  /* Ocean palette (light → deep) for the wave navigation */
+  --color-ocean-50: #ecf8fc;
+  --color-ocean-100: #d2eef6;
+  --color-ocean-200: #a7e0ec;
+  --color-ocean-300: #62cdde;
+  --color-ocean-400: #2fb4cd;
+  --color-ocean-500: #1593c2;
+  --color-ocean-600: #0e74a3;
+  --color-ocean-700: #0c5a7e;
+  --color-ocean-800: #0a3f57;
 
   --font-primary: 'Montserrat', sans-serif;
   --font-secondary: 'Inter', sans-serif;
@@ -39,7 +51,9 @@
 
   --animate-fade-in: fadeIn 0.3s ease-out forwards;
   --animate-scale-in: scaleIn 0.3s ease-out forwards;
-  
+  --animate-wave-slow: waveSlide 14s ease-in-out infinite alternate;
+  --animate-wave-fast: waveSlide 9s ease-in-out infinite alternate;
+
   @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -48,6 +62,11 @@
   @keyframes scaleIn {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes waveSlide {
+    from { transform: translateX(0); }
+    to { transform: translateX(-25px); }
   }
 }
 

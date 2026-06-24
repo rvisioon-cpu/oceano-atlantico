@@ -4,8 +4,9 @@ import { useStore } from '@/store/useStore';
 import Map, { Marker, NavigationControl, FullscreenControl, ScaleControl, Source, Layer, Popup } from 'react-map-gl/mapbox';
 // import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin } from 'lucide-react';
-import { locationsData } from '@/data/locations'; 
-import { getAssetUrl } from '@/utils/assets'; 
+import { locationsData } from '@/data/locations';
+import { getAssetUrl } from '@/utils/assets';
+import config from '@/config/config';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
@@ -294,17 +295,17 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
                         </div>
                     </div>
                     <div className="p-2">
-                        <h3 className="text-xs font-bold text-gray-900 leading-tight mb-0.5">Santa Fe 190</h3>
+                        <h3 className="text-xs font-bold text-gray-900 leading-tight mb-0.5">{config.company?.buildingName || 'Residencial Océano Atlántico'}</h3>
                     </div>
                  </div>
 
                  {/* Pin/Logo */}
                  <div className="relative z-50 group-hover:scale-110 transition-transform duration-300">
                      <div className="w-20 h-20 bg-white rounded-full p-2 shadow-xl border-2 border-brand-orange relative z-10 flex items-center justify-center">
-                        <img 
-                            src={getAssetUrl('identity/logo_full_black.png')} 
+                        <img
+                            src="/identity/identity_logo_ISOTIPO.png"
                             className="w-full h-full object-contain" // Use contain to fit logo
-                            alt="Santa Fe Logo"
+                            alt={config.appName}
                         />
                      </div>
                      {/* Triangle pointer */}
