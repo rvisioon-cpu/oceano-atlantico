@@ -203,55 +203,58 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         </div>
     );
 
-    // ── FORCED LANDSCAPE (rotated frame): bottom positioning is unreliable, so we
-    // use a full-screen ocean overlay that fades in instead of sliding from the bottom.
+    // ── FORCED LANDSCAPE (rotated frame): a true bottom bar can't be used because
+    // the frame is rotated 90°, so we use a full-screen ocean overlay — but with the
+    // same ocean gradient, wave crest and white-pill items as the desktop bottom bar.
     if (isForcedLandscape) {
         return (
             <div
                 className={`fixed inset-0 z-[70] flex flex-col bg-gradient-to-b from-ocean-600 via-ocean-700 to-ocean-800 transition-opacity duration-400
                     ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
             >
-                <WaveCrest className="rotate-180 shrink-0" />
-
-                <button onClick={onClose} className="absolute top-5 right-5 p-2 bg-white/10 border border-white/25 rounded-full text-white/80 hover:text-white hover:bg-white/20 transition-colors z-20 cursor-pointer">
-                    <X size={22} />
-                </button>
-
-                <div className="absolute top-5 left-6 z-20">
+                {/* Header strip (logo + close) capped by the same ocean wave crest */}
+                <div className="shrink-0 flex items-center justify-between px-6 pt-5 pb-2 bg-ocean-600">
                     <img src="/identity/identity_logo_white.png" alt={config.appName} className="h-9 object-contain" />
+                    <button onClick={onClose} className="p-2 -mr-1 text-white/75 hover:text-white hover:scale-110 transition-all cursor-pointer">
+                        <X size={24} />
+                    </button>
                 </div>
+                <WaveCrest className="rotate-180 shrink-0 -mt-px" />
 
-                <div className="flex-1 flex items-center justify-center w-full px-8">
-                    <div className="grid grid-cols-5 gap-5 w-full max-w-4xl">
+                {/* Menu items */}
+                <div className="flex-1 flex items-center justify-center w-full px-6">
+                    <ul className="grid grid-cols-5 gap-4 w-full max-w-4xl">
                         {menuItems.map((item) => {
                             const active = isItemActive(item.path);
                             const IconComponent = IconMap[item.icon] || Box;
                             return (
-                                <button
-                                    key={item.label}
-                                    onClick={() => handleNavigation(item.path, (item as any).action)}
-                                    onMouseEnter={() => handleMouseEnter((item as any).preloadKey)}
-                                    className={`flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border transition-all group cursor-pointer
-                                        ${active
-                                            ? 'border-white bg-white text-ocean-700 shadow-lg'
-                                            : 'border-white/20 bg-white/5 text-white/85 hover:bg-white/15 hover:text-white'}`}
-                                >
-                                    <IconComponent size={26} strokeWidth={1.75} className="transition-transform group-hover:scale-110" />
-                                    <span className="text-[11px] font-semibold uppercase tracking-wider text-center leading-tight">
-                                        {item.label}
-                                    </span>
-                                </button>
+                                <li key={item.label}>
+                                    <button
+                                        onClick={() => handleNavigation(item.path, (item as any).action)}
+                                        onMouseEnter={() => handleMouseEnter((item as any).preloadKey)}
+                                        className={`w-full flex flex-col items-center justify-center gap-2 p-3 rounded-2xl transition-all duration-300 group cursor-pointer
+                                            ${active
+                                                ? 'bg-white text-ocean-700 shadow-lg'
+                                                : 'text-white/85 hover:bg-white/12 hover:text-white'}`}
+                                    >
+                                        <IconComponent size={24} strokeWidth={1.9} className="transition-transform group-hover:scale-110" />
+                                        <span className="font-primary text-[11px] font-semibold tracking-wide text-center leading-tight">
+                                            {item.label}
+                                        </span>
+                                    </button>
+                                </li>
                             );
                         })}
-                    </div>
+                    </ul>
                 </div>
 
-                <div className="shrink-0 px-8 pb-6 flex items-center justify-center gap-6">
+                {/* Footer */}
+                <div className="shrink-0 px-6 pb-6 flex items-center justify-center gap-5">
                     <SocialLinks />
                     <div className="h-5 w-px bg-white/25" />
                     <img src="/identity/logo_inmobiliaria_white.png" alt={config.company?.realStateName} className="h-7 w-auto object-contain opacity-90" />
-                    <div className="h-5 w-px bg-white/25" />
-                    <p className="text-[10px] text-white/60 font-secondary select-none">
+                    <div className="hidden sm:block h-5 w-px bg-white/25" />
+                    <p className="hidden sm:block text-[10px] text-white/60 font-secondary select-none">
                         {new Date().getFullYear()}© {config.company?.developer}
                     </p>
                 </div>
