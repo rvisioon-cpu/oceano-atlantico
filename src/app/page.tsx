@@ -180,29 +180,29 @@ const Homepage = () => {
         {/* Central Hero Section */}
         <div className="flex-1 flex flex-col items-center justify-center relative w-full max-w-6xl mx-auto h-full">
              
-             {/* Logo & Button Container */}
-             <div className="relative z-20 flex flex-col items-center gap-8 landscape:gap-3 lg:gap-12 transition-transform will-change-transform">
-                 <img 
+             {/* Logo Container (animates up on its own) */}
+             <div className="relative z-20 flex flex-col items-center transition-transform will-change-transform">
+                 <img
                    ref={logoRef} // Ref moved to image for independent animation
-                   src={homepageData.hero.logo} 
-                   alt="Logo" 
+                   src={homepageData.hero.logo}
+                   alt="Logo"
                    className="w-[180px] lg:w-full max-w-xl object-contain drop-shadow-2xl opacity-90"
                  />
-
-                 {/* Entrar Button - Now inside the container to move with logo */}
-                 <button 
-                    ref={buttonRef}
-                    onClick={handleStartIntro}
-                    disabled={isPlayingIntro}
-                    className={`group relative px-8 lg:px-12 py-3 lg:py-4 bg-brand-primary/80 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white text-xs lg:text-sm font-medium tracking-widest uppercase rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl font-secondary shrink-0 
-                        ${(isPlayingIntro) ? 'opacity-0 pointer-events-none' : 'opacity-100'}
-                    `}
-                  >
-                    <span className="relative z-10 font-bold tracking-[0.2em] flex items-center gap-2">
-                        {homepageData.hero.button}
-                    </span>
-                  </button>
              </div>
+
+             {/* Entrar Button - anchored near the bottom, clear of the presentation text */}
+             <button
+                ref={buttonRef}
+                onClick={handleStartIntro}
+                disabled={isPlayingIntro}
+                className={`absolute bottom-[8%] lg:bottom-[10%] left-1/2 -translate-x-1/2 z-20 group px-8 lg:px-12 py-3 lg:py-4 bg-brand-primary/80 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white text-xs lg:text-sm font-medium tracking-widest uppercase rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl font-secondary
+                    ${(isPlayingIntro) ? 'opacity-0 pointer-events-none' : 'opacity-100'}
+                `}
+              >
+                <span className="relative z-10 font-bold tracking-[0.2em] flex items-center gap-2">
+                    {homepageData.hero.button}
+                </span>
+              </button>
 
              {/* Presentation Text Container */}
              <div className="absolute top-[38%] lg:top-[65%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 h-[160px] lg:h-[200px] px-4">

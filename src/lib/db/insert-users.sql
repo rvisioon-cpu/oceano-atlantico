@@ -14,16 +14,16 @@ VALUES (
   strftime('%s', 'now') * 1000
 );
 
--- 2. Admin (Andres Pluska)
+-- 2. Super Admin (Andres Pluska)
 INSERT INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
 VALUES (
   'a64bd2e3-29e7-47b7-bdcf-88aefcd19a6b',
   'Andres Pluska',
   'pluskaandres@gmail.com',
-  '$2b$10$QFBcqVN4nD.C2b1LEzMUpuHPZ5sm5.JAw6ktqwl2Y94e.WMVt0/de',
-  'ADMIN',
-  5,
-  'df1e78a6-56a7-47b2-bdcf-88aefcd19a6b',
+  '$2b$10$m9QehmPyXvoygRe3bVeOoesgMFC9cOiZgB.2s6hh8CLeEGFkMviQC',
+  'SUPER_ADMIN',
+  0,
+  NULL,
   strftime('%s', 'now') * 1000,
   strftime('%s', 'now') * 1000
 );
