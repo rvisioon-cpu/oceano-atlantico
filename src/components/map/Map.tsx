@@ -11,11 +11,11 @@ import config from '@/config/config';
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
 
-// Initial view state centering on Santa Fe 190, Pueblo Libre, Lima
+// Initial view state centering on Residencial Océano Atlántico (Salamanca, Ate, Lima)
 const INITIAL_VIEW_STATE = {
-  latitude: -12.07592,
-  longitude: -77.067632,
-  zoom: 16, 
+  latitude: -12.080049,
+  longitude: -76.974883,
+  zoom: 16,
   bearing: 0,
   pitch: 0
 };
