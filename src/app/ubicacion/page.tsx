@@ -74,7 +74,7 @@ const DirectionsPage = () => {
                 try {
                     if (!MAPBOX_TOKEN) return;
                     const response = await fetch(
-                        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(filter)}.json?access_token=${MAPBOX_TOKEN}&country=pe&limit=5&language=es&proximity=-77.067632,-12.07592`
+                        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(filter)}.json?access_token=${MAPBOX_TOKEN}&country=pe&limit=5&language=es&proximity=-76.974883,-12.080049`
                     );
                     const data = (await response.json()) as any;
                     setSearchResults(data.features || []);
