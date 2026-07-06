@@ -51,8 +51,13 @@
 
   --animate-fade-in: fadeIn 0.3s ease-out forwards;
   --animate-scale-in: scaleIn 0.3s ease-out forwards;
-  --animate-wave-slow: waveSlide 14s ease-in-out infinite alternate;
-  --animate-wave-fast: waveSlide 9s ease-in-out infinite alternate;
+  --animate-wave-slow: waveSlide 8s ease-in-out infinite alternate;
+  --animate-wave-fast: waveSlide 5s ease-in-out infinite alternate;
+  --animate-wave-medium: waveSlideMedium 6.5s ease-in-out infinite alternate;
+  --animate-wave-deep: waveSlideDeep 10s ease-in-out infinite alternate;
+  --animate-water-shimmer: waterShimmer 3s ease-in-out infinite;
+  --animate-caustic-slow: causticDrift 22s ease-in-out infinite alternate;
+  --animate-caustic-fast: causticDriftAlt 17s ease-in-out infinite alternate;
 
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -65,10 +70,45 @@
   }
 
   @keyframes waveSlide {
-    from { transform: translateX(0); }
-    to { transform: translateX(-25px); }
+    0%   { transform: translateX(0) translateY(0); }
+    30%  { transform: translateX(-20px) translateY(-5px); }
+    70%  { transform: translateX(-40px) translateY(2px); }
+    100% { transform: translateX(-60px) translateY(0); }
+  }
+
+  @keyframes waveSlideMedium {
+    0%   { transform: translateX(0) translateY(0); }
+    25%  { transform: translateX(15px) translateY(-4px); }
+    75%  { transform: translateX(-30px) translateY(3px); }
+    100% { transform: translateX(-45px) translateY(0); }
+  }
+
+  @keyframes waveSlideDeep {
+    0%   { transform: translateX(0) translateY(0); }
+    35%  { transform: translateX(-15px) translateY(-3px); }
+    65%  { transform: translateX(-25px) translateY(2px); }
+    100% { transform: translateX(-35px) translateY(0); }
+  }
+
+  @keyframes waterShimmer {
+    0%   { background-position: 0% 50%; opacity: 0; }
+    50%  { background-position: 100% 50%; opacity: 1; }
+    100% { background-position: 200% 50%; opacity: 0; }
+  }
+
+  @keyframes causticDrift {
+    0%   { transform: translate3d(-6%, -3%, 0) scale(1.05); opacity: 0.28; }
+    50%  { transform: translate3d(5%, 4%, 0) scale(1.15); opacity: 0.42; }
+    100% { transform: translate3d(-2%, 6%, 0) scale(1.08); opacity: 0.30; }
+  }
+
+  @keyframes causticDriftAlt {
+    0%   { transform: translate3d(5%, 4%, 0) scale(1.10); opacity: 0.22; }
+    50%  { transform: translate3d(-4%, -3%, 0) scale(1.00); opacity: 0.38; }
+    100% { transform: translate3d(6%, -5%, 0) scale(1.12); opacity: 0.26; }
   }
 }
+
 
 html, body {
   margin: 0;
