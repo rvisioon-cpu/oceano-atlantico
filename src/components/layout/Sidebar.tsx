@@ -1,6 +1,6 @@
 "use client";
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Home, Building2, Layers, Image, Rotate3D, Video, Download, MapPin, Phone, Facebook, Instagram, Mountain, Box, Construction } from 'lucide-react';
 import { getAssetUrl } from '@/utils/assets';
 import { useStore } from '@/store/useStore';
@@ -10,6 +10,7 @@ import { floorsData as staticFloorsData, getEntryFloorId } from '@/data/floors';
 import config from '@/config/config';
 import { getFeatures } from '@/app/actions/features';
 import defaultFeatures from '@/data/features.json';
+import LiquidMenuBackground from './LiquidMenuBackground';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -35,10 +36,6 @@ const TikTokIcon = ({ size = 24, className = "" }: { size?: number, className?: 
 const IconMap: Record<string, any> = {
     Home, Building2, Box, Layers, Image, Rotate3D, Mountain, Video, Download, MapPin, Construction, Phone, Facebook, Instagram
 };
-
-// Liquid hover-effect tuning — deliberately low for a delicate ("más delicado") ripple.
-const LIQUID_REST = 4;   // resting displacement: a barely-there breathing motion
-const LIQUID_ACTIVE = 15; // swell while the pointer is moving over the menu
 
 // Decorative layered ocean waves that crest along the top edge of the navigation.
 // All 4 layers animate at different speeds for an organic, living ocean surface.
@@ -187,109 +184,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
     const isForcedLandscape = useStore(state => state.isForcedLandscape);
 
-    // ── Liquid water hover effect ────────────────────────────────────────────
-    // A turbulence-displacement SVG filter gently ripples a light-only "water"
-    // layer behind the menu; a soft caustic reflection eases toward the cursor.
-    // Text/icons live on a separate z-10 layer, so they stay perfectly crisp.
-    const dispRef = useRef<SVGFEDisplacementMapElement | null>(null);
-    const liquidLayerRef = useRef<HTMLDivElement | null>(null);
-    const targetScale = useRef(LIQUID_REST);
-    const currentScale = useRef(LIQUID_REST);
-    const lastMoveAt = useRef(0);
-    const [reduceMotion, setReduceMotion] = useState(false);
-
-    useEffect(() => {
-        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const sync = () => setReduceMotion(mq.matches);
-        sync();
-        mq.addEventListener?.('change', sync);
-        return () => mq.removeEventListener?.('change', sync);
-    }, []);
-
-    // While the menu is open, ease the displacement strength toward its target:
-    // it swells where the pointer moves, then settles back to a delicate ripple.
-    useEffect(() => {
-        if (!isOpen || reduceMotion) {
-            dispRef.current?.setAttribute('scale', String(LIQUID_REST));
-            return;
-        }
-        let raf = 0;
-        const tick = () => {
-            if (performance.now() - lastMoveAt.current > 380) targetScale.current = LIQUID_REST;
-            currentScale.current += (targetScale.current - currentScale.current) * 0.075;
-            dispRef.current?.setAttribute('scale', currentScale.current.toFixed(2));
-            raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-        return () => cancelAnimationFrame(raf);
-    }, [isOpen, reduceMotion]);
-
-    const handleLiquidMove = (e: ReactPointerEvent<HTMLElement>) => {
-        const layer = liquidLayerRef.current;
-        if (!layer) return;
-        const rect = e.currentTarget.getBoundingClientRect();
-        layer.style.setProperty('--lx', `${((e.clientX - rect.left) / rect.width) * 100}%`);
-        layer.style.setProperty('--ly', `${((e.clientY - rect.top) / rect.height) * 100}%`);
-        if (!reduceMotion) {
-            targetScale.current = LIQUID_ACTIVE;
-            lastMoveAt.current = performance.now();
-        }
-    };
-
-    const handleLiquidLeave = () => {
-        targetScale.current = LIQUID_REST;
-    };
-
-    // Shared water surface: the SVG filter defs + the rippling light layer.
-    // Only one navigation variant renders at a time, so a single filter id is safe.
-    const liquidSurface = (
-        <>
-            <svg aria-hidden="true" focusable="false" className="pointer-events-none absolute h-0 w-0">
-                <defs>
-                    <filter id="oa-liquid" x="-25%" y="-25%" width="150%" height="150%" colorInterpolationFilters="sRGB">
-                        <feTurbulence type="fractalNoise" baseFrequency="0.008 0.013" numOctaves={2} seed={7} result="oa-noise">
-                            {!reduceMotion && (
-                                <animate
-                                    attributeName="baseFrequency"
-                                    dur="19s"
-                                    values="0.008 0.013;0.012 0.009;0.007 0.014;0.008 0.013"
-                                    repeatCount="indefinite"
-                                />
-                            )}
-                        </feTurbulence>
-                        <feDisplacementMap
-                            ref={dispRef}
-                            in="SourceGraphic"
-                            in2="oa-noise"
-                            scale={LIQUID_REST}
-                            xChannelSelector="R"
-                            yChannelSelector="G"
-                        />
-                    </filter>
-                </defs>
-            </svg>
-
-            <div
-                ref={liquidLayerRef}
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-                style={{ filter: 'url(#oa-liquid)' }}
-            >
-                <div className="absolute -left-[8%] -top-[40%] h-[180%] w-[55%] rounded-full bg-[radial-gradient(closest-side,rgba(178,236,255,0.5),transparent)] blur-2xl animate-caustic-slow motion-reduce:animate-none" />
-                <div className="absolute -right-[6%] -top-[30%] h-[170%] w-[48%] rounded-full bg-[radial-gradient(closest-side,rgba(120,205,235,0.42),transparent)] blur-2xl animate-caustic-fast motion-reduce:animate-none" />
-                <div
-                    className="absolute h-56 w-56 rounded-full blur-2xl transition-[left,top] duration-300 ease-out motion-reduce:transition-none"
-                    style={{
-                        left: 'var(--lx, 50%)',
-                        top: 'var(--ly, 50%)',
-                        transform: 'translate(-50%, -50%)',
-                        background: 'radial-gradient(circle,rgba(206,246,255,0.55),rgba(206,246,255,0) 68%)',
-                    }}
-                />
-            </div>
-        </>
-    );
-
     const SocialLinks = ({ size = 16 }: { size?: number }) => (
         <div className="flex gap-3">
             {config.company?.buildingSocials?.facebook && (
@@ -319,12 +213,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     if (isForcedLandscape) {
         return (
             <div
-                onPointerMove={handleLiquidMove}
-                onPointerLeave={handleLiquidLeave}
                 className={`fixed inset-0 z-[70] isolate overflow-hidden flex flex-col bg-gradient-to-b from-ocean-600 via-ocean-700 to-ocean-800 transition-opacity duration-400
                     ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
             >
-                {liquidSurface}
+                {isOpen && <LiquidMenuBackground />}
 
                 <div className="relative z-10 flex flex-1 flex-col">
                 {/* Header strip (logo + close) capped by the same ocean wave crest */}
@@ -395,12 +287,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             >
                 <WaveCrest />
 
-                <div
-                    onPointerMove={handleLiquidMove}
-                    onPointerLeave={handleLiquidLeave}
-                    className="relative isolate overflow-hidden bg-gradient-to-b from-ocean-600 via-ocean-700 to-ocean-800 px-4 pt-0 pb-3 shadow-[0_-14px_40px_rgba(8,40,60,0.35)]"
-                >
-                    {liquidSurface}
+                <div className="relative isolate overflow-hidden bg-gradient-to-b from-ocean-600 via-ocean-700 to-ocean-800 px-4 pt-0 pb-3 shadow-[0_-14px_40px_rgba(8,40,60,0.35)]">
+                    {isOpen && <LiquidMenuBackground />}
 
                     {/* Header row: building logo + close — logo hidden on homepage (desktop) */}
                     <div className="relative z-10 flex items-center justify-between px-1 pb-1.5">

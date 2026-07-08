@@ -42,3 +42,5 @@ next-env.d.ts
 
 .wrangler/
 .open-next
+
+/.claude

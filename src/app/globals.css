@@ -56,8 +56,6 @@
   --animate-wave-medium: waveSlideMedium 6.5s ease-in-out infinite alternate;
   --animate-wave-deep: waveSlideDeep 10s ease-in-out infinite alternate;
   --animate-water-shimmer: waterShimmer 3s ease-in-out infinite;
-  --animate-caustic-slow: causticDrift 22s ease-in-out infinite alternate;
-  --animate-caustic-fast: causticDriftAlt 17s ease-in-out infinite alternate;
 
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -94,18 +92,6 @@
     0%   { background-position: 0% 50%; opacity: 0; }
     50%  { background-position: 100% 50%; opacity: 1; }
     100% { background-position: 200% 50%; opacity: 0; }
-  }
-
-  @keyframes causticDrift {
-    0%   { transform: translate3d(-6%, -3%, 0) scale(1.05); opacity: 0.28; }
-    50%  { transform: translate3d(5%, 4%, 0) scale(1.15); opacity: 0.42; }
-    100% { transform: translate3d(-2%, 6%, 0) scale(1.08); opacity: 0.30; }
-  }
-
-  @keyframes causticDriftAlt {
-    0%   { transform: translate3d(5%, 4%, 0) scale(1.10); opacity: 0.22; }
-    50%  { transform: translate3d(-4%, -3%, 0) scale(1.00); opacity: 0.38; }
-    100% { transform: translate3d(6%, -5%, 0) scale(1.12); opacity: 0.26; }
   }
 }
 
