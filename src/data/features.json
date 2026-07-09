@@ -9,7 +9,7 @@
   { "id": "video", "icon": "Video", "label": "Video", "path": "/video", "active": true },
   { "id": "brochure", "icon": "Download", "label": "Brochure", "path": "", "action": "brochure", "active": false },
   { "id": "location", "icon": "MapPin", "label": "Ubicación", "path": "/ubicacion", "active": true },
-  { "id": "avance", "icon": "Construction", "label": "Avance de obra", "path": "/avance-de-obra", "active": true },
+  { "id": "avance", "icon": "Construction", "label": "Avance de obra", "path": "/avance-de-obra", "active": false },
   { "id": "contact", "icon": "Phone", "label": "Contacto", "path": "/contact", "active": true },
   { "id": "identity", "icon": "Palette", "label": "Identidad (Dashboard)", "path": "", "active": false }
 ]

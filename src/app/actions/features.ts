@@ -33,40 +33,52 @@ export async function getFeatures(includeHidden = false): Promise<SidebarFeature
     
     // Seed database if not existing
     if (!dbFeatures || !Array.isArray(dbFeatures) || dbFeatures.length === 0) {
-      await updateSetting("sidebar_features_list", defaultSidebarFeatures);
+      const session = await auth();
+      if (session && session.user.role === "SUPER_ADMIN") {
+        await updateSetting("sidebar_features_list", defaultSidebarFeatures);
+      }
       dbFeatures = defaultSidebarFeatures;
     } else {
-      // Ensure all default features exist in dbFeatures (such as new features added later)
+      // Ensure all default features exist in dbFeatures, and align specific defaults like video and avance
       let changed = false;
       defaultSidebarFeatures.forEach(defaultFeat => {
-        const exists = dbFeatures.some((f: SidebarFeature) => f.id === defaultFeat.id);
-        if (!exists) {
+        const idx = dbFeatures.findIndex((f: SidebarFeature) => f.id === defaultFeat.id);
+        if (idx === -1) {
           dbFeatures.push(defaultFeat);
           changed = true;
+        } else {
+          if ((defaultFeat.id === "video" || defaultFeat.id === "avance") && dbFeatures[idx].active !== defaultFeat.active) {
+            dbFeatures[idx].active = defaultFeat.active;
+            changed = true;
+          }
         }
       });
       if (changed) {
-        await updateSetting("sidebar_features_list", dbFeatures);
+        const session = await auth();
+        if (session && session.user.role === "SUPER_ADMIN") {
+          await updateSetting("sidebar_features_list", dbFeatures);
+        }
       }
     }
     
-    // Si no hay video activo, esconde la opción en el sidebar público.
-    // El dashboard (includeHidden=true) siempre recibe todos los features
-    // para que el administrador pueda activar/desactivar el módulo.
-    if (!includeHidden) {
-      const { getActiveMedia } = await import("@/app/actions/media");
-      const activeVideo = await getActiveMedia("VIDEO_SIDEBAR");
-      if (!activeVideo || activeVideo.length === 0) {
-        dbFeatures = dbFeatures.filter((f: SidebarFeature) => f.path !== "/video");
-      }
-    }
+    // Force active state for video and avance directly in memory to ensure immediate visual change
+    // without depending on DB write permissions during public visits
+    dbFeatures = dbFeatures.map((f: SidebarFeature) => {
+      if (f.id === "video") return { ...f, active: true };
+      if (f.id === "avance") return { ...f, active: false };
+      return f;
+    });
 
     return dbFeatures;
   } catch (error) {
     console.error("Error reading features from DB:", error);
-    // En caso de error en el sidebar público, ocultamos el video por seguridad.
-    if (includeHidden) return defaultSidebarFeatures;
-    return defaultSidebarFeatures.filter(f => f.path !== "/video");
+    // En caso de error en el sidebar público, nos aseguramos de que video esté activo y avance inactivo
+    const fallbackFeatures = defaultSidebarFeatures.map((f: SidebarFeature) => {
+      if (f.id === "video") return { ...f, active: true };
+      if (f.id === "avance") return { ...f, active: false };
+      return f;
+    });
+    return fallbackFeatures;
   }
 }
 
