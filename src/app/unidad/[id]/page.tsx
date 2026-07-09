@@ -24,12 +24,12 @@ const UnitPage = () => {
     const unit = floor?.units.find(u => u.id === unitId);
 
     const isDuplex = unit && (unit.subtitle === 'Dúplex' || unit.subtitle === 'Duplex' || ['801', '802'].includes(unit.identifier || ''));
-    const isPiso1 = unit && floor?.id === '8';
+    const isPiso1 = unit && floor?.id === '5';
 
     // Find the other level unit
     let otherLevelUnit: any = undefined;
     if (unit && isDuplex) {
-        const targetFloorId = floor?.id === '8' ? '9' : '8';
+        const targetFloorId = floor?.id === '5' ? '6' : '5';
         for (const f of floorsData) {
             if (f.id === targetFloorId) {
                 otherLevelUnit = f.units.find(u => u.identifier === unit.identifier);

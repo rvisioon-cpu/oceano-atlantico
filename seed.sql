@@ -1,6 +1,8 @@
 DELETE FROM tours;
 DELETE FROM units;
 DELETE FROM floors;
+INSERT INTO floors (id, name, level, type, image_path) VALUES ('floor_PB2', 'PB 2', -2, 'Sótano', '/plants/floor_pb1.png');
+INSERT INTO floors (id, name, level, type, image_path) VALUES ('floor_PB1', 'PB 1', -1, 'Sótano', '/plants/floor_pb.png');
 INSERT INTO floors (id, name, level, type, image_path) VALUES ('floor_1', '1', 1, 'Piso', '/plants/floor_1.png');
 INSERT INTO units (id, floor_id, identifier, type, bedrooms, bathrooms, area_sqm, coordinates, state, tour_url) VALUES ('unit_1_101', 'floor_1', '101', 'APARTMENT', 1, 2.5, 108.42, NULL, 'AVAILABLE', NULL);
 INSERT INTO units (id, floor_id, identifier, type, bedrooms, bathrooms, area_sqm, coordinates, state, tour_url) VALUES ('unit_1_102', 'floor_1', '102', 'APARTMENT', 1, 1.5, 80.11, NULL, 'AVAILABLE', NULL);
@@ -16,3 +18,6 @@ INSERT INTO units (id, floor_id, identifier, type, bedrooms, bathrooms, area_sqm
 INSERT INTO floors (id, name, level, type, image_path) VALUES ('floor_5', '5', 5, 'Piso', '/plants/floor_5.png');
 INSERT INTO units (id, floor_id, identifier, type, bedrooms, bathrooms, area_sqm, coordinates, state, tour_url) VALUES ('unit_5_501', 'floor_5', '501', 'APARTMENT', 3, 2, 250.95, NULL, 'AVAILABLE', NULL);
 INSERT INTO units (id, floor_id, identifier, type, bedrooms, bathrooms, area_sqm, coordinates, state, tour_url) VALUES ('unit_5_502', 'floor_5', '502', 'APARTMENT', 2, 2, 267.89, NULL, 'AVAILABLE', NULL);
+INSERT INTO floors (id, name, level, type, image_path) VALUES ('floor_6', '6', 6, 'Piso', '/plants/floor_6.png');
+INSERT INTO units (id, floor_id, identifier, type, bedrooms, bathrooms, area_sqm, coordinates, state, tour_url) VALUES ('unit_6_601', 'floor_6', '501', 'APARTMENT', 3, 2, 250.95, NULL, 'AVAILABLE', NULL);
+INSERT INTO units (id, floor_id, identifier, type, bedrooms, bathrooms, area_sqm, coordinates, state, tour_url) VALUES ('unit_6_602', 'floor_6', '502', 'APARTMENT', 2, 2, 267.89, NULL, 'AVAILABLE', NULL);

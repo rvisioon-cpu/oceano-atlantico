@@ -99,6 +99,7 @@ export const media = sqliteTable('media', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   title: text('title').notNull(),
   url: text('url').notNull(),
+  urlNight: text('url_night'),
   type: text('type'),
   category: text('category').default('EXTRA').notNull(), // 'VIDEO_SIDEBAR', 'AMENITIES_GALLERY', 'EXTRA'
   isActive: integer('is_active', { mode: 'boolean' }).default(false).notNull(),

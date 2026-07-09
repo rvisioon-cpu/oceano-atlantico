@@ -114,6 +114,7 @@ export async function getFloorsData() {
     return {
       id: f.id.replace('floor_', ''),
       name: f.name,
+      level: f.level,
       floorPlanImage: f.imagePath || '',
       units: floorUnits,
     };

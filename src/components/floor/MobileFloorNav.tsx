@@ -20,16 +20,7 @@ const MobileFloorNav = ({ currentFloorId }: MobileFloorNavProps) => {
 
     // Let's sort simply by numerical value to find neighbors easily
     // Standard sort: PB (0), 1, 2, ... 9.
-    const sortedFloorsAsc = [...floorsData].sort((a, b) => {
-        const getVal = (id: string | undefined) => {
-            if (!id) return 0;
-            const cleanId = id.toLowerCase();
-            if (cleanId === 'pb') return 0;
-            const num = Number(cleanId);
-            return isNaN(num) ? 0 : num;
-        };
-        return getVal(a.id) - getVal(b.id);
-    });
+    const sortedFloorsAsc = [...floorsData].sort((a, b) => a.level - b.level);
 
     const currentIndex = sortedFloorsAsc.findIndex(f => f.id === currentFloorId);
     

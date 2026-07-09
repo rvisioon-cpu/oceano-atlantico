@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { buildingFaces, type BuildingFace } from '../data/buildingData';
 import { preloadVideo, preloadImages } from '../utils/preload';
-import { type Floor } from '../data/floors';
+import { type Floor, getEntryFloorId } from '../data/floors';
 import { getAssetUrl } from '../utils/assets';
 
 interface ShowroomState {
@@ -113,7 +113,7 @@ export const useStore = create<ShowroomState>((set, get) => ({
 
     let targetImage: string | undefined;
     if (destination === 'Floors') {
-      const targetFloor = state.floorsData.find(f => f.id === '9');
+      const targetFloor = state.floorsData.find(f => f.id === getEntryFloorId(state.floorsData));
       if (targetFloor) {
         targetImage = getAssetUrl(targetFloor.floorPlanImage);
       }

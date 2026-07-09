@@ -103,7 +103,8 @@ export const assetManifest: string[] = [
     'plants/details/x02/balcony/2.png',
 
     // Amenities
-    'amenities/1.png',
+    'amenities/1_day.png',
+    'amenities/1_night.png',
     'amenities/2.png',
     'amenities/3.png',
     'amenities/4.png',
