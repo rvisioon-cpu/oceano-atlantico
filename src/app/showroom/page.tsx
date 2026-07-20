@@ -256,17 +256,6 @@ const ShowroomContent = () => {
         </button>
       )}
 
-      {/* Structure Reference Image */}
-      {viewState === 'IDLE' && (
-        <div className="fixed bottom-6 md:bottom-10 sm:bottom-3 left-6 md:left-10 sm:left-3 z-20 pointer-events-none select-none">
-          <img
-            src={showroomConfig.structureImage}
-            alt="Structure Reference"
-            className="w-auto h-48 sm:h-32 opacity-90 drop-shadow-lg"
-          />
-        </div>
-      )}
-
       {/* Floating UI */}
       {viewState === 'IDLE' && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">

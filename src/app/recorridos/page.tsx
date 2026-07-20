@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Play } from 'lucide-react';
+import { Play, SlidersHorizontal, X } from 'lucide-react';
 import { getToursPublic } from '@/app/actions/tours';
 import Sidebar from '@/components/layout/Sidebar';
 import TourHeader from '@/components/UI/TourHeader';
@@ -18,6 +18,24 @@ interface Tour {
   type: 'unit' | 'building';
   target: string;
   floorName?: string;
+  floorLevel?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  areaSqm?: number;
+}
+
+const ALL = 'all';
+
+// Area is a continuous value, so it is filtered in bands rather than by exact
+// match. Bands are derived from the tours actually on offer so the dropdown
+// never lists a range with nothing in it.
+const AREA_BAND_SIZE = 25;
+
+interface AreaBand {
+  id: string;
+  label: string;
+  min: number;
+  max: number; // exclusive; Infinity on the last band so the largest unit matches
 }
 
 const RecorridosContent = () => {
@@ -25,6 +43,12 @@ const RecorridosContent = () => {
   const [selectedTour, setSelectedTour] = useState<Tour | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  // Filters
+  const [floorFilter, setFloorFilter] = useState<string>(ALL);
+  const [bedroomsFilter, setBedroomsFilter] = useState<string>(ALL);
+  const [bathroomsFilter, setBathroomsFilter] = useState<string>(ALL);
+  const [areaFilter, setAreaFilter] = useState<string>(ALL);
 
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -41,7 +65,11 @@ const RecorridosContent = () => {
           thumbnail: t.thumbnailUrl,
           type: t.type as 'unit' | 'building',
           target: t.targetUrl,
-          floorName: t.floorName || undefined
+          floorName: t.floorName || undefined,
+          floorLevel: t.floorLevel ?? undefined,
+          bedrooms: t.bedrooms ?? undefined,
+          bathrooms: t.bathrooms ?? undefined,
+          areaSqm: t.areaSqm ?? undefined
         }));
         setTours(mapped);
       } catch (err) {
@@ -61,6 +89,83 @@ const RecorridosContent = () => {
         if (found) setSelectedTour(found);
     }
   }, [searchParams, tours]);
+
+  // ── Filter options, derived from the live tour list ──────────────────────
+  // Every dropdown only offers values that exist, so a visitor can never land
+  // on an empty result by picking a combination the catalogue doesn't have.
+
+  const floorOptions = useMemo(() => {
+    const seen = new Map<string, number>();
+    tours.forEach(t => {
+      if (t.floorName) seen.set(t.floorName, t.floorLevel ?? -Infinity);
+    });
+    // Highest floor first — matches how buyers think about a tower.
+    return [...seen.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([name]) => name);
+  }, [tours]);
+
+  const bedroomOptions = useMemo(
+    () => [...new Set(tours.map(t => t.bedrooms).filter((v): v is number => typeof v === 'number'))].sort((a, b) => a - b),
+    [tours]
+  );
+
+  const bathroomOptions = useMemo(
+    () => [...new Set(tours.map(t => t.bathrooms).filter((v): v is number => typeof v === 'number'))].sort((a, b) => a - b),
+    [tours]
+  );
+
+  const areaBands = useMemo<AreaBand[]>(() => {
+    const areas = tours.map(t => t.areaSqm).filter((v): v is number => typeof v === 'number');
+    if (areas.length === 0) return [];
+
+    const smallest = Math.min(...areas);
+    const largest = Math.max(...areas);
+    const start = Math.floor(smallest / AREA_BAND_SIZE) * AREA_BAND_SIZE;
+    const end = Math.ceil(largest / AREA_BAND_SIZE) * AREA_BAND_SIZE;
+
+    const bands: AreaBand[] = [];
+    for (let lower = start; lower < end; lower += AREA_BAND_SIZE) {
+      const upper = lower + AREA_BAND_SIZE;
+      const isLast = upper >= end;
+      bands.push({
+        id: `${lower}`,
+        // Areas are stored as decimals (e.g. 250.95); round for legibility.
+        label: `${lower} – ${Math.round(isLast ? largest : upper)} m²`,
+        min: lower,
+        max: isLast ? Infinity : upper
+      });
+    }
+    // Drop bands no unit falls into (gaps in the mix, e.g. nothing at 75–100).
+    return bands.filter(b => areas.some(a => a >= b.min && a < b.max));
+  }, [tours]);
+
+  const hasUnitFilters = floorOptions.length > 0 || bedroomOptions.length > 0
+    || bathroomOptions.length > 0 || areaBands.length > 0;
+
+  const isFiltering = floorFilter !== ALL || bedroomsFilter !== ALL
+    || bathroomsFilter !== ALL || areaFilter !== ALL;
+
+  const filteredTours = useMemo(() => {
+    if (!isFiltering) return tours;
+
+    const band = areaBands.find(b => b.id === areaFilter);
+
+    return tours.filter(tour => {
+      if (floorFilter !== ALL && tour.floorName !== floorFilter) return false;
+      if (bedroomsFilter !== ALL && tour.bedrooms !== Number(bedroomsFilter)) return false;
+      if (bathroomsFilter !== ALL && tour.bathrooms !== Number(bathroomsFilter)) return false;
+      if (band && !(typeof tour.areaSqm === 'number' && tour.areaSqm >= band.min && tour.areaSqm < band.max)) return false;
+      return true;
+    });
+  }, [tours, isFiltering, floorFilter, bedroomsFilter, bathroomsFilter, areaFilter, areaBands]);
+
+  const resetFilters = () => {
+    setFloorFilter(ALL);
+    setBedroomsFilter(ALL);
+    setBathroomsFilter(ALL);
+    setAreaFilter(ALL);
+  };
 
   const handleTourClick = (tour: Tour) => {
       setSelectedTour(tour);
@@ -143,13 +248,115 @@ const RecorridosContent = () => {
             </p>
         </div>
 
+        {/* Filter bar — only rendered when the catalogue actually has unit data
+            to filter on, so a building-only tour list stays uncluttered. */}
+        {tours.length > 0 && hasUnitFilters && (
+          <div className="mb-10 bg-white rounded-xl border border-gray-200/60 shadow-sm p-5">
+            <div className="flex items-center gap-2 mb-4 text-gray-700">
+              <SlidersHorizontal size={16} />
+              <span className="text-xs uppercase tracking-widest font-medium">Filtrar recorridos</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {floorOptions.length > 0 && (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs text-gray-500">Piso</span>
+                  <select
+                    value={floorFilter}
+                    onChange={e => setFloorFilter(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
+                  >
+                    <option value={ALL}>Todos</option>
+                    {floorOptions.map(name => (
+                      <option key={name} value={name}>Piso {name}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {bedroomOptions.length > 0 && (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs text-gray-500">Habitaciones</span>
+                  <select
+                    value={bedroomsFilter}
+                    onChange={e => setBedroomsFilter(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
+                  >
+                    <option value={ALL}>Todas</option>
+                    {bedroomOptions.map(n => (
+                      <option key={n} value={n}>{n} {n === 1 ? 'habitación' : 'habitaciones'}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {bathroomOptions.length > 0 && (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs text-gray-500">Baños</span>
+                  <select
+                    value={bathroomsFilter}
+                    onChange={e => setBathroomsFilter(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
+                  >
+                    <option value={ALL}>Todos</option>
+                    {bathroomOptions.map(n => (
+                      <option key={n} value={n}>{n} {n === 1 ? 'baño' : 'baños'}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+
+              {areaBands.length > 0 && (
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs text-gray-500">Metraje</span>
+                  <select
+                    value={areaFilter}
+                    onChange={e => setAreaFilter(e.target.value)}
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 focus:border-brand-primary focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
+                  >
+                    <option value={ALL}>Todos</option>
+                    {areaBands.map(b => (
+                      <option key={b.id} value={b.id}>{b.label}</option>
+                    ))}
+                  </select>
+                </label>
+              )}
+            </div>
+
+            {isFiltering && (
+              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between gap-4">
+                <p className="text-xs text-gray-500">
+                  {filteredTours.length} {filteredTours.length === 1 ? 'recorrido' : 'recorridos'} de {tours.length}
+                </p>
+                <button
+                  onClick={resetFilters}
+                  className="inline-flex items-center gap-1.5 text-xs text-gray-600 hover:text-brand-orange transition-colors cursor-pointer"
+                >
+                  <X size={14} />
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         {tours.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl border border-gray-200/60 max-w-lg mx-auto shadow-sm">
             <p className="text-gray-500 text-sm">No hay recorridos virtuales activos por el momento.</p>
           </div>
+        ) : filteredTours.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-200/60 max-w-lg mx-auto shadow-sm">
+            <p className="text-gray-500 text-sm mb-4">Ningún recorrido coincide con los filtros seleccionados.</p>
+            <button
+              onClick={resetFilters}
+              className="text-xs uppercase tracking-widest text-brand-orange hover:underline cursor-pointer"
+            >
+              Limpiar filtros
+            </button>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {tours.map(tour => (
+              {filteredTours.map(tour => (
                   <div 
                       key={tour.id}
                       onClick={() => handleTourClick(tour)}
@@ -186,6 +393,21 @@ const RecorridosContent = () => {
                           <p className="text-gray-500 text-sm">
                               {tour.subtitle}
                           </p>
+
+                          {/* Unit specs — the same attributes the filter bar works on */}
+                          {(tour.bedrooms || tour.bathrooms || tour.areaSqm) && (
+                            <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+                              {typeof tour.bedrooms === 'number' && (
+                                <span>{tour.bedrooms} {tour.bedrooms === 1 ? 'hab.' : 'habs.'}</span>
+                              )}
+                              {typeof tour.bathrooms === 'number' && (
+                                <span>{tour.bathrooms} {tour.bathrooms === 1 ? 'baño' : 'baños'}</span>
+                              )}
+                              {typeof tour.areaSqm === 'number' && (
+                                <span>{Math.round(tour.areaSqm)} m²</span>
+                              )}
+                            </div>
+                          )}
                       </div>
                   </div>
               ))}

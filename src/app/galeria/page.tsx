@@ -253,14 +253,15 @@ const GalleryPage = () => {
                  </button>
 
                   {/* Image / Comparison Slider */}
-                  <div className="w-full h-full p-0 flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center justify-center">
                      {currentImage.srcNight ? (
-                       <div className="w-full h-[80%] max-h-[85vh] aspect-[16/10] max-w-[90%] p-2 lg:p-4">
-                         <ImageComparisonSlider 
+                       <div className="w-full h-full">
+                         <ImageComparisonSlider
                            key={currentImage.id}
                            dayImage={currentImage.src}
                            nightImage={currentImage.srcNight}
                            alt={currentImage.title || currentImage.alt}
+                           fullBleed
                          />
                        </div>
                      ) : (
@@ -281,8 +282,10 @@ const GalleryPage = () => {
                      <ChevronRight size={24} />
                  </button>
 
-                 {/* Counter/Index */}
-                 <div className="absolute bottom-6 right-6 z-20 pointer-events-none">
+                 {/* Counter/Index — centered rather than bottom-right: now that the
+                     comparison slider runs edge-to-edge, its "Noche" corner label
+                     occupies that corner. */}
+                 <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
                      <div className="text-xs font-medium bg-black/30 text-white px-3 py-1 rounded-full backdrop-blur-md border border-white/10">
                         {currentIndex + 1} / {displayImages.length}
                      </div>

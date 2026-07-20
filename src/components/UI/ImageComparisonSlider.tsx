@@ -6,12 +6,16 @@ interface ImageComparisonSliderProps {
   dayImage: string;
   nightImage: string;
   alt?: string;
+  /** Edge-to-edge mode: drops the card chrome (rounding, border, shadow) so the
+   *  comparison can sit flush against the viewport. */
+  fullBleed?: boolean;
 }
 
 export const ImageComparisonSlider: React.FC<ImageComparisonSliderProps> = ({
   dayImage,
   nightImage,
-  alt = 'Amenities Comparison'
+  alt = 'Amenities Comparison',
+  fullBleed = false
 }) => {
   const [sliderPosition, setSliderPosition] = useState(50); // 0 to 100
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,7 +78,9 @@ export const ImageComparisonSlider: React.FC<ImageComparisonSliderProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden select-none cursor-pointer rounded-2xl shadow-2xl bg-neutral-900 border border-white/10"
+      className={`relative w-full h-full overflow-hidden select-none cursor-pointer bg-neutral-900 ${
+        fullBleed ? '' : 'rounded-2xl shadow-2xl border border-white/10'
+      }`}
       onClick={handleContainerClick}
     >
       {/* Day Image (Background / Underneath) */}

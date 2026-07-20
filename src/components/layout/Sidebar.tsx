@@ -40,8 +40,11 @@ const IconMap: Record<string, any> = {
 // Decorative layered ocean waves that crest along the top edge of the navigation.
 // All 4 layers animate at different speeds for an organic, living ocean surface.
 // Paths run from x=-80 to x=1520 so the horizontal drift never exposes a gap.
+// `.top-wave-blur` carries the panel's frosted backdrop up through the crest
+// (masked to the wave silhouette) so crest and panel read as one surface.
 const WaveCrest = ({ className = "" }: { className?: string }) => (
     <div className={`pointer-events-none relative h-[46px] w-full overflow-hidden ${className}`}>
+        <div className="top-wave-blur backdrop-blur-xl" />
         <div className="top-wave-1 absolute inset-0" />
         <div className="top-wave-2 absolute inset-0" />
         <div className="top-wave-3 absolute inset-0" />
@@ -193,10 +196,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 {isOpen && <LiquidMenuBackground />}
 
                 <div className="relative z-10 flex flex-1 flex-col">
-                    {/* Header strip (logo + close) capped by the same ocean wave crest */}
-                    <div className="shrink-0 flex items-center justify-between px-6 pt-5 pb-2 bg-transparent">
-                        <img src="/identity/identity_logo_white.png" alt={config.appName} className="h-9 object-contain" />
-                        <button onClick={onClose} className="p-2 -mr-1 text-white/75 hover:text-white hover:scale-110 transition-all cursor-pointer">
+                    {/* Header strip (logo + close) capped by the same ocean wave crest.
+                        The rotated frame has no room for a separate backdrop logo,
+                        so the logo is centered here instead of tucked in a corner. */}
+                    <div className="relative shrink-0 flex items-center justify-center px-6 pt-5 pb-2 bg-transparent">
+                        <img src="/identity/identity_logo_white.png" alt={config.appName} className="h-12 object-contain drop-shadow-lg" />
+                        <button onClick={onClose} className="absolute right-5 top-1/2 -translate-y-1/2 p-2 text-white/75 hover:text-white hover:scale-110 transition-all cursor-pointer">
                             <X size={24} />
                         </button>
                     </div>
@@ -254,6 +259,27 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 onClick={onClose}
             />
 
+            {/* Project logo, centered on the blurred backdrop. This is the menu's
+                own logo — it renders on every route rather than relying on the
+                homepage hero logo being lifted above the backdrop, and it
+                replaces the small logo that used to sit in the nav header.
+                pointer-events-none keeps the backdrop's click-to-close intact. */}
+            <div
+                aria-hidden={!isOpen}
+                className={`fixed inset-0 z-[62] flex items-center justify-center px-8 pb-[clamp(11rem,24vh,15rem)] pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]
+                    ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+            >
+                {/* The bottom padding offsets the nav bar's height so the logo
+                    reads as centered in the space actually left visible.
+                    Sizing classes deliberately mirror the homepage hero logo
+                    (src/app/page.tsx) so the mark keeps one size across the site. */}
+                <img
+                    src="/identity/identity_logo_white.png"
+                    alt={config.appName}
+                    className="w-[180px] lg:w-full max-w-xl object-contain drop-shadow-2xl"
+                />
+            </div>
+
             {/* Bottom Wave Navigation */}
             <nav
                 aria-label="Navegación principal"
@@ -262,17 +288,26 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             >
                 <WaveCrest />
 
-                <div className="relative isolate overflow-hidden bg-gradient-to-b from-ocean-600/60 via-ocean-700/65 to-ocean-800/70 backdrop-blur-xl px-4 pt-0 pb-3 shadow-[0_-14px_40px_rgba(8,40,60,0.35)]">
+                {/* -mt-px closes the subpixel hairline between crest and panel.
+                    The upward drop-shadow that used to live here was removed: it
+                    fell across the crest and re-drew the very seam the wave-shaped
+                    blur is meant to dissolve. */}
+                <div className="relative isolate -mt-px overflow-hidden bg-gradient-to-b from-ocean-600/60 via-ocean-700/65 to-ocean-800/70 backdrop-blur-xl px-4 pt-0 pb-3">
+                    {/* Colour bridge. The four crest layers composite to ~99% alpha
+                        (1-(1-.45)(1-.65)(1-.75)(1-.85)), so the panel has to START
+                        fully opaque in the crest's own colour and only then decay to
+                        its translucent base — anything less leaves a visible step.
+                        Fades to ocean-600/0 rather than `transparent` so only alpha
+                        interpolates; `transparent` is rgba(0,0,0,0) and would pull
+                        the midpoint toward grey, drawing a fresh band. */}
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-20 z-0 bg-gradient-to-b from-ocean-600 to-ocean-600/0" />
                     {isOpen && <LiquidMenuBackground />}
 
-                    {/* Header row: building logo + close — logo hidden on homepage (desktop) */}
-                    <div className="relative z-10 flex items-center justify-between px-1 pb-1.5">
-                        {pathname === '/' ? (
-                            <span className="h-7" />
-                        ) : (
-                            <img src="/identity/identity_logo_white.png" alt={config.appName} className="h-7 object-contain" />
-                        )}
+                    {/* Header row: close only — the logo now lives large and
+                        centered on the backdrop, not shrunk into this strip. */}
+                    <div className="relative z-10 flex items-center justify-end px-1 pb-1.5">
                         <button onClick={onClose} className="p-1.5 -mr-1 text-white/70 hover:text-white hover:scale-110 transition-all cursor-pointer relative z-10">
+
                             <X size={20} />
                         </button>
                     </div>

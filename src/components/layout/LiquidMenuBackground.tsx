@@ -67,7 +67,12 @@ export default function LiquidMenuBackground() {
         <canvas
             ref={canvasRef}
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0 h-full w-full mix-blend-screen opacity-60"
+            // The mask fades the ripples in over the first 5rem. This canvas is
+            // scoped to the nav panel, but `mix-blend-screen` brightens whatever
+            // it covers — without the fade its top edge lightens the panel while
+            // the wave crest above stays untouched, re-drawing the seam the crest
+            // blend exists to remove.
+            className="pointer-events-none absolute inset-0 z-0 h-full w-full mix-blend-screen opacity-60 [mask-image:linear-gradient(to_bottom,transparent,black_5rem)]"
         />
     );
 }

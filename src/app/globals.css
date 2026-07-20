@@ -161,6 +161,38 @@ html, body {
   }
 }
 
+/* Wave-shaped backdrop blur.
+   The crest strip used to sit on unblurred page content while the nav panel
+   below it was `backdrop-blur-xl`, which drew a hard horizontal line where the
+   blur began. This layer carries the same blur up into the crest but masks it
+   with the wave silhouette, so the frosted edge follows the water instead of
+   cutting straight across. It rides along with .top-wave-4 (the front-most,
+   darkest wave) so the mask edge always stays tucked under painted water.
+   The blur itself comes from the `backdrop-blur-xl` utility on the element —
+   the same one the nav panel uses, so both sides of the join match exactly.
+   (Declaring backdrop-filter here doesn't survive: Lightning CSS drops the
+   unprefixed property for the configured browser targets.) */
+.top-wave-blur {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='198'%3E%3Cpath fill='%23ffffff' fill-rule='evenodd' d='M.005 121C311 121 409.898-.25 811 0c400 0 500 121 789 121v77H0s.005-48 .005-77z' transform='matrix(-1 0 0 1 1600 0)'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='198'%3E%3Cpath fill='%23ffffff' fill-rule='evenodd' d='M.005 121C311 121 409.898-.25 811 0c400 0 500 121 789 121v77H0s.005-48 .005-77z' transform='matrix(-1 0 0 1 1600 0)'/%3E%3C/svg%3E");
+  -webkit-mask-size: 800px 46px;
+  mask-size: 800px 46px;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-position: left bottom;
+  mask-position: left bottom;
+  animation: scroll-mask-4 7s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scroll-mask-4 {
+  from { -webkit-mask-position-x: 0; mask-position-x: 0; }
+  to { -webkit-mask-position-x: -800px; mask-position-x: -800px; }
+}
+
 /* Continuous Scrolling Top Wave Crest */
 .top-wave-1, .top-wave-2, .top-wave-3, .top-wave-4 {
   background-repeat: repeat-x;
