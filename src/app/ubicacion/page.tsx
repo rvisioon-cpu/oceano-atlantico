@@ -21,7 +21,7 @@ const DirectionsPage = () => {
     const [viewMode, setViewMode] = useState<'video' | 'map'>('video');
 
     const videoUrl = getAssetUrl('location/videos/video_mapa.mp4');
-    const posterUrl = getAssetUrl('location/photos/FOTO_VISTA_PLANETA_PERU.png');
+    const posterUrl = getAssetUrl('location/photos/FOTO_VISTA_PLANETA_PERU.webp');
 
     const handleVideoEnded = () => {
         const video = videoRef.current;

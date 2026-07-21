@@ -19,7 +19,7 @@ export const homepageData: HomepageData = {
     button: "Entrar"
   },
   intro: {
-    poster: "homepage/intro.png",
+    poster: "homepage/intro.webp",
     video: "homepage/intro_video.mp4"
   },
   slides: [

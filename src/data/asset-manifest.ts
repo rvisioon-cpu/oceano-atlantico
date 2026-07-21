@@ -5,27 +5,27 @@
  */
 export const assetManifest: string[] = [
     // Homepage
-    'homepage/intro.png',
+    'homepage/intro.webp',
     'homepage/intro_video.mp4',
 
     // Location Assets
-    'location/photos/FOTO_VISTA_PLANETA_PERU.png',
+    'location/photos/FOTO_VISTA_PLANETA_PERU.webp',
     'location/videos/video_mapa.mp4',
 
     // Building Assets
-    'building/photos/0.1.png',
+    'building/photos/0.1.webp',
     'building/videos/0.1.mp4',
     'building/transitions/0.1_a_1.1.mp4',
-    'building/photos/1.1.png',
-    'building/photos/1.2.png',
+    'building/photos/1.1.webp',
+    'building/photos/1.2.webp',
     'building/transitions/1.1_a_1.2.mp4',
     'building/transitions/1.2_a_1.1.mp4',
-    'building/photos/2.1.png',
-    'building/photos/2.2.2.png',
+    'building/photos/2.1.webp',
+    'building/photos/2.2.2.webp',
     'building/transitions/2.1_a_2.2.mp4',
     'building/transitions/2.2_a_2.1.mp4',
-    'building/photos/3.1.png',
-    'building/photos/3.2.png',
+    'building/photos/3.1.webp',
+    'building/photos/3.2.webp',
     'building/transitions/3.1_a_3.2.mp4',
     'building/transitions/3.2_a_3.1.mp4',
     'building/transitions/1.1_a_2.1.mp4',
