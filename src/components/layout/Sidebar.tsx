@@ -82,10 +82,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             // "El edificio" (Showroom) Critical Path
             const face0 = buildingFacesData[0];
             if (face0) {
-                preloadVideo(getAssetUrl('videos/walks/trans_intro_to_0.mp4')).catch(() => { });
                 const currentAssetSet = timeOfDay === 'day' ? face0.day : face0.night;
                 if (currentAssetSet?.background) {
                     preloadImages([currentAssetSet.background]).catch(() => { });
+                }
+                if (currentAssetSet?.backgroundVideo) {
+                    preloadVideo(currentAssetSet.backgroundVideo).catch(() => { });
                 }
                 if (currentAssetSet?.introVideo) {
                     preloadVideo(currentAssetSet.introVideo).catch(() => { });
@@ -113,12 +115,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
         if (path) {
             if (path.startsWith('/')) {
-                // Pass transition state for Showroom via Query Params for Next.js
-                if (path === '/showroom') {
-                    router.push('/showroom?transition=intro');
-                }
                 // Route Floors through Showroom for the transition video
-                else if (path === '/plantas') {
+                if (path === '/plantas') {
                     router.push('/showroom?transition=floors&targetPath=/plantas');
                 }
                 else {
@@ -137,8 +135,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 
         if (key === 'showroom' && buildingFacesData.length > 0) {
             if (face0) {
-                preloadVideo(getAssetUrl('videos/walks/trans_intro_to_0.mp4')).catch(() => { });
                 if (currentAssetSet?.background) preloadImages([currentAssetSet.background]).catch(() => { });
+                if (currentAssetSet?.backgroundVideo) preloadVideo(currentAssetSet.backgroundVideo).catch(() => { });
+                if (currentAssetSet?.introVideo) preloadVideo(currentAssetSet.introVideo).catch(() => { });
             }
         }
         else if (key === 'floors' && buildingFacesData.length > 0) {
