@@ -44,3 +44,6 @@ next-env.d.ts
 .open-next
 
 /.claude
+
+# drive downloads
+public/drive-download-*

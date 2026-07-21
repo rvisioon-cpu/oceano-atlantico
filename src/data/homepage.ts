@@ -19,22 +19,29 @@ export const homepageData: HomepageData = {
     button: "Entrar"
   },
   intro: {
-    poster: "/intro.jpg",
-    video: "/videos/walk.mp4"
+    poster: "homepage/intro.png",
+    video: "homepage/intro_video.mp4"
   },
   slides: [
     {
-      text: "{{highlight}} es un edificio boutique ubicado estratégicamente en el corazón de Pueblo Libre.",
-      highlight: "Santa Fe 190"
+      text: "{{highlight}} Océano Atlántico es un proyecto residencial de solo 10 departamentos, diseñado para quienes valoran la privacidad, el confort y los acabados premium.",
+      highlight: "Exclusividad en cada detalle"
     },
     {
-      text: "Exclusividad de solo 15 departamentos, con áreas desde 52.90 m² hasta 134.50 m²."
+      text: "{{highlight}} Vive en una ubicación estratégica cercana al Jockey Plaza, la Universidad de Lima y los principales servicios de la ciudad.",
+      highlight: "Una ubicación que lo conecta todo"
     },
     {
-      text: "Conectividad total en una zona tranquila, rodeada de parques y cerca de todo lo que necesitas."
+      text: "{{highlight}} Un proyecto exclusivo que combina arquitectura sofisticada, distribuciones funcionales y acabados cuidadosamente seleccionados para elevar tu experiencia de vida.",
+      highlight: "Diseño premium, estilo único"
     },
     {
-      text: "Una propuesta moderna de 8 pisos que destaca por su diseño funcional y acabados contemporáneos."
+      text: "{{highlight}} Con únicamente 10 unidades y 14 estacionamientos simples y dobles, Océano Atlántico ofrece una propuesta residencial privada, moderna y diferenciada.",
+      highlight: "Un edificio boutique para pocos"
+    },
+    {
+      text: "{{highlight}} Flats y dúplex de diseño contemporáneo, acabados premium y una ubicación privilegiada se unen en un proyecto pensado para disfrutar cada espacio.",
+      highlight: "La sofisticación de vivir bien"
     }
   ]
 };

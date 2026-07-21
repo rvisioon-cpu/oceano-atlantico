@@ -4,6 +4,10 @@
  * This file should be updated whenever new assets are added to the project.
  */
 export const assetManifest: string[] = [
+    // Homepage
+    'homepage/intro.png',
+    'homepage/intro_video.mp4',
+
     // 901
     'plants/details/901/unfurnished.jpg',
     'plants/details/901/plans.jpg',

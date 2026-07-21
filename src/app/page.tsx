@@ -15,7 +15,7 @@ const Homepage = () => {
   const router = useRouter();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isPlayingIntro, setIsPlayingIntro] = useState(false);
-  const [introVideo, setIntroVideo] = useState(homepageData.intro.video);
+  const [introVideo, setIntroVideo] = useState(getAssetUrl(homepageData.intro.video));
 
   useEffect(() => {
     getActiveMedia("VIDEO_PORTADA").then((media) => {
@@ -37,7 +37,7 @@ const Homepage = () => {
   useEffect(() => {
     // Preload the poster immediately to avoid gray screen
     const img = new Image();
-    img.src = homepageData.intro.poster;
+    img.src = getAssetUrl(homepageData.intro.poster);
 
     // Background preloading of transition assets so they are ready when the user clicks 'Ingresar'
     preloadVideo(getAssetUrl('videos/walks/trans_intro_to_0.mp4')).catch(() => {});
@@ -137,7 +137,7 @@ const Homepage = () => {
           autoPlay 
           muted 
           playsInline
-          poster={homepageData.intro.poster}
+          poster={getAssetUrl(homepageData.intro.poster)}
           className="w-full h-full object-cover"
           onEnded={handleBackgroundVideoEnded}
           // Prioritize loading intro assets as soon as the main video can play
@@ -208,16 +208,19 @@ const Homepage = () => {
               </button>
 
              {/* Presentation Text Container */}
-             <div className={`absolute top-[38%] lg:top-[65%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 h-[160px] lg:h-[200px] px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
+             <div className={`absolute top-[38%] lg:top-[65%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 h-[220px] lg:h-[260px] px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
                  
                  {homepageData.slides.map((slide, index) => (
                     <p 
                         key={index}
                         ref={el => { textRefs.current[index] = el }} 
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full lg:w-fit bg-black/40 backdrop-blur-md rounded-2xl p-6 lg:p-10 text-center text-lg lg:text-3xl font-light tracking-wide opacity-0 text-white drop-shadow-lg max-w-4xl mx-auto"
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full lg:w-fit bg-black/40 backdrop-blur-md rounded-2xl p-6 lg:p-10 text-center text-lg lg:text-3xl font-light tracking-wide opacity-0 text-white drop-shadow-lg max-w-4xl mx-auto flex flex-col gap-2"
                     >
                         {slide.highlight ? (
-                            <><span className="font-bold">{slide.highlight}</span> {slide.text.replace('{{highlight}}', '').trim()}</>
+                            <>
+                              <span className="font-bold block text-lg lg:text-2xl uppercase tracking-wider text-brand-primary">{slide.highlight}</span>
+                              <span className="text-sm lg:text-base font-light leading-relaxed block max-w-2xl mx-auto normal-case">{slide.text.replace('{{highlight}}', '').trim()}</span>
+                            </>
                         ) : (
                             slide.text
                         )}
