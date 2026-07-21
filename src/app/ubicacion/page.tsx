@@ -1,11 +1,12 @@
 "use client";
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import MapComponent from '@/components/map/Map';
 import Sidebar from '@/components/layout/Sidebar';
-import { Search, MapPin, Menu, ChevronDown, ChevronUp, Car, Footprints, Bike, Navigation, X } from 'lucide-react';
+import { Search, MapPin, Menu, ChevronDown, ChevronUp, Car, Footprints, Bike, Navigation, X, Video, Map as MapIcon } from 'lucide-react';
 import { type LocationFeature } from '@/data/locations';
 import { getLocations, seedLocations } from '@/app/actions/locations';
 import { useStore } from '@/store/useStore';
+import { getAssetUrl } from '@/utils/assets';
 
 const DirectionsPage = () => {
     const isForcedLandscape = useStore(state => state.isForcedLandscape);
@@ -14,6 +15,29 @@ const DirectionsPage = () => {
     const [selectedName, setSelectedName] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Video Transition State & References
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [viewMode, setViewMode] = useState<'video' | 'map'>('video');
+
+    const videoUrl = getAssetUrl('location/videos/video_mapa.mp4');
+    const posterUrl = getAssetUrl('location/photos/FOTO_VISTA_PLANETA_PERU.png');
+
+    const handleVideoEnded = () => {
+        const video = videoRef.current;
+        if (!video) return;
+        video.currentTime = 8;
+        video.play().catch(console.error);
+    };
+
+    const handleTimeUpdate = () => {
+        const video = videoRef.current;
+        if (!video) return;
+        if (video.duration && video.currentTime >= video.duration - 0.15) {
+            video.currentTime = 8;
+            video.play().catch(console.error);
+        }
+    };
 
     // Load locations dynamically from database
     useEffect(() => {
@@ -200,6 +224,21 @@ const DirectionsPage = () => {
                         <Bike size={20} />
                         {routeStats && <span className="text-xs font-bold">{formatDuration(routeStats.cycling.duration)}</span>}
                     </button>
+
+                    {/* Switch to Video Map Mode */}
+                    <button
+                        onClick={() => {
+                            setViewMode('video');
+                            setTimeout(() => {
+                                videoRef.current?.play().catch(console.error);
+                            }, 50);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all pointer-events-auto bg-white text-gray-700 hover:bg-gray-50 text-xs font-semibold border border-gray-100"
+                        title="Ver Video Mapa"
+                    >
+                        <Video size={18} className="text-brand-orange" />
+                        <span>Ver Video Mapa</span>
+                    </button>
                 </div>
             </div>
 
@@ -220,7 +259,7 @@ const DirectionsPage = () => {
 
             {/* Floating Bottom Panel (Console) */}
             <div
-                className={`fixed bottom-0 md:bottom-6 left-0 md:left-6 w-full md:w-[450px] bg-white md:rounded-2xl shadow-2xl z-40 flex flex-col transition-all duration-500 ease-in-out h-full md:h-auto md:max-h-[70%] ${isPanelOpen ? 'translate-y-0 pointer-events-auto' : 'translate-y-full md:translate-y-[calc(100%-180px)] opacity-100 pointer-events-none'}`}
+                className={`fixed bottom-0 md:bottom-6 left-0 md:left-6 w-full md:w-[450px] bg-white md:rounded-2xl shadow-2xl z-40 flex flex-col transition-all duration-500 ease-in-out h-full md:h-auto md:max-h-[70%] ${(isPanelOpen && viewMode === 'map') ? 'translate-y-0 pointer-events-auto' : 'translate-y-full md:translate-y-[calc(100%-180px)] opacity-100 pointer-events-none'}`}
             >
 
                 {/* Handler / Header Area */}
@@ -414,6 +453,34 @@ const DirectionsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Video Transition Overlay */}
+            {viewMode === 'video' && (
+                <div className="fixed inset-0 z-40 bg-black flex items-center justify-center">
+                    <video
+                        ref={videoRef}
+                        src={videoUrl}
+                        poster={posterUrl}
+                        autoPlay
+                        muted
+                        playsInline
+                        onEnded={handleVideoEnded}
+                        onTimeUpdate={handleTimeUpdate}
+                        className="w-full h-full object-cover"
+                    />
+
+                    {/* Floating Button to Switch to Interactive Map */}
+                    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+                        <button
+                            onClick={() => setViewMode('map')}
+                            className="flex items-center gap-2 bg-brand-primary/90 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white px-8 py-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer uppercase tracking-wider text-xs lg:text-sm font-semibold font-secondary"
+                        >
+                            <MapIcon size={20} />
+                            <span>Explorar Mapa Interactivo</span>
+                        </button>
+                    </div>
+                </div>
+            )}
 
         </div>
     );

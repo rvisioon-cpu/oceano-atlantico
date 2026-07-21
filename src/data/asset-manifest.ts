@@ -8,6 +8,10 @@ export const assetManifest: string[] = [
     'homepage/intro.png',
     'homepage/intro_video.mp4',
 
+    // Location Assets
+    'location/photos/FOTO_VISTA_PLANETA_PERU.png',
+    'location/videos/video_mapa.mp4',
+
     // Building Assets
     'building/photos/0.1.png',
     'building/videos/0.1.mp4',
