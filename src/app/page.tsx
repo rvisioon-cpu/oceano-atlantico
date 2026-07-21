@@ -39,11 +39,10 @@ const Homepage = () => {
     const img = new Image();
     img.src = getAssetUrl(homepageData.intro.poster);
 
-    // Background preloading of transition assets so they are ready when the user clicks 'Ingresar'
-    preloadVideo(getAssetUrl('videos/walks/trans_intro_to_0.mp4')).catch(() => {});
+    // Background preloading of transition assets so they are ready when the user enters the showroom
+    preloadVideo(getAssetUrl('building/transitions/0.1_a_1.1.mp4')).catch(() => {});
     preloadImages([
-       getAssetUrl('building/photos/face_0_daylight.png'),
-       getAssetUrl('building/photos/face_0_nightlight.png')
+       getAssetUrl('building/photos/0.1.webp')
     ]).catch(() => {});
     
     // Create timeline but don't auto-repeat infinitely (we handle restart via video sync)
