@@ -105,6 +105,38 @@ export const useStore = create<ShowroomState>((set, get) => ({
 
   startTransition: async (destination) => {
     const state = get();
+
+    if (state.currentFace === 0) {
+      // Transition from Face 0 (Cara Inicial) to Face 2 (Cara Central)
+      const face0 = state.buildingFacesData[0];
+      const videoUrl = face0?.day?.introVideo; // "building/transitions/0.1_a_1.1.mp4"
+      const nextFaceIndex = 2; // Cara Central
+      const nextFaceData = state.buildingFacesData[nextFaceIndex];
+      const nextBackgroundUrl = nextFaceData ? nextFaceData[state.timeOfDay]?.background : undefined;
+
+      if (videoUrl) {
+        set({ isLoadingAssets: true });
+        try {
+          const promises: Promise<void | HTMLImageElement>[] = [preloadVideo(videoUrl)];
+          if (nextBackgroundUrl) {
+            promises.push(preloadImages([nextBackgroundUrl]));
+          }
+          await Promise.all(promises);
+        } catch (e) {
+          console.warn('Failed to preload intro-to-center transition', e);
+        }
+        set({ isLoadingAssets: false });
+      }
+
+      set({
+        nextFace: nextFaceIndex,
+        transitionUrl: videoUrl,
+        viewState: 'TRANSITION_ROTATION',
+        targetDestination: null
+      });
+      return;
+    }
+
     const face = state.buildingFacesData[state.currentFace] || state.buildingFacesData[0];
     if (!face) return;
     const assetSet = face[state.timeOfDay];
@@ -173,9 +205,8 @@ export const useStore = create<ShowroomState>((set, get) => ({
       videoUrl
     });
 
-    // If no video URL is defined, just snap
+    // If no video URL is defined, do not rotate (rotation is not allowed)
     if (!videoUrl) {
-      set({ currentFace: nextFaceIndex });
       return;
     }
 

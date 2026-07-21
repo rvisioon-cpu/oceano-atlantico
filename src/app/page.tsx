@@ -99,8 +99,7 @@ const Homepage = () => {
   }, []);
 
   const handleStartIntro = () => {
-    // Start playing intro transition video immediately for instant UX feedback
-    setIsPlayingIntro(true);
+    router.push('/showroom');
   };
 
   const handleVideoEnd = () => {

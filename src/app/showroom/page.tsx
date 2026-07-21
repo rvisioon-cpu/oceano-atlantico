@@ -200,7 +200,7 @@ const ShowroomContent = () => {
       <div className="fixed top-6 right-6 z-30 flex flex-col gap-4 items-end">
 
         {/* Day/Night Toggle */}
-        {viewState === 'IDLE' && (
+        {viewState === 'IDLE' && currentFace !== 0 && (
           <div className="relative group">
             <button
               onClick={() => { setLoadingAction('daynight'); toggleTimeOfDay(); }}
