@@ -7,14 +7,14 @@ let floorsDataStr = fileContent.substring(fileContent.indexOf('export const floo
 floorsDataStr = floorsDataStr.substring(0, floorsDataStr.lastIndexOf('];') + 1);
 
 // Replace asset usages with actual paths
-floorsDataStr = floorsDataStr.replace(/floorPB2/g, '"/plants/floor_pb1.png"');
-floorsDataStr = floorsDataStr.replace(/floorPB1/g, '"/plants/floor_pb.png"');
-floorsDataStr = floorsDataStr.replace(/floor1/g, '"/plants/floor_1.png"');
-floorsDataStr = floorsDataStr.replace(/floor2/g, '"/plants/floor_2.png"');
-floorsDataStr = floorsDataStr.replace(/floor3/g, '"/plants/floor_3.png"');
-floorsDataStr = floorsDataStr.replace(/floor4/g, '"/plants/floor_4.png"');
-floorsDataStr = floorsDataStr.replace(/floor5/g, '"/plants/floor_5.png"');
-floorsDataStr = floorsDataStr.replace(/floor6/g, '"/plants/floor_6.png"');
+floorsDataStr = floorsDataStr.replace(/floorS2/g, '"/plants/floor_s2.webp"');
+floorsDataStr = floorsDataStr.replace(/floorS1/g, '"/plants/floor_s1.webp"');
+floorsDataStr = floorsDataStr.replace(/floor1/g, '"/plants/floor_1.webp"');
+floorsDataStr = floorsDataStr.replace(/floor2/g, '"/plants/floor_2.webp"');
+floorsDataStr = floorsDataStr.replace(/floor3/g, '"/plants/floor_3.webp"');
+floorsDataStr = floorsDataStr.replace(/floor4/g, '"/plants/floor_4.webp"');
+floorsDataStr = floorsDataStr.replace(/floor5/g, '"/plants/floor_5.webp"');
+floorsDataStr = floorsDataStr.replace(/floor6/g, '"/plants/floor_6.webp"');
 floorsDataStr = floorsDataStr.replace(/floor7/g, '"/plants/floor_7.png"');
 floorsDataStr = floorsDataStr.replace(/floorDuplex1/g, '"/plants/floor_duplex_1.png"');
 floorsDataStr = floorsDataStr.replace(/floorDuplex2/g, '"/plants/floor_duplex_2.png"');
@@ -28,7 +28,7 @@ for (const floor of floorsData) {
   let type = 'Piso';
   if (floor.id.toLowerCase() === 'pb') {
     type = 'Planta Baja';
-  } else if (floor.id.toLowerCase().startsWith('pb')) {
+  } else if (floor.id.toLowerCase().startsWith('pb') || floor.id.toLowerCase().startsWith('s')) {
     type = 'Sótano';
   }
   sql += `INSERT INTO floors (id, name, level, type, image_path) VALUES ('${floorId}', '${floor.name}', ${floor.level}, '${type}', '${floor.floorPlanImage}');\n`;

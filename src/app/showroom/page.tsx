@@ -76,8 +76,11 @@ const ShowroomContent = () => {
             targetDestination: 'Lobby'
           });
         } else if (transition === 'floors') {
-          // Plantas: Uses the generic "Central View" walk (Day/Night sensitive)
-          const floorsVideoUrl = currentTimeOfDay === 'day' ? face0?.day?.introVideo : face0?.night?.introVideo;
+          // Plantas: enters the building with the "Cara Central" walk (Day/Night
+          // sensitive). Face 0 is the cover, whose introVideo only rotates to the
+          // central face — index 2 is the same face the store rotates to from it.
+          const centralFace = faces[2] || face0;
+          const floorsVideoUrl = currentTimeOfDay === 'day' ? centralFace?.day?.introVideo : centralFace?.night?.introVideo;
 
           if (floorsVideoUrl) {
             useStore.setState({
@@ -277,39 +280,41 @@ const ShowroomContent = () => {
         </div>
       )}
 
-      {/* Initial-face luxury cover — brand logo + a refined "Ingresar" CTA,
-          positioned toward the left. Only menu & fullscreen stay in the corners. */}
+      {/* Initial-face luxury cover — a large brand logo filling the upper-left
+          area, with a refined "Ingresar" CTA below it. The logo width, and the
+          logo/button left+top offsets, are the knobs to nudge the placement.
+          Only menu & fullscreen stay in the corners. */}
       {viewState === 'IDLE' && isInitialFace && (
         <div className="fixed inset-0 z-40 pointer-events-none">
-          {/* Soft radial scrim (behind the mark) so the white reads over the render */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_46%_52%_at_21%_44%,rgba(4,22,32,0.55),rgba(4,22,32,0)_62%)]" />
+          {/* Soft scrim over the left area so the white mark reads on the render */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_54%_60%_at_30%_42%,rgba(4,22,32,0.5),rgba(4,22,32,0)_66%)]" />
 
-          <div className="absolute left-[21%] top-[44%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center px-4">
-            <img
-              src="/identity/identity_logo_white.png"
-              alt={config.appName}
-              className="relative w-[240px] lg:w-[360px] object-contain drop-shadow-[0_6px_40px_rgba(0,0,0,0.55)] animate-fade-in"
-            />
+          {/* Logo — fills the upper-left area */}
+          <img
+            src="/identity/identity_logo_white.png"
+            alt={config.appName}
+            className="absolute left-[12%] top-[25%] w-[42vw] min-w-[260px] max-w-[820px] object-contain drop-shadow-[0_6px_40px_rgba(0,0,0,0.55)] animate-fade-in"
+          />
 
-            <button
-              onClick={() => { setLoadingAction('enter'); startTransition('Floors'); }}
-              onMouseEnter={() => setIsHoveringIngresar(true)}
-              onMouseLeave={() => setIsHoveringIngresar(false)}
-              disabled={isLoadingAssets}
-              className="group pointer-events-auto relative mt-10 inline-flex items-center gap-4 overflow-hidden border border-white/50 px-12 py-4 backdrop-blur-[2px] transition-all duration-500 hover:border-white disabled:opacity-60 disabled:cursor-not-allowed animate-fade-in"
-            >
-              {/* White fill sweeps up on hover */}
-              <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
-              <span className="relative z-10 text-[13px] font-light uppercase tracking-[0.35em] text-white transition-colors duration-500 group-hover:text-ocean-900">
-                {loadingAction === 'enter' ? <Loader className="w-[18px] h-[18px]" /> : 'Ingresar'}
-              </span>
-              {loadingAction !== 'enter' && (
-                <svg className="relative z-10 h-4 w-4 text-white transition-all duration-500 group-hover:text-ocean-900 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              )}
-            </button>
-          </div>
+          {/* Luxury "Ingresar" CTA — centered below the logo */}
+          <button
+            onClick={() => { setLoadingAction('enter'); startTransition('Floors'); }}
+            onMouseEnter={() => setIsHoveringIngresar(true)}
+            onMouseLeave={() => setIsHoveringIngresar(false)}
+            disabled={isLoadingAssets}
+            className="group pointer-events-auto absolute left-[30%] top-[51%] -translate-x-1/2 inline-flex items-center gap-4 overflow-hidden border border-white/50 px-12 py-4 backdrop-blur-[2px] transition-all duration-500 hover:border-white disabled:opacity-60 disabled:cursor-not-allowed animate-fade-in"
+          >
+            {/* White fill sweeps up on hover */}
+            <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+            <span className="relative z-10 text-[13px] font-light uppercase tracking-[0.35em] text-white transition-colors duration-500 group-hover:text-ocean-900">
+              {loadingAction === 'enter' ? <Loader className="w-[18px] h-[18px]" /> : 'Ingresar'}
+            </span>
+            {loadingAction !== 'enter' && (
+              <svg className="relative z-10 h-4 w-4 text-white transition-all duration-500 group-hover:text-ocean-900 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            )}
+          </button>
         </div>
       )}
     </div>

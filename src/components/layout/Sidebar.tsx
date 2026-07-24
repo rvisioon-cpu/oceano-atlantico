@@ -141,7 +141,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             }
         }
         else if (key === 'floors' && buildingFacesData.length > 0) {
-            if (currentAssetSet?.introVideo) preloadVideo(currentAssetSet.introVideo).catch(() => { });
+            // "Plantas" enters through the central face's walk (see /showroom?transition=floors)
+            const centralFace = buildingFacesData[2] || face0;
+            const centralAssetSet = centralFace ? (timeOfDay === 'day' ? centralFace.day : centralFace.night) : null;
+            if (centralAssetSet?.introVideo) preloadVideo(centralAssetSet.introVideo).catch(() => { });
 
             const defaultFloor = floorsData.find(f => f.id === getEntryFloorId(floorsData));
             if (defaultFloor) {

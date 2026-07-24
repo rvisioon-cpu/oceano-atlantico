@@ -39,14 +39,14 @@ export interface Unit {
 
 import { getAssetUrl } from '../utils/assets';
 
-const floorPB2 = getAssetUrl('plants/floor_pb1.png');
-const floorPB1 = getAssetUrl('plants/floor_pb.png');
-const floor1 = getAssetUrl('plants/floor_1.png');
-const floor2 = getAssetUrl('plants/floor_2.png');
-const floor3 = getAssetUrl('plants/floor_3.png');
-const floor4 = getAssetUrl('plants/floor_4.png');
-const floor5 = getAssetUrl('plants/floor_5.png');
-const floor6 = getAssetUrl('plants/floor_6.png');
+const floorS2 = getAssetUrl('plants/floor_s2.webp');
+const floorS1 = getAssetUrl('plants/floor_s1.webp');
+const floor1 = getAssetUrl('plants/floor_1.webp');
+const floor2 = getAssetUrl('plants/floor_2.webp');
+const floor3 = getAssetUrl('plants/floor_3.webp');
+const floor4 = getAssetUrl('plants/floor_4.webp');
+const floor5 = getAssetUrl('plants/floor_5.webp');
+const floor6 = getAssetUrl('plants/floor_6.webp');
 
 export interface Floor {
   id: string;
@@ -57,7 +57,7 @@ export interface Floor {
 }
 
 // ============================================================================
-// Residencial Océano Atlántico — 6 floors, 2 basements (PB 1, PB 2).
+// Residencial Océano Atlántico — 6 floors, 2 basements (S1, S2).
 // Bedrooms / bathrooms / area (m²) provided by the client.
 // NOTE: units 301/401 mirror the 201 stack and 302/402 mirror the 202 stack
 // (the client left those rows blank; stacked lines share the same layout).
@@ -65,17 +65,17 @@ export interface Floor {
 // ============================================================================
 export const floorsData: Floor[] = [
   {
-    id: "PB2",
-    name: "PB 2",
+    id: "S2",
+    name: "S2",
     level: -2,
-    floorPlanImage: floorPB2,
+    floorPlanImage: floorS2,
     units: []
   },
   {
-    id: "PB1",
-    name: "PB 1",
+    id: "S1",
+    name: "S1",
     level: -1,
-    floorPlanImage: floorPB1,
+    floorPlanImage: floorS1,
     units: []
   },
   {

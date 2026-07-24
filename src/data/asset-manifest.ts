@@ -36,7 +36,24 @@ export const assetManifest: string[] = [
     'building/transitions/2.2_a_1.2.mp4',
     'building/transitions/3.1_a_1.1.mp4',
     'building/transitions/3.2_a_1.2.mp4',
-    'building/transitions/1.2_a_Piso_6.mp4',
+
+    // Building -> Floors entry walks (one per face / time of day, all land on PISO 6)
+    'building/transitions/1.1_a_PISO_6.mp4',
+    'building/transitions/1.2_a_PISO_6.mp4',
+    'building/transitions/2.1_a_PISO_6.mp4',
+    'building/transitions/2.2_a_PISO_6.mp4',
+    'building/transitions/3.1_a_PISO_6.mp4',
+    'building/transitions/3.2_a_PISO_6.mp4',
+
+    // Floor plans
+    'plants/floor_s2.webp',
+    'plants/floor_s1.webp',
+    'plants/floor_1.webp',
+    'plants/floor_2.webp',
+    'plants/floor_3.webp',
+    'plants/floor_4.webp',
+    'plants/floor_5.webp',
+    'plants/floor_6.webp',
 
     // 901
     'plants/details/901/unfurnished.jpg',
