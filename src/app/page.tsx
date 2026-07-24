@@ -153,9 +153,9 @@ const Homepage = () => {
       </div>
 
       {/* UI Overlay */}
-      {/* Stays below the sidebar backdrop (z-60) at all times: when the menu is
-          open the whole page — hero logo included — blurs behind it, and the
-          menu supplies its own centered logo. */}
+      {/* Stays below the sidebar backdrop (z-60): when the menu is open the page
+          blurs behind it and the hero logo is hidden, so the menu's own centered
+          logo stands alone instead of ghosting over a blurred duplicate. */}
       <div className="relative z-10 flex-1 flex flex-col justify-between p-6 lg:p-12 text-white">
         
         {/* Header */}
@@ -181,8 +181,9 @@ const Homepage = () => {
         {/* Central Hero Section */}
         <div className="flex-1 flex flex-col items-center justify-center relative w-full max-w-6xl mx-auto h-full">
              
-             {/* Logo Container (animates up on its own) */}
-             <div className="relative z-20 flex flex-col items-center transition-transform will-change-transform">
+             {/* Logo Container (animates up on its own). Fades out while the menu
+                 is open so it doesn't sit behind the menu's own centered logo. */}
+             <div className={`relative z-20 flex flex-col items-center transition-opacity duration-300 will-change-transform ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                  <img
                    ref={logoRef} // Ref moved to image for independent animation
                    src={homepageData.hero.logo}

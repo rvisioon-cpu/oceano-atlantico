@@ -252,7 +252,9 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     // ── STANDARD WEB: bottom navigation bar that slides up, crested with ocean waves.
     return (
         <>
-            {/* Backdrop with blur and dark overlay */}
+            {/* Frosted backdrop — blurs the page behind the menu. The homepage's
+                own hero logo is hidden separately while the menu is open, so the
+                menu's centered logo doesn't ghost over a duplicate. */}
             <div
                 className={`fixed inset-0 bg-ocean-900/40 backdrop-blur-md z-[60] transition-opacity duration-300 ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                 onClick={onClose}
