@@ -19,6 +19,9 @@ const DirectionsPage = () => {
     // Video Transition State & References
     const videoRef = useRef<HTMLVideoElement>(null);
     const [viewMode, setViewMode] = useState<'video' | 'map'>('video');
+    // The "Explorar mapa" button only appears once the intro video has played
+    // all the way through once (afterwards the clip loops from the 8s mark).
+    const [showExploreButton, setShowExploreButton] = useState(false);
 
     const videoUrl = getAssetUrl('location/videos/video_mapa.mp4');
     const posterUrl = getAssetUrl('location/photos/FOTO_VISTA_PLANETA_PERU.webp');
@@ -26,6 +29,7 @@ const DirectionsPage = () => {
     const handleVideoEnded = () => {
         const video = videoRef.current;
         if (!video) return;
+        setShowExploreButton(true); // first full play finished
         video.currentTime = 8;
         video.play().catch(console.error);
     };
@@ -34,6 +38,7 @@ const DirectionsPage = () => {
         const video = videoRef.current;
         if (!video) return;
         if (video.duration && video.currentTime >= video.duration - 0.15) {
+            setShowExploreButton(true); // reached the end (loop restart preempts onEnded)
             video.currentTime = 8;
             video.play().catch(console.error);
         }
@@ -469,8 +474,11 @@ const DirectionsPage = () => {
                         className="w-full h-full object-cover"
                     />
 
-                    {/* Floating Button to Switch to Interactive Map */}
-                    <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+                    {/* Floating Button to Switch to Interactive Map — revealed
+                        only after the intro video has finished its first play. */}
+                    <div
+                        className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-50 transition-all duration-700 ease-out ${showExploreButton ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+                    >
                         <button
                             onClick={() => setViewMode('map')}
                             className="flex items-center gap-2 bg-brand-primary/90 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white px-8 py-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer uppercase tracking-wider text-xs lg:text-sm font-semibold font-secondary"
