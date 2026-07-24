@@ -10,6 +10,7 @@ import { getAssetUrl } from '@/utils/assets';
 import Loader from '@/components/UI/Loader';
 import FullScreenToggle from '@/components/UI/FullScreenToggle';
 import { showroomConfig } from '@/data/showroom';
+import config from '@/config/config';
 
 const ShowroomContent = () => {
   const router = useRouter();
@@ -162,6 +163,10 @@ const ShowroomContent = () => {
   const hasLeftTransition = currentFaceData ? !!currentFaceData[timeOfDay]?.transitions?.toLeft : false;
   const hasRightTransition = currentFaceData ? !!currentFaceData[timeOfDay]?.transitions?.toRight : false;
 
+  // The "cara inicial" (face 0) is the branded cover: only the menu and
+  // fullscreen controls stay; the logo + a luxury "Ingresar" CTA take center.
+  const isInitialFace = currentFace === 0;
+
   const showLeftButton = currentRoom === 'Lobby' && viewState === 'IDLE' && hasLeftTransition;
   const showRightButton = currentRoom === 'Lobby' && viewState === 'IDLE' && hasRightTransition;
 
@@ -184,8 +189,8 @@ const ShowroomContent = () => {
         </span>
       </div>
 
-      {/* Recorrido General Button */}
-      {viewState === 'IDLE' && (
+      {/* Recorrido General Button — hidden on the initial cover face */}
+      {viewState === 'IDLE' && !isInitialFace && (
         <button
           onClick={() => router.push('/recorridos?tourId=building-main')}
           disabled={isLoadingAssets}
@@ -256,8 +261,9 @@ const ShowroomContent = () => {
         </button>
       )}
 
-      {/* Floating UI */}
-      {viewState === 'IDLE' && (
+      {/* Floating UI — standard "Ingresar" on the explorable faces; the initial
+          cover face renders its own centered luxury version below instead. */}
+      {viewState === 'IDLE' && !isInitialFace && (
         <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
           <button
             onClick={() => { setLoadingAction('enter'); startTransition('Floors'); }}
@@ -268,6 +274,42 @@ const ShowroomContent = () => {
           >
             {loadingAction === 'enter' ? <Loader className="w-[18px] h-[18px]" /> : 'Ingresar'}
           </button>
+        </div>
+      )}
+
+      {/* Initial-face luxury cover — brand logo + a refined "Ingresar" CTA,
+          positioned toward the left. Only menu & fullscreen stay in the corners. */}
+      {viewState === 'IDLE' && isInitialFace && (
+        <div className="fixed inset-0 z-40 pointer-events-none">
+          {/* Soft radial scrim (behind the mark) so the white reads over the render */}
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_46%_52%_at_21%_44%,rgba(4,22,32,0.55),rgba(4,22,32,0)_62%)]" />
+
+          <div className="absolute left-[21%] top-[44%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center px-4">
+            <img
+              src="/identity/identity_logo_white.png"
+              alt={config.appName}
+              className="relative w-[240px] lg:w-[360px] object-contain drop-shadow-[0_6px_40px_rgba(0,0,0,0.55)] animate-fade-in"
+            />
+
+            <button
+              onClick={() => { setLoadingAction('enter'); startTransition('Floors'); }}
+              onMouseEnter={() => setIsHoveringIngresar(true)}
+              onMouseLeave={() => setIsHoveringIngresar(false)}
+              disabled={isLoadingAssets}
+              className="group pointer-events-auto relative mt-10 inline-flex items-center gap-4 overflow-hidden border border-white/50 px-12 py-4 backdrop-blur-[2px] transition-all duration-500 hover:border-white disabled:opacity-60 disabled:cursor-not-allowed animate-fade-in"
+            >
+              {/* White fill sweeps up on hover */}
+              <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
+              <span className="relative z-10 text-[13px] font-light uppercase tracking-[0.35em] text-white transition-colors duration-500 group-hover:text-ocean-900">
+                {loadingAction === 'enter' ? <Loader className="w-[18px] h-[18px]" /> : 'Ingresar'}
+              </span>
+              {loadingAction !== 'enter' && (
+                <svg className="relative z-10 h-4 w-4 text-white transition-all duration-500 group-hover:text-ocean-900 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              )}
+            </button>
+          </div>
         </div>
       )}
     </div>

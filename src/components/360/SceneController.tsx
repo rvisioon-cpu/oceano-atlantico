@@ -217,7 +217,7 @@ export default function SceneController({ isHighlighted }: SceneControllerProps)
                 alt="Highlight"
               />
             )}
-            {currentFaceData?.name && (
+            {currentFaceData?.name && currentFace !== 0 && (
               <div className="absolute top-10 left-10 p-4 bg-black/50 text-white z-20">
                 <h1 className="text-2xl font-light tracking-widest">{currentFaceData.name}</h1>
               </div>
