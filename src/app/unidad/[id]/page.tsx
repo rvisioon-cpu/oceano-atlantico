@@ -94,7 +94,22 @@ const UnitPage = () => {
     };
 
     // --- ASSET RESOLUTION HELPERS ---
+    // Folder holding this unit's views and transition videos. Units that repeat
+    // the same typology share one folder (201/301/401 -> x01, 202/302/402 -> x02),
+    // so it is read from the view paths stored in the DB instead of being derived
+    // from the unit id. Falls back to the id for manifest-only units.
+    const getAssetFolder = (assetId: string) => {
+        const stored = unit?.photosFurnished?.[0] || unit?.photosUnfurnished?.[0] || unit?.photosPlans?.[0];
+        const match = stored?.match(/plants\/details\/([^/]+)\//);
+        if (match) return match[1];
+        return assetId.replace(/^unit_\d+_/, '');
+    };
+
     const getTransitionUrl = (assetId: string, type: string) => {
+        const folderPath = `plants/details/${getAssetFolder(assetId)}/transitions/${type}.mp4`;
+        if (assetManifest.includes(folderPath)) {
+            return getAssetUrl(folderPath);
+        }
         const cleanAssetId = assetId.replace(/^unit_\d+_/, '');
         const relativePathClean = `plants/details/${cleanAssetId}/transitions/${type}.mp4`;
         if (assetManifest.includes(relativePathClean)) {

@@ -594,6 +594,18 @@ export default function UnitsDashboard({
             />
           )}
 
+          {/* Interactive Floor Coordinates Drawing Tool Link */}
+          <a
+            href="/plantas/1?draw=true"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-sm btn-outline btn-neutral border-base-300 hover:bg-base-200 text-gray-700 font-medium"
+            title="Abrir herramienta interactiva para trazar coordenadas de los pisos"
+          >
+            <Compass className="w-4 h-4 mr-1 text-brand-orange" />
+            Dibujar Coordenadas
+          </a>
+
           {/* Add Floor Trigger */}
           {isSuperAdmin && (
             <button onClick={openAddFloorModal} className="btn btn-sm btn-warning bg-brand-orange hover:bg-brand-dark-orange text-white">
