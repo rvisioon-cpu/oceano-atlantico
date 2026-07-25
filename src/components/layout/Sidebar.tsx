@@ -114,8 +114,8 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         }
 
         if (path) {
+            onClose();
             if (path.startsWith('/')) {
-                // Route Floors through Showroom for the transition video
                 if (path === '/plantas') {
                     router.push('/showroom?transition=floors&targetPath=/plantas');
                 }
@@ -123,7 +123,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     router.push(path);
                 }
             }
-            onClose();
         }
     };
 

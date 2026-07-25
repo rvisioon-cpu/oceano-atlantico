@@ -25,9 +25,17 @@ const ShowroomContent = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isHoveringIngresar, setIsHoveringIngresar] = useState(false);
   const [loadingAction, setLoadingAction] = useState<'left' | 'right' | 'daynight' | 'enter' | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const currentFace = useStore(state => state.currentFace);
   const isLoadingAssets = useStore(state => state.isLoadingAssets);
   const buildingFacesData = useStore(state => state.buildingFacesData);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 50);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     if (!isLoadingAssets) setLoadingAction(null);
@@ -175,7 +183,7 @@ const ShowroomContent = () => {
 
 
   return (
-    <div className="font-sans relative h-full w-full overflow-hidden">
+    <div className={`font-sans relative h-full w-full overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isLoaded ? 'opacity-100 blur-0 scale-100' : 'opacity-0 blur-sm scale-[1.01]'}`}>
       <SceneController isHighlighted={isHoveringIngresar} />
 
       <div className="fixed top-6 left-6 z-30 group">
