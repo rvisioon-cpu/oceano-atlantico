@@ -99,3 +99,7 @@ UPDATE units SET
   gallery = '["plants/details/502/gallery/1.webp","plants/details/502/gallery/2.webp","plants/details/502/gallery/3.webp","plants/details/502/gallery/4.webp","plants/details/502/gallery/5.webp","plants/details/502/gallery/6.webp","plants/details/502/gallery/7.webp","plants/details/502/gallery/8.webp","plants/details/502/gallery/9.webp","plants/details/502/gallery/10.webp","plants/details/502/gallery/11.webp","plants/details/502/gallery/12.webp"]',
   updated_at = unixepoch()
 WHERE id = 'unit_6_602';
+-- Both duplexes span floors 5 and 6, so each level is its own unit row. Marking
+-- the type is what makes the unit page offer the level selector between them.
+UPDATE units SET type = 'DUPLEX', updated_at = unixepoch()
+WHERE id IN ('unit_5_501', 'unit_5_502', 'unit_6_601', 'unit_6_602');

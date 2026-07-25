@@ -126,11 +126,12 @@ const UnitPage = () => {
     const getUnitGalleryImages = (assetId: string, title?: string) => {
         // 0. Try DB gallery first
         if (unit && unit.gallery && unit.gallery.length > 0) {
+            const label = unit.identifier || unit.id;
             return unit.gallery.map((src, idx) => ({
                 id: `db-gallery-${idx}`,
                 src: getAssetUrl(src),
-                alt: `Unit ${title || assetId} Gallery ${idx + 1}`,
-                title: `Unit ${title || assetId}`
+                alt: `Unidad ${label} — imagen ${idx + 1}`,
+                title: `Unidad ${label}`
             }));
         }
 

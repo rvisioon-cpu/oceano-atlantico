@@ -80,6 +80,10 @@ export async function getFloorsData() {
         let subtitle = 'Flat';
         if (u.type === 'STORAGE') {
           subtitle = 'Bodega';
+        } else if (u.type === 'DUPLEX') {
+          // Marks the unit as spanning two floors, which is what makes the unit
+          // page show the level selector between its lower and upper plans.
+          subtitle = 'Dúplex';
         } else if (u.identifier === 'Terraza') {
           subtitle = 'Terraza';
         } else if (u.identifier === '801') {
