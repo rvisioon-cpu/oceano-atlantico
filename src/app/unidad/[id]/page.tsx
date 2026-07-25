@@ -13,6 +13,10 @@ import FullScreenToggle from '@/components/UI/FullScreenToggle';
 import { getAssetUrl, assetManifest } from '@/utils/assets';
 import { useStore } from '@/store/useStore';
 
+// The three views of a unit the user can switch between (the gallery and the
+// 360 tour are overlays, not part of this track).
+type StaticView = 'furnished' | 'unfurnished' | 'plans';
+
 const UnitPage = () => {
     const params = useParams();
     const unitId = params.id as string;
@@ -393,27 +397,33 @@ const UnitPage = () => {
     };
 
     // Navigation State Logic
+    // The three static views sit on a left-to-right track, and each view offers
+    // the other two — every pair has its own transition video, so any jump
+    // animates. The Terraza has no empty-apartment render, so it drops that stop.
+    const viewTrack: StaticView[] = ['plans', 'furnished', 'unfurnished'];
+
+    const getViewLabel = (view: StaticView) => {
+        if (view === 'furnished') return unit.subtitle === 'Terraza' ? 'Terraza' : 'Amoblado';
+        if (view === 'unfurnished') return 'Sin Amoblar';
+        return 'Medidas';
+    };
+
     const getNavState = () => {
-        // Special case for 'Terraza' unit - No 'unfurnished' view
-        if (unit.subtitle === 'Terraza') {
-            if (viewMode === 'plans') return { showLeft: true, showRight: false, leftTarget: 'furnished' as const };
-            if (viewMode === 'furnished') return { showLeft: false, showRight: true, rightTarget: 'plans' as const }; // showLeft false to hide Unfurnished
-            return { showLeft: false, showRight: false };
+        if (viewMode !== 'furnished' && viewMode !== 'unfurnished' && viewMode !== 'plans') {
+            return { showLeft: false, showRight: false }; // Gallery or tour
         }
 
-        // Only allow transitions where videos exist:
-        // - Unfurnished <-> Furnished
-        // - Plans <-> Furnished
-        if (viewMode === 'unfurnished') {
-            return { showLeft: false, showRight: true, rightTarget: 'furnished' as const };
-        }
-        if (viewMode === 'plans') {
-            return { showLeft: true, showRight: false, leftTarget: 'furnished' as const };
-        }
-        if (viewMode === 'furnished') {
-            return { showLeft: true, showRight: true, leftTarget: 'unfurnished' as const, rightTarget: 'plans' as const };
-        }
-        return { showLeft: false, showRight: false }; // Gallery or other
+        const track = unit.subtitle === 'Terraza'
+            ? viewTrack.filter(view => view !== 'unfurnished')
+            : viewTrack;
+        const others = track.filter(view => view !== viewMode);
+
+        return {
+            showLeft: others.length > 0,
+            leftTarget: others[0],
+            showRight: others.length > 1,
+            rightTarget: others[1],
+        };
     };
 
     const navState = getNavState();
@@ -843,6 +853,14 @@ const UnitPage = () => {
                                     setIsPlayingTransition(false);
                                     setTransitionVideo(null);
                                 }}
+                                // Without this a video that fails to load leaves the
+                                // overlay covering the plan for good. The target view is
+                                // already set by this point, so dropping the overlay lands
+                                // the user on it — just without the morph.
+                                onError={() => {
+                                    setIsPlayingTransition(false);
+                                    setTransitionVideo(null);
+                                }}
                             />
                         </div>
                     )}
@@ -860,50 +878,24 @@ const UnitPage = () => {
                             {navState.showLeft && navState.leftTarget && (
                                 <button
                                     onClick={() => startTransition(navState.leftTarget!)}
-                                    className={`absolute left-6 top-1/2 -translate-y-1/2 z-30 flex items-center gap-3 p-3 bg-black/40 hover:bg-black/60 backdrop-blur text-white rounded-full transition-all group ${
-                                        navState.leftTarget === 'furnished' ? 'pl-5' : 'pr-5'
-                                    }`}
+                                    className="absolute left-6 top-1/2 -translate-y-1/2 z-30 flex items-center gap-3 p-3 pr-5 bg-black/40 hover:bg-black/60 backdrop-blur text-white rounded-full transition-all group"
                                 >
-                                    {navState.leftTarget === 'unfurnished' ? (
-                                        <>
-                                            <ChevronLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
-                                            <span className="text-sm font-medium tracking-wide uppercase hidden sm:block">
-                                                Sin Amoblar
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span className="text-sm font-medium tracking-wide uppercase hidden sm:block">
-                                                {unit.subtitle === 'Terraza' ? 'Terraza' : 'Amoblado'}
-                                            </span>
-                                            <ChevronRight size={28} className="group-hover:translate-x-1 transition-transform" />
-                                        </>
-                                    )}
+                                    <ChevronLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
+                                    <span className="text-sm font-medium tracking-wide uppercase hidden sm:block">
+                                        {getViewLabel(navState.leftTarget)}
+                                    </span>
                                 </button>
                             )}
 
                             {navState.showRight && navState.rightTarget && (
                                 <button
                                     onClick={() => startTransition(navState.rightTarget!)}
-                                    className={`absolute right-6 top-1/2 -translate-y-1/2 z-30 flex items-center gap-3 p-3 bg-black/40 hover:bg-black/60 backdrop-blur text-white rounded-full transition-all group ${
-                                        navState.rightTarget === 'furnished' ? 'pr-5' : 'pl-5'
-                                    }`}
+                                    className="absolute right-6 top-1/2 -translate-y-1/2 z-30 flex items-center gap-3 p-3 pl-5 bg-black/40 hover:bg-black/60 backdrop-blur text-white rounded-full transition-all group"
                                 >
-                                    {navState.rightTarget === 'plans' ? (
-                                        <>
-                                            <span className="text-sm font-medium tracking-wide uppercase hidden sm:block">
-                                                {unit.subtitle === 'Terraza' ? 'Medidas' : 'Medidas'}
-                                            </span>
-                                            <ChevronRight size={28} className="group-hover:translate-x-1 transition-transform" />
-                                        </>
-                                    ) : (
-                                        <>
-                                            <ChevronLeft size={28} className="group-hover:-translate-x-1 transition-transform" />
-                                            <span className="text-sm font-medium tracking-wide uppercase hidden sm:block">
-                                                {unit.subtitle === 'Terraza' ? 'Terraza' : 'Amoblado'}
-                                            </span>
-                                        </>
-                                    )}
+                                    <span className="text-sm font-medium tracking-wide uppercase hidden sm:block">
+                                        {getViewLabel(navState.rightTarget)}
+                                    </span>
+                                    <ChevronRight size={28} className="group-hover:translate-x-1 transition-transform" />
                                 </button>
                             )}
                         </>

@@ -5,6 +5,7 @@ import { floors, units, logs } from "@/lib/db/schema";
 import { eq, and, isNull, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { floorsData as staticFloorsData } from "@/data/floors";
 
 // Helper to audit actions
 async function logAction(
@@ -62,6 +63,9 @@ export async function getFloorsData() {
     .orderBy(units.identifier);
 
   return allFloors.map(f => {
+    const rawFloorId = f.id.replace('floor_', '');
+    const staticFloor = staticFloorsData.find(sf => sf.id === rawFloorId);
+
     const floorUnits = allUnits
       .filter(u => u.floorId === f.id)
       .filter(u => {
@@ -77,6 +81,11 @@ export async function getFloorsData() {
         
         const coords = u.coordinates as { x?: number; y?: number; path?: string } | null;
         
+        const cleanUnitId = u.id.replace(`unit_${rawFloorId}_`, '');
+        const staticUnit = staticFloor?.units.find(
+          su => su.id === cleanUnitId || su.id === u.identifier || (su.identifier && su.identifier === u.identifier)
+        );
+
         let subtitle = 'Flat';
         if (u.type === 'STORAGE') {
           subtitle = 'Bodega';
@@ -104,9 +113,9 @@ export async function getFloorsData() {
           description: '',
           images: u.gallery ? (u.gallery as string[]) : [],
           tourUrl: u.tourUrl || undefined,
-          x: coords?.x,
-          y: coords?.y,
-          path: coords?.path,
+          x: coords?.x ?? staticUnit?.x,
+          y: coords?.y ?? staticUnit?.y,
+          path: coords?.path ?? staticUnit?.path,
           photosFurnished: u.photosFurnished ? (u.photosFurnished as string[]) : [],
           photosUnfurnished: u.photosUnfurnished ? (u.photosUnfurnished as string[]) : [],
           photosPlans: u.photosPlans ? (u.photosPlans as string[]) : [],
