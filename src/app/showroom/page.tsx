@@ -310,15 +310,16 @@ const ShowroomContent = () => {
             onMouseEnter={() => setIsHoveringIngresar(true)}
             onMouseLeave={() => setIsHoveringIngresar(false)}
             disabled={isLoadingAssets}
-            className="group pointer-events-auto absolute left-[30%] top-[51%] -translate-x-1/2 inline-flex items-center gap-4 overflow-hidden border border-white/50 px-12 py-4 backdrop-blur-[2px] transition-all duration-500 hover:border-white disabled:opacity-60 disabled:cursor-not-allowed animate-fade-in"
+            className="group pointer-events-auto absolute left-[30%] top-[51%] -translate-x-1/2 inline-flex items-center justify-center gap-5 lg:gap-6 overflow-hidden border-2 border-white/70 px-16 py-5 lg:px-24 lg:py-6 backdrop-blur-md bg-black/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-500 hover:border-white hover:scale-105 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed animate-fade-in cursor-pointer"
           >
             {/* White fill sweeps up on hover */}
             <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0" />
-            <span className="relative z-10 text-[13px] font-light uppercase tracking-[0.35em] text-white transition-colors duration-500 group-hover:text-ocean-900">
-              {loadingAction === 'enter' ? <Loader className="w-[18px] h-[18px]" /> : 'Ingresar'}
+            
+            <span className="relative z-10 text-base lg:text-xl font-medium uppercase tracking-[0.4em] text-white transition-colors duration-500 group-hover:text-ocean-950 drop-shadow-md whitespace-nowrap">
+              {loadingAction === 'enter' ? <Loader className="w-5 h-5 lg:w-6 lg:h-6" /> : 'Ingresar'}
             </span>
             {loadingAction !== 'enter' && (
-              <svg className="relative z-10 h-4 w-4 text-white transition-all duration-500 group-hover:text-ocean-900 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg className="relative z-10 h-5 w-5 lg:h-6 lg:w-6 text-white transition-all duration-500 group-hover:text-ocean-950 group-hover:translate-x-2 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             )}
