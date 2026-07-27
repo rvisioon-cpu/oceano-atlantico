@@ -1,4 +1,7 @@
 -- Unit typologies ("5. TIPOLOGÍAS COMPLETO" delivery).
+-- NOTE: these values now live in src/data/floors.ts and ship in the generated
+-- seed, so this script is only for patching a database in place — it updates
+-- the unit rows without the wipe that seeding does.
 -- photos_* hold the three views the unit page switches between (amoblado /
 -- sin amoblar / plano) and gallery holds the interior renders. The path also
 -- tells the unit page which folder to read the transition videos from, so the

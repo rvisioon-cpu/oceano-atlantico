@@ -1,7 +1,7 @@
 -- Insert default production users
 
 -- 1. Super Admin
-INSERT INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
+INSERT OR IGNORE INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
 VALUES (
   'df1e78a6-56a7-47b2-bdcf-88aefcd19a6b',
   'Super Admin',
@@ -15,7 +15,7 @@ VALUES (
 );
 
 -- 2. Super Admin (Andres Pluska)
-INSERT INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
+INSERT OR IGNORE INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
 VALUES (
   'a64bd2e3-29e7-47b7-bdcf-88aefcd19a6b',
   'Andres Pluska',
@@ -29,7 +29,7 @@ VALUES (
 );
 
 -- 2.5 Admin (Rvisioon)
-INSERT INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
+INSERT OR IGNORE INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
 VALUES (
   'e64bd2e3-29e7-47b7-bdcf-88aefcd19a6b',
   'Rvisioon',
@@ -43,7 +43,7 @@ VALUES (
 );
 
 -- 3. Seller
-INSERT INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
+INSERT OR IGNORE INTO users (id, name, email, password, role, admin_limit, created_by, created_at, updated_at)
 VALUES (
   '37a77b61-29e7-47b7-bdcf-88aefcd19a6b',
   'Seller',
