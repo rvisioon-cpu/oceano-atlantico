@@ -191,14 +191,12 @@ const RecorridosContent = () => {
   if (selectedTour) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
-        {/* Viewer Header */}
-        <div className="absolute top-0 left-0 w-full z-50">
-           <TourHeader 
-                title={selectedTour.title}
-                subtitle={`${selectedTour.subtitle} ${selectedTour.floorName ? `- Piso ${selectedTour.floorName}` : ''}`}
-                onBack={closeViewer}
-            />
-        </div>
+        {/* Viewer Header — floats over the panorama so nothing is cropped */}
+        <TourHeader
+            title={selectedTour.title}
+            subtitle={`${selectedTour.subtitle} ${selectedTour.floorName ? `- Piso ${selectedTour.floorName}` : ''}`}
+            onBack={closeViewer}
+        />
 
         {/* Iframe Content */}
         <div className="flex-1 w-full h-full pt-0">

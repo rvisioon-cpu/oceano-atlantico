@@ -444,8 +444,10 @@ const UnitPage = () => {
             />
 
             {/* GLOBAL SIDEBAR TOGGLE */}
-            {/* GLOBAL CONTROLS (Left) */}
-            <div className="fixed top-6 left-6 z-50 flex flex-col items-start gap-4 group pointer-events-auto">
+            {/* GLOBAL CONTROLS (Left) — step aside in tour mode, same as the
+                right-hand stack: the viewer's own back pill sits here and the
+                360 is meant to be seen edge to edge. */}
+            <div className={`fixed top-6 left-6 z-50 flex flex-col items-start gap-4 group transition-opacity duration-300 ${viewMode === 'tour' ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
 
                 {/* Row 1: Menu + Back */}
                 <div className="flex items-center gap-3">
