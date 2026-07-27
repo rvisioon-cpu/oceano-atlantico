@@ -7,6 +7,8 @@ import { MapPin } from 'lucide-react';
 import { locationsData } from '@/data/locations';
 import { getAssetUrl } from '@/utils/assets';
 import config from '@/config/config';
+import LandmarkMarker from './LandmarkMarker';
+import type { Landmark } from '@/data/landmarks';
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11';
@@ -33,12 +35,20 @@ interface MapProps {
     transportMode?: 'driving' | 'walking' | 'cycling';
     onRouteCalculated?: (stats: { driving: RouteStats; walking: RouteStats; cycling: RouteStats } | null) => void;
     locations?: any[]; // Feature[]
+    landmarks?: Landmark[];
+    /** Travel time from the project to each landmark, in seconds, keyed by slug. */
+    landmarkDurations?: Record<string, number>;
+    /** Slug of the clip currently playing, if any. */
+    openLandmarkSlug?: string | null;
+    onLandmarkOpen?: (slug: string) => void;
 }
 
-export default function MapComponent({ destination, origin, padding, onMarkerClick, transportMode = 'driving', onRouteCalculated, locations }: MapProps) {
+export default function MapComponent({ destination, origin, padding, onMarkerClick, transportMode = 'driving', onRouteCalculated, locations, landmarks, landmarkDurations, openLandmarkSlug, onLandmarkOpen }: MapProps) {
   const mapRef = useRef<any>(null);
   const [routeGeoJSON, setRouteGeoJSON] = useState<any>(null);
   const [routeStats, setRouteStats] = useState<RouteStats | null>(null);
+  // The hovered hito is lifted above the project pin so its card isn't covered.
+  const [hoveredLandmark, setHoveredLandmark] = useState<string | null>(null);
 
   // Use passed locations or default to all if not provided (fallback)
   const displayLocations = locations || locationsData.features;
@@ -278,6 +288,25 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
         )}
 
         {markers}
+
+        {/* Hitos — the surroundings that carry their own clip */}
+        {(landmarks || []).map(landmark => (
+            <Marker
+                key={landmark.slug}
+                longitude={landmark.coordinates[0]}
+                latitude={landmark.coordinates[1]}
+                anchor="bottom"
+                style={{ zIndex: hoveredLandmark === landmark.slug ? 10000 : 100 }}
+            >
+                <LandmarkMarker
+                    landmark={landmark}
+                    duration={landmarkDurations?.[landmark.slug]}
+                    suppressed={!!openLandmarkSlug}
+                    onHoverChange={(slug, hovered) => setHoveredLandmark(prev => hovered ? slug : (prev === slug ? null : prev))}
+                    onOpen={(slug) => onLandmarkOpen?.(slug)}
+                />
+            </Marker>
+        ))}
 
         {/* Santa Fe Marker (Main Project) */}
         <Marker longitude={INITIAL_VIEW_STATE.longitude} latitude={INITIAL_VIEW_STATE.latitude} anchor="bottom" style={{ zIndex: 9999 }}>

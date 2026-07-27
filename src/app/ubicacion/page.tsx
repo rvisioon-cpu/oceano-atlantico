@@ -4,9 +4,13 @@ import MapComponent from '@/components/map/Map';
 import Sidebar from '@/components/layout/Sidebar';
 import { Search, MapPin, Menu, ChevronDown, ChevronUp, Car, Footprints, Bike, Navigation, X, Map as MapIcon } from 'lucide-react';
 import { type LocationFeature } from '@/data/locations';
+import { landmarks, landmarkPoiNames } from '@/data/landmarks';
 import { getLocations, seedLocations } from '@/app/actions/locations';
 import { useStore } from '@/store/useStore';
 import { getAssetUrl } from '@/utils/assets';
+
+// Residencial Océano Atlántico — the origin every hito is measured from.
+const PROJECT_COORDS: [number, number] = [-76.974883, -12.080049];
 
 const DirectionsPage = () => {
     const isForcedLandscape = useStore(state => state.isForcedLandscape);
@@ -86,10 +90,45 @@ const DirectionsPage = () => {
     const [transportMode, setTransportMode] = useState<'driving' | 'walking' | 'cycling'>('driving');
     const [routeStats, setRouteStats] = useState<{ driving: { duration: number }; walking: { duration: number }; cycling: { duration: number } } | null>(null);
 
+    // Hitos: travel time from the project to each one, and the clip being watched
+    const [landmarkDurations, setLandmarkDurations] = useState<Record<string, number>>({});
+    const [openLandmarkSlug, setOpenLandmarkSlug] = useState<string | null>(null);
+    const openLandmark = landmarks.find(l => l.slug === openLandmarkSlug) || null;
+
+    // One Matrix request per transport mode gives all four times at once.
+    useEffect(() => {
+        const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+        if (!MAPBOX_TOKEN) return;
+        let cancelled = false;
+
+        const coords = [PROJECT_COORDS, ...landmarks.map(l => l.coordinates)]
+            .map(([lng, lat]) => `${lng},${lat}`)
+            .join(';');
+        const destinations = landmarks.map((_, i) => i + 1).join(';');
+
+        fetch(`https://api.mapbox.com/directions-matrix/v1/mapbox/${transportMode}/${coords}?sources=0&destinations=${destinations}&annotations=duration&access_token=${MAPBOX_TOKEN}`)
+            .then(res => res.json() as Promise<any>)
+            .then(data => {
+                if (cancelled) return;
+                const row: (number | null)[] = data?.durations?.[0] || [];
+                const next: Record<string, number> = {};
+                landmarks.forEach((landmark, i) => {
+                    const seconds = row[i];
+                    if (typeof seconds === 'number') next[landmark.slug] = seconds;
+                });
+                setLandmarkDurations(next);
+            })
+            .catch(error => console.error('Error fetching landmark durations:', error));
+
+        return () => { cancelled = true; };
+    }, [transportMode]);
+
     const categories = Array.from(new Set(locationsFeatures.map((f: LocationFeature) => f.properties.categoria))).filter(Boolean) as string[];
 
     const filteredLocations = locationsFeatures.filter((feature: LocationFeature) => {
         if (feature.properties.nombre === 'Santa Fe') return false;
+        // The hitos carry their own marker, so the plain POI would double-pin them.
+        if (landmarkPoiNames.has(feature.properties.nombre)) return false;
 
         const matchesSearch = feature.properties.nombre.toLowerCase().includes(filter.toLowerCase());
         const matchesCategory = selectedCategory ? feature.properties.categoria === selectedCategory : true;
@@ -138,6 +177,14 @@ const DirectionsPage = () => {
         });
     }, []);
 
+    // Three states: open, peeking (its handle stays clickable so it can be
+    // reopened), and fully out of the way while a hito's clip is playing.
+    const panelStateClasses = openLandmark || viewMode !== 'map'
+        ? 'translate-y-full pointer-events-none'
+        : isPanelOpen
+            ? 'translate-y-0 pointer-events-auto'
+            : 'translate-y-full md:translate-y-[calc(100%-180px)] pointer-events-auto';
+
     const formatDuration = (seconds: number) => {
         if (!seconds) return '';
         const mins = Math.round(seconds / 60);
@@ -162,6 +209,10 @@ const DirectionsPage = () => {
                     transportMode={transportMode}
                     onRouteCalculated={handleRouteCalculated}
                     locations={filteredLocations}
+                    landmarks={landmarks}
+                    landmarkDurations={landmarkDurations}
+                    openLandmarkSlug={openLandmarkSlug}
+                    onLandmarkOpen={setOpenLandmarkSlug}
                     padding={useMemo(() => {
                         // Only push map on desktop where panel is sidebar
                         const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
@@ -226,7 +277,7 @@ const DirectionsPage = () => {
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
             {/* Floating Toggle Button - Mobile Only (Visible when panel closed) */}
-            {!isPanelOpen && (
+            {!isPanelOpen && !openLandmark && (
                 <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-20 md:hidden pointer-events-auto">
                     <button
                         onClick={() => setIsPanelOpen(true)}
@@ -240,7 +291,7 @@ const DirectionsPage = () => {
 
             {/* Floating Bottom Panel (Console) */}
             <div
-                className={`fixed bottom-0 md:bottom-6 left-0 md:left-6 w-full md:w-[450px] bg-white md:rounded-2xl shadow-2xl z-40 flex flex-col transition-all duration-500 ease-in-out h-full md:h-auto md:max-h-[70%] ${(isPanelOpen && viewMode === 'map') ? 'translate-y-0 pointer-events-auto' : `translate-y-full md:translate-y-[calc(100%-180px)] ${viewMode === 'map' ? 'pointer-events-auto' : 'pointer-events-none'}`}`}
+                className={`fixed bottom-0 md:bottom-6 left-0 md:left-6 w-full md:w-[450px] bg-white md:rounded-2xl shadow-2xl z-40 flex flex-col transition-all duration-500 ease-in-out h-full md:h-auto md:max-h-[70%] ${panelStateClasses}`}
             >
 
                 {/* Handler / Header Area */}
@@ -434,6 +485,46 @@ const DirectionsPage = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Hito player — takes over the space the directions panel leaves */}
+            {openLandmark && (
+                <div className="fixed inset-0 md:inset-auto md:top-6 md:bottom-6 md:left-6 md:w-[420px] z-50 bg-black/70 md:bg-transparent flex items-center justify-center p-4 md:p-0">
+                    <div className="relative w-full h-full max-w-[420px] md:max-w-none bg-black rounded-2xl overflow-hidden shadow-2xl">
+                        <video
+                            key={openLandmark.slug}
+                            src={getAssetUrl(openLandmark.video)}
+                            poster={getAssetUrl(openLandmark.poster)}
+                            autoPlay
+                            controls
+                            playsInline
+                            className="w-full h-full object-cover"
+                        />
+
+                        {/* Title strip */}
+                        <div className="absolute inset-x-0 top-0 p-4 pb-10 bg-gradient-to-b from-black/80 to-transparent pointer-events-none">
+                            <p className="text-[10px] uppercase tracking-wider text-white/70 font-semibold">
+                                {openLandmark.category}
+                            </p>
+                            <h2 className="text-lg font-bold text-white font-secondary leading-tight pr-10">
+                                {openLandmark.name}
+                            </h2>
+                            {landmarkDurations[openLandmark.slug] && (
+                                <p className="text-xs text-white/80 mt-1">
+                                    A {formatDuration(landmarkDurations[openLandmark.slug])} del proyecto
+                                </p>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => setOpenLandmarkSlug(null)}
+                            className="absolute top-4 right-4 p-2 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-colors cursor-pointer"
+                            title="Cerrar"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Video Transition Overlay */}
             {viewMode === 'video' && (
