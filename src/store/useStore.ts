@@ -28,9 +28,13 @@ interface ShowroomState {
   startTransition: (destination: string) => Promise<void>;
   endTransition: (newRoom: string) => void;
   rotateBuilding: (direction: 'left' | 'right') => Promise<void>;
+  // Rotations and timelapses commit in two steps: "confirm" swaps the scene
+  // behind the still-playing video, "finish" tears the video down once the new
+  // background has actually decoded. Doing both at once flashes the old face.
   confirmRotation: () => void;
   finishRotation: () => void;
   toggleTimeOfDay: () => Promise<void>;
+  confirmTimeLapse: () => void;
   finishTimeLapse: () => void;
 
   // Loading State
@@ -277,10 +281,13 @@ export const useStore = create<ShowroomState>((set, get) => ({
     });
   },
 
-  finishTimeLapse: () => set((state) => ({
-    timeOfDay: state.timeOfDay === 'day' ? 'night' : 'day',
+  confirmTimeLapse: () => set((state) => ({
+    timeOfDay: state.timeOfDay === 'day' ? 'night' : 'day'
+  })),
+
+  finishTimeLapse: () => set({
     viewState: 'IDLE',
     transitionUrl: null
-  })),
+  }),
 }));
 
