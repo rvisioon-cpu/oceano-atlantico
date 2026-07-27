@@ -47,8 +47,8 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
   const mapRef = useRef<any>(null);
   const [routeGeoJSON, setRouteGeoJSON] = useState<any>(null);
   const [routeStats, setRouteStats] = useState<RouteStats | null>(null);
-  // The hovered hito is lifted above the project pin so its card isn't covered.
-  const [hoveredLandmark, setHoveredLandmark] = useState<string | null>(null);
+  // Only one hito card shows at a time, and it is lifted above the project pin.
+  const [activeLandmark, setActiveLandmark] = useState<string | null>(null);
 
   // Use passed locations or default to all if not provided (fallback)
   const displayLocations = locations || locationsData.features;
@@ -296,13 +296,14 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
                 longitude={landmark.coordinates[0]}
                 latitude={landmark.coordinates[1]}
                 anchor="bottom"
-                style={{ zIndex: hoveredLandmark === landmark.slug ? 10000 : 100 }}
+                style={{ zIndex: activeLandmark === landmark.slug ? 10000 : 100 }}
             >
                 <LandmarkMarker
                     landmark={landmark}
                     duration={landmarkDurations?.[landmark.slug]}
-                    suppressed={!!openLandmarkSlug}
-                    onHoverChange={(slug, hovered) => setHoveredLandmark(prev => hovered ? slug : (prev === slug ? null : prev))}
+                    active={activeLandmark === landmark.slug && !openLandmarkSlug}
+                    onActiveChange={(slug, active) => setActiveLandmark(prev => active ? slug : (prev === slug ? null : prev))}
+                    onSelect={(l) => onMarkerClick?.(l.coordinates, l.name)}
                     onOpen={(slug) => onLandmarkOpen?.(slug)}
                 />
             </Marker>

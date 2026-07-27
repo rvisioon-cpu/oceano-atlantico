@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Play } from 'lucide-react';
 import { getAssetUrl } from '@/utils/assets';
 import type { Landmark } from '@/data/landmarks';
@@ -8,56 +8,61 @@ interface LandmarkMarkerProps {
   landmark: Landmark;
   /** Travel time in seconds from the project, for the current transport mode. */
   duration?: number;
-  /** True while a clip is playing, so the hover card doesn't double up on it. */
-  suppressed?: boolean;
-  onHoverChange?: (slug: string, hovered: boolean) => void;
+  /** Whether this hito's card is the one on screen (the map allows only one). */
+  active: boolean;
+  onActiveChange: (slug: string, active: boolean) => void;
+  /** Pick the hito as a destination, like any other point on the map. */
+  onSelect: (landmark: Landmark) => void;
+  /** Play the hito's clip. */
   onOpen: (slug: string) => void;
 }
 
 /**
- * A raised pin for one of the four hitos. The preview clip is only mounted
- * while the card is open, so idling on the map costs nothing.
+ * A raised pin for one of the four hitos.
+ *
+ * Pointer devices open the card on hover; a tap opens it too, which is the
+ * only way in on touch. Either way the click also picks the place as a
+ * destination, so the route and its travel time behave like any other point.
+ * The preview clip is only mounted while the card is open.
  */
-export default function LandmarkMarker({ landmark, duration, suppressed, onHoverChange, onOpen }: LandmarkMarkerProps) {
-  const [isHovered, setIsHovered] = useState(false);
+export default function LandmarkMarker({ landmark, duration, active, onActiveChange, onSelect, onOpen }: LandmarkMarkerProps) {
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const show = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    setIsHovered(true);
-    onHoverChange?.(landmark.slug, true);
+    onActiveChange(landmark.slug, true);
   };
 
   // Small grace period so the pointer can travel from the pin to the card
   // without the card disappearing under it.
   const hide = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => {
-      setIsHovered(false);
-      onHoverChange?.(landmark.slug, false);
-    }, 120);
+    closeTimer.current = setTimeout(() => onActiveChange(landmark.slug, false), 120);
   };
 
   const minutes = duration ? Math.round(duration / 60) : null;
-  const showCard = isHovered && !suppressed;
 
   return (
     <div
       className="relative flex flex-col items-center cursor-pointer"
-      style={{ zIndex: showCard ? 9998 : 40 }}
+      style={{ zIndex: active ? 9998 : 40 }}
       onMouseEnter={show}
       onMouseLeave={hide}
       onClick={(e) => {
         e.stopPropagation();
-        onOpen(landmark.slug);
+        onSelect(landmark);
+        // Touch has no hover, and the card would end up off-screen anyway once
+        // the map refits to the new route, so a tap goes straight to the clip.
+        if (window.matchMedia('(hover: hover)').matches) show();
+        else onOpen(landmark.slug);
       }}
     >
       {/* Preview card */}
       <div
-        className={`absolute bottom-full mb-3 w-48 rounded-2xl overflow-hidden bg-black shadow-2xl ring-1 ring-black/10 transition-all duration-300 ${showCard ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}`}
+        className={`absolute bottom-full mb-3 w-48 rounded-2xl overflow-hidden bg-black shadow-2xl ring-1 ring-black/10 transition-all duration-300 ${active ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}`}
       >
         <div className="relative w-full aspect-[9/16]">
-          {showCard && (
+          {active && (
             <video
               src={getAssetUrl(landmark.preview)}
               poster={getAssetUrl(landmark.poster)}
@@ -76,16 +81,22 @@ export default function LandmarkMarker({ landmark, duration, suppressed, onHover
             {minutes !== null && (
               <p className="text-[11px] text-white/80 mt-0.5">A {minutes} min del proyecto</p>
             )}
-            <span className="mt-2 inline-flex items-center gap-1.5 bg-white text-gray-900 text-[11px] font-bold px-3 py-1.5 rounded-full">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen(landmark.slug);
+              }}
+              className="mt-2 inline-flex items-center gap-1.5 bg-white hover:bg-white/90 text-gray-900 text-[11px] font-bold px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+            >
               <Play size={12} className="fill-current" />
               Ver más
-            </span>
+            </button>
           </div>
         </div>
       </div>
 
       {/* Pin */}
-      <div className={`relative transition-transform duration-300 ${showCard ? 'scale-110' : ''}`}>
+      <div className={`relative transition-transform duration-300 ${active ? 'scale-110' : ''}`}>
         <div className="w-14 h-14 rounded-full overflow-hidden bg-white shadow-xl border-2 border-brand-orange relative z-10">
           <img
             src={getAssetUrl(landmark.poster)}

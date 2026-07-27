@@ -95,30 +95,30 @@ const DirectionsPage = () => {
     const [openLandmarkSlug, setOpenLandmarkSlug] = useState<string | null>(null);
     const openLandmark = landmarks.find(l => l.slug === openLandmarkSlug) || null;
 
-    // One Matrix request per transport mode gives all four times at once.
+    // Deliberately the Directions endpoint, not the cheaper Matrix one: the
+    // route drawn when a hito is picked comes from Directions, and the two
+    // disagree by minutes on some of these, which would show the same trip
+    // with two different times on screen at once.
     useEffect(() => {
         const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
         if (!MAPBOX_TOKEN) return;
         let cancelled = false;
 
-        const coords = [PROJECT_COORDS, ...landmarks.map(l => l.coordinates)]
-            .map(([lng, lat]) => `${lng},${lat}`)
-            .join(';');
-        const destinations = landmarks.map((_, i) => i + 1).join(';');
-
-        fetch(`https://api.mapbox.com/directions-matrix/v1/mapbox/${transportMode}/${coords}?sources=0&destinations=${destinations}&annotations=duration&access_token=${MAPBOX_TOKEN}`)
-            .then(res => res.json() as Promise<any>)
-            .then(data => {
-                if (cancelled) return;
-                const row: (number | null)[] = data?.durations?.[0] || [];
-                const next: Record<string, number> = {};
-                landmarks.forEach((landmark, i) => {
-                    const seconds = row[i];
-                    if (typeof seconds === 'number') next[landmark.slug] = seconds;
-                });
-                setLandmarkDurations(next);
-            })
-            .catch(error => console.error('Error fetching landmark durations:', error));
+        const origin = `${PROJECT_COORDS[0]},${PROJECT_COORDS[1]}`;
+        Promise.all(landmarks.map(landmark =>
+            fetch(`https://api.mapbox.com/directions/v5/mapbox/${transportMode}/${origin};${landmark.coordinates[0]},${landmark.coordinates[1]}?access_token=${MAPBOX_TOKEN}`)
+                .then(res => res.json() as Promise<any>)
+                .then(data => data?.routes?.[0]?.duration as number | undefined)
+                .catch(() => undefined)
+        )).then(durations => {
+            if (cancelled) return;
+            const next: Record<string, number> = {};
+            landmarks.forEach((landmark, i) => {
+                const seconds = durations[i];
+                if (typeof seconds === 'number') next[landmark.slug] = seconds;
+            });
+            setLandmarkDurations(next);
+        });
 
         return () => { cancelled = true; };
     }, [transportMode]);
