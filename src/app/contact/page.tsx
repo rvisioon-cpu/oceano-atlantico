@@ -7,6 +7,7 @@ import FullScreenToggle from '@/components/UI/FullScreenToggle';
 import config from '@/config/config';
 import Adviser from '@/components/Adviser';
 import { advisersData } from '@/data/advisers';
+import { homepageData } from '@/data/homepage';
 import { getUnits, getFloors } from '@/app/actions/units';
 
 const TikTokIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
@@ -475,28 +476,21 @@ const Contact = () => {
            <FullScreenToggle />
       </div>
 
-      {/* Background Video — a blurred, scaled-up copy fills the frame (no black
-          bars) while the sharp centered copy stays object-contain so it's
-          never harshly cropped. */}
-      <div className="absolute inset-0 z-0 bg-black overflow-hidden">
+      {/* Background Video — fills the strip the form panel leaves free, edge to
+          edge. object-contain across the whole viewport (the template default)
+          only looks right on very wide windows: on a 16:9 one it letterboxes
+          and the panel hides ~45% of the frame. Shares the homepage cover video
+          so both ambients stay in sync from a single definition. */}
+      <div className="absolute inset-y-0 left-0 right-0 md:right-[600px] lg:right-[650px] z-0 bg-black overflow-hidden">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover scale-125 blur-2xl opacity-60"
+          poster={getAssetUrl(homepageData.intro.poster)}
+          className="w-full h-full object-cover"
         >
-          <source src={getAssetUrl('videos/walk.mp4')} type="video/mp4" />
-        </video>
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="relative w-full h-full object-contain"
-          style={{ objectPosition: '0' }}
-        >
-          <source src={getAssetUrl('videos/walk.mp4')} type="video/mp4" />
+          <source src={getAssetUrl(homepageData.intro.video)} type="video/mp4" />
         </video>
       </div>
 
