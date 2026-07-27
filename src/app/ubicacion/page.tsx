@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import MapComponent from '@/components/map/Map';
 import Sidebar from '@/components/layout/Sidebar';
-import { Search, MapPin, Menu, ChevronDown, ChevronUp, Car, Footprints, Bike, Navigation, X, Video, Map as MapIcon } from 'lucide-react';
+import { Search, MapPin, Menu, ChevronDown, ChevronUp, Car, Footprints, Bike, Navigation, X, Map as MapIcon } from 'lucide-react';
 import { type LocationFeature } from '@/data/locations';
 import { getLocations, seedLocations } from '@/app/actions/locations';
 import { useStore } from '@/store/useStore';
@@ -204,46 +204,22 @@ const DirectionsPage = () => {
                 className="fixed top-6 right-16 z-30 flex flex-col gap-4 items-end pointer-events-none"
                 style={{ top: 'calc(1.5rem + env(safe-area-inset-top))', right: 'calc(4rem + env(safe-area-inset-right))' }}
             >
-                <div className="flex flex-col gap-2">
-                    <button
-                        onClick={() => setTransportMode('driving')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all pointer-events-auto ${transportMode === 'driving' ? 'bg-brand-orange text-white scale-105' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                        title="Auto"
-                    >
-                        <Car size={20} />
-                        {routeStats && <span className="text-xs font-bold">{formatDuration(routeStats.driving.duration)}</span>}
-                    </button>
-                    <button
-                        onClick={() => setTransportMode('walking')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all pointer-events-auto ${transportMode === 'walking' ? 'bg-brand-orange text-white scale-105' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                        title="Caminar"
-                    >
-                        <Footprints size={20} />
-                        {routeStats && <span className="text-xs font-bold">{formatDuration(routeStats.walking.duration)}</span>}
-                    </button>
-                    <button
-                        onClick={() => setTransportMode('cycling')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all pointer-events-auto ${transportMode === 'cycling' ? 'bg-brand-orange text-white scale-105' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                        title="Bicicleta"
-                    >
-                        <Bike size={20} />
-                        {routeStats && <span className="text-xs font-bold">{formatDuration(routeStats.cycling.duration)}</span>}
-                    </button>
-
-                    {/* Switch to Video Map Mode */}
-                    <button
-                        onClick={() => {
-                            setViewMode('video');
-                            setTimeout(() => {
-                                videoRef.current?.play().catch(console.error);
-                            }, 50);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 rounded-full shadow-lg transition-all pointer-events-auto bg-white text-gray-700 hover:bg-gray-50 text-xs font-semibold border border-gray-100"
-                        title="Ver Video Mapa"
-                    >
-                        <Video size={18} className="text-brand-orange" />
-                        <span>Ver Video Mapa</span>
-                    </button>
+                <div className="flex flex-col gap-2 items-end">
+                    {([
+                        { mode: 'driving' as const, Icon: Car, label: 'Auto' },
+                        { mode: 'walking' as const, Icon: Footprints, label: 'Caminar' },
+                        { mode: 'cycling' as const, Icon: Bike, label: 'Bicicleta' },
+                    ]).map(({ mode, Icon, label }) => (
+                        <button
+                            key={mode}
+                            onClick={() => setTransportMode(mode)}
+                            className={`flex items-center justify-center h-10 rounded-full shadow-lg transition-all pointer-events-auto ${routeStats ? 'gap-2 px-4' : 'w-10'} ${transportMode === mode ? 'bg-brand-orange text-white scale-105' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                            title={label}
+                        >
+                            <Icon size={20} className="shrink-0" />
+                            {routeStats && <span className="text-xs font-bold whitespace-nowrap">{formatDuration(routeStats[mode].duration)}</span>}
+                        </button>
+                    ))}
                 </div>
             </div>
 
@@ -264,7 +240,7 @@ const DirectionsPage = () => {
 
             {/* Floating Bottom Panel (Console) */}
             <div
-                className={`fixed bottom-0 md:bottom-6 left-0 md:left-6 w-full md:w-[450px] bg-white md:rounded-2xl shadow-2xl z-40 flex flex-col transition-all duration-500 ease-in-out h-full md:h-auto md:max-h-[70%] ${(isPanelOpen && viewMode === 'map') ? 'translate-y-0 pointer-events-auto' : 'translate-y-full md:translate-y-[calc(100%-180px)] opacity-100 pointer-events-none'}`}
+                className={`fixed bottom-0 md:bottom-6 left-0 md:left-6 w-full md:w-[450px] bg-white md:rounded-2xl shadow-2xl z-40 flex flex-col transition-all duration-500 ease-in-out h-full md:h-auto md:max-h-[70%] ${(isPanelOpen && viewMode === 'map') ? 'translate-y-0 pointer-events-auto' : `translate-y-full md:translate-y-[calc(100%-180px)] ${viewMode === 'map' ? 'pointer-events-auto' : 'pointer-events-none'}`}`}
             >
 
                 {/* Handler / Header Area */}
