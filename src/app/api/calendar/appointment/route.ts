@@ -13,7 +13,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await createAppointment(data);
+    const result = await createAppointment({
+      ...data,
+      sellerId: data.sellerId || undefined,
+    });
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("Error in create appointment API handler:", error);

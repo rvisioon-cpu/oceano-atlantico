@@ -64,6 +64,12 @@ export default function BuildingDashboard({ initialFaces }: BuildingDashboardPro
   const [dayToNightTransition, setDayToNightTransition] = useState("");
   const [nightToDayTransition, setNightToDayTransition] = useState("");
 
+  const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const showNotification = (type: "success" | "error", message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
   const selectedFace = faces.find((f) => f.id === selectedFaceId);
 
   // Reset form when opening create/edit
@@ -167,7 +173,7 @@ export default function BuildingDashboard({ initialFaces }: BuildingDashboardPro
       }
     } catch (err) {
       console.error(err);
-      alert("Error al eliminar la cara.");
+      showNotification("error", "Error al eliminar la cara.");
     }
   };
 
@@ -189,7 +195,7 @@ export default function BuildingDashboard({ initialFaces }: BuildingDashboardPro
       await reorderBuildingFaces(newFaces.map((f) => f.id));
     } catch (err) {
       console.error(err);
-      alert("Error al guardar el nuevo orden.");
+      showNotification("error", "Error al guardar el nuevo orden.");
     }
   };
 
@@ -349,6 +355,16 @@ export default function BuildingDashboard({ initialFaces }: BuildingDashboardPro
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full pb-12 items-start max-w-6xl mx-auto">
+      {notification && (
+        <div className="toast toast-top toast-end z-[100]">
+          <div className={`alert shadow-lg ${notification.type === "success" ? "alert-success text-white" : "alert-error text-white"}`}>
+            <div>
+              {notification.type === "success" ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
+              <span>{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Left side: Horizontal columns & Connectors */}
       <div className="flex-1 flex flex-col gap-6 w-full">
         {/* Header */}

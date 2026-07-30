@@ -20,6 +20,8 @@ import {
   Settings,
   Shield,
   Send,
+  Video,
+  ExternalLink,
 } from "lucide-react";
 import {
   getAppointments,
@@ -131,6 +133,12 @@ export default function CalendarDashboard({
   const [transferType, setTransferType] = useState<"TEMPORARY" | "DEFINITIVE">("TEMPORARY");
   const [transferStartDate, setTransferStartDate] = useState("");
   const [transferEndDate, setTransferEndDate] = useState("");
+
+  const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const showNotification = (type: "success" | "error", message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   // Synchronize availability editor state
   useEffect(() => {
@@ -463,10 +471,10 @@ export default function CalendarDashboard({
           slotDuration: availSlotDuration,
         }));
         await saveAvailabilities(targetId, slotsWithDuration);
-        alert("Disponibilidad guardada correctamente.");
+        showNotification("success", "Disponibilidad guardada correctamente.");
         loadData();
       } catch (error: any) {
-        alert("Error al guardar disponibilidad: " + error.message);
+        showNotification("error", "Error al guardar disponibilidad: " + error.message);
       }
     });
   };
@@ -494,15 +502,15 @@ export default function CalendarDashboard({
   const handleCreateTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!transferFromId || !transferToId) {
-      alert("Por favor selecciona los vendedores de origen y destino.");
+      showNotification("error", "Por favor selecciona los vendedores de origen y destino.");
       return;
     }
     if (transferFromId === transferToId) {
-      alert("El vendedor de origen y destino no pueden ser el mismo.");
+      showNotification("error", "El vendedor de origen y destino no pueden ser el mismo.");
       return;
     }
     if (transferType === "TEMPORARY" && (!transferStartDate || !transferEndDate)) {
-      alert("Por favor selecciona el rango de fechas para el traspaso temporal.");
+      showNotification("error", "Por favor selecciona el rango de fechas para el traspaso temporal.");
       return;
     }
 
@@ -515,14 +523,14 @@ export default function CalendarDashboard({
           startDate: transferType === "TEMPORARY" ? new Date(transferStartDate) : new Date(),
           endDate: transferType === "TEMPORARY" ? new Date(transferEndDate) : new Date(),
         });
-        alert("Traspaso configurado con éxito.");
+        showNotification("success", "Traspaso configurado con éxito.");
         setTransferFromId("");
         setTransferToId("");
         setTransferStartDate("");
         setTransferEndDate("");
         loadData();
       } catch (error: any) {
-        alert("Error al configurar el traspaso: " + error.message);
+        showNotification("error", "Error al configurar el traspaso: " + error.message);
       }
     });
   };
@@ -532,10 +540,10 @@ export default function CalendarDashboard({
     startTransition(async () => {
       try {
         await deleteTransfer(id);
-        alert("Traspaso revocado con éxito.");
+        showNotification("success", "Traspaso revocado con éxito.");
         loadData();
       } catch (error: any) {
-        alert("Error al revocar el traspaso: " + error.message);
+        showNotification("error", "Error al revocar el traspaso: " + error.message);
       }
     });
   };
@@ -544,7 +552,7 @@ export default function CalendarDashboard({
   const handleBookAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formProspectName || !formProspectEmail) {
-      alert("Nombre y Correo electrónico son obligatorios.");
+      showNotification("error", "Nombre y Correo electrónico son obligatorios.");
       return;
     }
 
@@ -568,7 +576,7 @@ export default function CalendarDashboard({
         if (!result.success) {
           throw new Error(result.error);
         }
-        alert("Cita agendada correctamente.");
+        showNotification("success", "Cita agendada correctamente.");
         setIsBookingModalOpen(false);
         // Reset Form
         setFormProspectName("");
@@ -580,7 +588,7 @@ export default function CalendarDashboard({
         setFormSellerId("");
         loadData();
       } catch (error: any) {
-        alert("Error al agendar cita: " + error.message);
+        showNotification("error", "Error al agendar cita: " + error.message);
       }
     });
   };
@@ -592,7 +600,7 @@ export default function CalendarDashboard({
         setSelectedAppointment((prev: any) => (prev ? { ...prev, status } : null));
         loadData();
       } catch (error: any) {
-        alert("Error al actualizar estado: " + error.message);
+        showNotification("error", "Error al actualizar estado: " + error.message);
       }
     });
   };
@@ -603,9 +611,9 @@ export default function CalendarDashboard({
         await updateAppointmentNotes(id, notes);
         setSelectedAppointment((prev: any) => (prev ? { ...prev, notes } : null));
         loadData();
-        alert("Notas guardadas.");
+        showNotification("success", "Notas guardadas.");
       } catch (error: any) {
-        alert("Error al actualizar notas: " + error.message);
+        showNotification("error", "Error al actualizar notas: " + error.message);
       }
     });
   };
@@ -828,6 +836,16 @@ export default function CalendarDashboard({
 
   return (
     <div className="w-full flex flex-col gap-6">
+      {notification && (
+        <div className="toast toast-top toast-end z-[100]">
+          <div className={`alert shadow-lg ${notification.type === "success" ? "alert-success text-white" : "alert-error text-white"}`}>
+            <div>
+              {notification.type === "success" ? <Check className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
+              <span>{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header Tabs */}
       <div className="flex flex-wrap justify-between items-center border-b border-base-200 pb-4 gap-4">
         <div className="flex gap-2 bg-base-100 p-1.5 rounded-xl border border-base-300">
@@ -1368,6 +1386,27 @@ export default function CalendarDashboard({
                 </div>
               </div>
 
+              {selectedAppointment.type === "VIRTUAL" && (
+                <div className="flex items-start gap-3 text-sm">
+                  <Video className="w-4 h-4 text-primary mt-1 shrink-0" />
+                  <div>
+                    <p className="font-bold text-gray-400 text-[10px] uppercase">Enlace Google Meet</p>
+                    {selectedAppointment.meetLink ? (
+                      <a
+                        href={selectedAppointment.meetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary font-bold hover:underline flex items-center gap-1 mt-0.5"
+                      >
+                        Unirse a la Reunión <ExternalLink className="w-3.5 h-3.5 inline" />
+                      </a>
+                    ) : (
+                      <p className="text-gray-500 italic mt-0.5">Enlace no generado o pendiente</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {selectedAppointment.prospect?.units && selectedAppointment.prospect.units.length > 0 && (
                 <div className="flex items-start gap-3 text-sm">
                   <Building className="w-4 h-4 text-primary mt-1 shrink-0" />
@@ -1456,9 +1495,9 @@ export default function CalendarDashboard({
                               : null
                           );
                           loadData();
-                          alert("Cita traspasada exitosamente.");
+                          showNotification("success", "Cita traspasada exitosamente.");
                         } catch (error: any) {
-                          alert("Error al traspasar la cita: " + error.message);
+                          showNotification("error", "Error al traspasar la cita: " + error.message);
                         }
                       });
                     }}

@@ -26,6 +26,7 @@ export const appointments = sqliteTable('appointments', {
   sendEmail: integer('send_email', { mode: 'boolean' }).default(true).notNull(),
   status: text('status').default('SCHEDULED').notNull(), // 'SCHEDULED', 'COMPLETED', 'CANCELLED'
   notes: text('notes'),
+  meetLink: text('meet_link'),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   deletedAt: integer('deleted_at', { mode: 'timestamp' }),
@@ -221,6 +222,47 @@ export const pageViews = sqliteTable('page_views', {
   path: text('path').notNull(),
   unitId: text('unit_id').references(() => units.id),
   deviceType: text('device_type').notNull(), // 'mobile', 'tablet', 'desktop'
+  duration: integer('duration').default(0), // in seconds
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+});
+
+export const socialContent = sqliteTable('social_content', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  title: text('title').notNull(),
+  platform: text('platform').notNull(), // 'facebook', 'instagram', 'tiktok', 'linkedin'
+  templateType: text('template_type').notNull(), // 'post_square', 'post_horizontal', 'story', 'reel_cover'
+  width: integer('width').notNull(),
+  height: integer('height').notNull(),
+  aspectRatio: text('aspect_ratio').notNull(), // '1:1', '1.91:1', '9:16', '4:5'
+  prompt: text('prompt'),
+  resultUrl: text('result_url'),
+  referenceUrls: text('reference_urls', { mode: 'json' }), // string[]
+  status: text('status').default('DRAFT').notNull(), // 'DRAFT', 'GENERATING', 'COMPLETED', 'FAILED'
+  createdBy: text('created_by').references(() => users.id),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  deletedAt: integer('deleted_at', { mode: 'timestamp' }),
+});
+
+// Plantillas de lienzo guardadas por el usuario: conservan la medida del
+// canvas y la posición/estilo de los textos; los medios se agregan al usarla
+export const canvasTemplates = sqliteTable('canvas_templates', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  width: integer('width').notNull(),
+  height: integer('height').notNull(),
+  aspectRatio: text('aspect_ratio').notNull(), // '1:1', '1.91:1', '9:16', '4:5'
+  layout: text('layout', { mode: 'json' }).notNull(), // { version, texts: [{ text, color, fontSize, x, y }] }
+  createdBy: text('created_by').references(() => users.id),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  deletedAt: integer('deleted_at', { mode: 'timestamp' }),
+});
+
+export const socialContentMessages = sqliteTable('social_content_messages', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  socialContentId: text('social_content_id').references(() => socialContent.id).notNull(),
+  sender: text('sender').notNull(), // 'USER', 'AI'
+  text: text('text').notNull(),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 

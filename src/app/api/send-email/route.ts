@@ -23,7 +23,9 @@ export async function POST(request: Request) {
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'Santa Fe 190 <no-reply@kayen.work>', // Updated sender address
+      // TODO: reemplazar kayen.work por el dominio propio de Océano Atlántico
+      // cuando esté definido y verificado en Resend.
+      from: 'Océano Atlántico <no-reply@kayen.work>',
       to: ['ventas@kayeninmobiliaria.com'], // Updated recipient
       subject: `Nueva Solicitud: ${nombres} ${apellido}`,
       react: ContactEmail({
@@ -35,7 +37,7 @@ export async function POST(request: Request) {
         documentNumber,
         contactPreference,
         horario,
-        project: project || 'Santa Fe 190',
+        project: project || 'Residencial Océano Atlántico',
         mensaje
       }),
     });

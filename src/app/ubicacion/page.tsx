@@ -126,7 +126,6 @@ const DirectionsPage = () => {
     const categories = Array.from(new Set(locationsFeatures.map((f: LocationFeature) => f.properties.categoria))).filter(Boolean) as string[];
 
     const filteredLocations = locationsFeatures.filter((feature: LocationFeature) => {
-        if (feature.properties.nombre === 'Santa Fe') return false;
         // The hitos carry their own marker, so the plain POI would double-pin them.
         if (landmarkPoiNames.has(feature.properties.nombre)) return false;
 

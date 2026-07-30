@@ -2,18 +2,19 @@
 
 import { useState, useTransition } from "react";
 import { 
-  Plus, 
-  LayoutGrid, 
-  List, 
-  Trash2, 
-  Edit, 
-  Hammer, 
-  Calendar, 
-  Video, 
-  Image as ImageIcon, 
-  X, 
-  AlertTriangle, 
-  ExternalLink 
+  Plus,
+  LayoutGrid,
+  List,
+  Trash2,
+  Edit,
+  Hammer,
+  Calendar,
+  Video,
+  Image as ImageIcon,
+  X,
+  Check,
+  AlertTriangle,
+  ExternalLink
 } from "lucide-react";
 import { 
   createProgressUpdate, 
@@ -75,6 +76,51 @@ const formatSpanishDate = (dateVal: Date): string => {
   return `${MONTHS[d.getMonth()].label} ${d.getFullYear()}`;
 };
 
+const uploadFileWithProgress = (file: File, category: string, onProgress: (progress: number) => void): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("category", category);
+
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        const percentComplete = Math.round((event.loaded / event.total) * 100);
+        onProgress(percentComplete);
+      }
+    });
+
+    xhr.addEventListener("load", () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.success && res.url) {
+            resolve(res.url);
+          } else {
+            reject(new Error(res.error || "Error al subir archivo"));
+          }
+        } catch (e) {
+          reject(new Error("Error al procesar la respuesta del servidor"));
+        }
+      } else {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          reject(new Error(res.error || `Error en la subida (${xhr.status})`));
+        } catch (e) {
+          reject(new Error(`La subida falló con estado ${xhr.status}`));
+        }
+      }
+    });
+
+    xhr.addEventListener("error", () => {
+      reject(new Error("Ocurrió un error de red durante la subida."));
+    });
+
+    xhr.open("POST", "/api/r2/upload");
+    xhr.send(formData);
+  });
+};
+
 export default function ProgressDashboard({ initialUpdates, currentUser }: ProgressDashboardProps) {
   const [updates, setUpdates] = useState<ProgressUpdate[]>(initialUpdates);
   const [activeView, setActiveView] = useState<"grid" | "list">("grid");
@@ -96,6 +142,13 @@ export default function ProgressDashboard({ initialUpdates, currentUser }: Progr
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [formError, setFormError] = useState("");
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
+  const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const showNotification = (type: "success" | "error", message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   const isEditor = currentUser.role === "SUPER_ADMIN" || currentUser.role === "ADMIN";
 
@@ -141,11 +194,16 @@ export default function ProgressDashboard({ initialUpdates, currentUser }: Progr
       try {
         let finalMediaUrl = mediaUrl;
 
-        // Si hay un archivo nuevo, lo subimos
+        // Si hay un archivo nuevo, lo subimos con barra de progreso
         if (mediaFile) {
-          const formData = new FormData();
-          formData.append("file", mediaFile);
-          finalMediaUrl = await uploadMedia(formData);
+          setUploadProgress(0);
+          try {
+            finalMediaUrl = await uploadFileWithProgress(mediaFile, "progress", (progress) => {
+              setUploadProgress(progress);
+            });
+          } finally {
+            setUploadProgress(null);
+          }
         }
 
         const payload = {
@@ -195,13 +253,23 @@ export default function ProgressDashboard({ initialUpdates, currentUser }: Progr
         setIsDeleteConfirmOpen(false);
         setUpdateToDelete(null);
       } catch (err: any) {
-        alert("Error al eliminar: " + err.message);
+        showNotification("error", "Error al eliminar: " + err.message);
       }
     });
   };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto animate-fade-in pb-12">
+      {notification && (
+        <div className="toast toast-top toast-end z-[100]">
+          <div className={`alert shadow-lg ${notification.type === "success" ? "alert-success text-white" : "alert-error text-white"}`}>
+            <div>
+              {notification.type === "success" ? <Check className="w-5 h-5 shrink-0" /> : <AlertTriangle className="w-5 h-5 shrink-0" />}
+              <span>{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Upper header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-5 border-base-300">
         <div>
@@ -410,6 +478,7 @@ export default function ProgressDashboard({ initialUpdates, currentUser }: Progr
           <div className="modal-box bg-white max-w-lg border border-base-200 overflow-x-hidden">
             <button
               onClick={() => setIsFormOpen(false)}
+              disabled={uploadProgress !== null}
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
             >
               <X className="w-4 h-4" />
@@ -478,6 +547,7 @@ export default function ProgressDashboard({ initialUpdates, currentUser }: Progr
                 <input
                   type="file"
                   accept="video/*,image/*"
+                  disabled={uploadProgress !== null}
                   onChange={(e) => {
                     const file = e.target.files?.[0];
                     if (file) setMediaFile(file);
@@ -493,6 +563,20 @@ export default function ProgressDashboard({ initialUpdates, currentUser }: Progr
                     El archivo se guardará de forma segura en la nube (R2).
                   </span>
                 </label>
+
+                {uploadProgress !== null && (
+                  <div className="mt-2 space-y-1.5 p-3 bg-base-200/50 rounded-lg border border-base-200">
+                    <div className="flex justify-between text-xs font-bold font-secondary">
+                      <span className="text-gray-600">Subiendo archivo...</span>
+                      <span className="text-brand-orange">{uploadProgress}%</span>
+                    </div>
+                    <progress 
+                      className="progress progress-warning w-full bg-base-300" 
+                      value={uploadProgress} 
+                      max="100"
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="form-control">
@@ -519,22 +603,23 @@ export default function ProgressDashboard({ initialUpdates, currentUser }: Progr
                 <button
                   type="button"
                   onClick={() => setIsFormOpen(false)}
+                  disabled={uploadProgress !== null}
                   className="btn btn-ghost text-sm"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  disabled={isPending}
+                  disabled={isPending || uploadProgress !== null}
                   className="btn btn-warning bg-brand-orange text-white text-sm"
                 >
-                  {isPending && <span className="loading loading-spinner loading-xs mr-1" />}
+                  {(isPending || uploadProgress !== null) && <span className="loading loading-spinner loading-xs mr-1" />}
                   {editingUpdate ? "Guardar Cambios" : "Crear Avance"}
                 </button>
               </div>
             </form>
           </div>
-          <div className="modal-backdrop bg-black/40 backdrop-blur-xs" onClick={() => setIsFormOpen(false)}></div>
+          <div className="modal-backdrop bg-black/40 backdrop-blur-xs" onClick={() => uploadProgress === null && setIsFormOpen(false)}></div>
         </div>
       )}
 

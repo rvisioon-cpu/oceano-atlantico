@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, Trash2, Download, Upload, Loader2, FileText, Image as ImageIcon, FileVideo, File, Search } from "lucide-react";
+import { Plus, Trash2, Download, Upload, Loader2, FileText, Image as ImageIcon, FileVideo, File, Search, Check, AlertTriangle } from "lucide-react";
 import { uploadMedia, toggleMediaActive, deleteMedia } from "@/app/actions/media";
 
 type MediaItem = {
@@ -62,6 +62,12 @@ export default function MediaDashboard({ initialMedia, currentUserRole = "SELLER
   const [selectedTypologyFilter, setSelectedTypologyFilter] = useState("TODOS");
   const [selectedSubTypologyFilter, setSelectedSubTypologyFilter] = useState("TODOS");
 
+  const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const showNotification = (type: "success" | "error", message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
+
   const handleCategoryFilterChange = (val: string) => {
     setSelectedCategoryFilter(val);
     setSelectedTypologyFilter("TODOS");
@@ -81,7 +87,7 @@ export default function MediaDashboard({ initialMedia, currentUserRole = "SELLER
         })
       );
     } catch (e: any) {
-      alert(e.message || "Error al cambiar estado");
+      showNotification("error", e.message || "Error al cambiar estado");
     }
   };
 
@@ -91,7 +97,7 @@ export default function MediaDashboard({ initialMedia, currentUserRole = "SELLER
       await deleteMedia(id);
       setMediaList((prev) => prev.filter((m) => m.id !== id));
     } catch (e: any) {
-      alert(e.message || "Error al eliminar");
+      showNotification("error", e.message || "Error al eliminar");
     }
   };
 
@@ -181,6 +187,16 @@ export default function MediaDashboard({ initialMedia, currentUserRole = "SELLER
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto animate-fade-in pb-12">
+      {notification && (
+        <div className="toast toast-top toast-end z-[100]">
+          <div className={`alert shadow-lg ${notification.type === "success" ? "alert-success text-white" : "alert-error text-white"}`}>
+            <div>
+              {notification.type === "success" ? <Check className="w-5 h-5 shrink-0" /> : <AlertTriangle className="w-5 h-5 shrink-0" />}
+              <span>{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Header */}
       <div className="border-b pb-5 border-base-300 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

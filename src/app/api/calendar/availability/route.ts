@@ -15,6 +15,8 @@ export async function GET(request: Request) {
     const yearStr = searchParams.get("year"); // e.g. "2026"
     const monthStr = searchParams.get("month"); // e.g. "6" (1-12)
     const typeParam = searchParams.get("type"); // "VIRTUAL" | "IN_PERSON" (optional)
+    const sellerIdParam = searchParams.get("sellerId"); // Filter by specific seller (optional)
+    const sellersParam = searchParams.get("sellers"); // "true" to return active sellers list
 
     // Keep availability consistent with appointment creation: an availability
     // is only bookable for a meeting type if it matches that type or is "BOTH".
@@ -22,6 +24,24 @@ export async function GET(request: Request) {
       !typeParam || meetingType === typeParam || meetingType === "BOTH";
 
     const db = await getDb();
+
+    // CASE 0: Return active sellers list (public endpoint for booking UI)
+    if (sellersParam === "true") {
+      const activeSellers = await db
+        .select({ id: users.id, name: users.name })
+        .from(users)
+        .where(isNull(users.deletedAt));
+
+      // Only return sellers who have at least one availability configured
+      const allAvails = await db.select().from(availabilities);
+      const sellersWithAvailability = new Set(allAvails.map((av) => av.userId));
+
+      const sellers = activeSellers
+        .filter((s) => sellersWithAvailability.has(s.id))
+        .map((s) => ({ id: s.id, name: s.name }));
+
+      return NextResponse.json({ sellers });
+    }
 
     // 1. Fetch active sellers
     const activeSellers = await db
@@ -39,7 +59,11 @@ export async function GET(request: Request) {
       .select()
       .from(availabilities);
     
-    const activeAvails = weeklyAvails.filter((av) => activeSellerIds.has(av.userId));
+    // Filter by active sellers, and optionally by a specific seller
+    let activeAvails = weeklyAvails.filter((av) => activeSellerIds.has(av.userId));
+    if (sellerIdParam) {
+      activeAvails = activeAvails.filter((av) => av.userId === sellerIdParam);
+    }
 
     // 3. Fetch all calendar transfers
     const transfers = await db.select().from(calendarTransfers);
@@ -97,6 +121,7 @@ export async function GET(request: Request) {
         (av) => av.dayOfWeek === dayOfWeek && matchesType(av.meetingType)
       );
 
+      const nowInPeru = new Date(Date.now() - 5 * 3600000);
       const availableHoursSet = new Set<string>();
 
       for (const avail of dayAvails) {
@@ -117,6 +142,13 @@ export async function GET(request: Request) {
 
         while (current.getTime() < endLimit.getTime()) {
           const slotPeru = new Date(current.getTime() - 5 * 3600000);
+
+          // Skip past slots
+          if (slotPeru.getTime() <= nowInPeru.getTime()) {
+            current.setUTCMinutes(current.getUTCMinutes() + duration);
+            continue;
+          }
+
           const timeLabel = `${String(slotPeru.getUTCHours()).padStart(2, "0")}:${String(slotPeru.getUTCMinutes()).padStart(2, "0")}`;
 
           // Check if this effective seller has a booking at this time
@@ -124,8 +156,9 @@ export async function GET(request: Request) {
             const appDate = new Date(app.date);
             const appPeruDate = new Date(appDate.getTime() - 5 * 3600000);
             const appTimeLabel = `${String(appPeruDate.getUTCHours()).padStart(2, "0")}:${String(appPeruDate.getUTCMinutes()).padStart(2, "0")}`;
-            // Match same time label and seller
-            return appTimeLabel === timeLabel && app.sellerId === effectiveSellerId;
+            const appEffectiveSellerId = resolveEffectiveSeller(app.sellerId, targetDate);
+            // Match same time label and seller (original or effective)
+            return appTimeLabel === timeLabel && (appEffectiveSellerId === effectiveSellerId || app.sellerId === effectiveSellerId);
           });
 
           if (!isBusy) {
@@ -213,13 +246,22 @@ export async function GET(request: Request) {
 
           while (current.getTime() < endLimit.getTime()) {
             const slotPeru = new Date(current.getTime() - 5 * 3600000);
+
+            // Skip past slots
+            if (slotPeru.getTime() <= nowInPeru.getTime()) {
+              current.setUTCMinutes(current.getUTCMinutes() + duration);
+              continue;
+            }
+
             const timeLabel = `${String(slotPeru.getUTCHours()).padStart(2, "0")}:${String(slotPeru.getUTCMinutes()).padStart(2, "0")}`;
 
             const isBusy = dayAppointments.some((app) => {
               const appDate = new Date(app.date);
               const appPeruDate = new Date(appDate.getTime() - 5 * 3600000);
               const appTimeLabel = `${String(appPeruDate.getUTCHours()).padStart(2, "0")}:${String(appPeruDate.getUTCMinutes()).padStart(2, "0")}`;
-              return appTimeLabel === timeLabel && app.sellerId === effectiveSellerId;
+              const appEffectiveSellerId = resolveEffectiveSeller(app.sellerId, currentDate);
+              // Match same time label and seller (original or effective)
+              return appTimeLabel === timeLabel && (appEffectiveSellerId === effectiveSellerId || app.sellerId === effectiveSellerId);
             });
 
             if (!isBusy) {

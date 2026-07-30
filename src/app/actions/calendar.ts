@@ -16,6 +16,7 @@ import { auth as nextAuth } from "@/auth";
 import { Resend } from "resend";
 import AppointmentEmail from "@/components/emails/AppointmentEmail";
 import config from "@/config/config";
+import { createGoogleMeetEvent } from "@/utils/googleMeet";
 
 // Helper to get logged-in user or mock for local development
 async function getSessionUser(db: any) {
@@ -277,6 +278,10 @@ export async function createAppointment(data: {
     const db = await getDb();
     const bookingDate = new Date(data.date);
 
+    if (bookingDate.getTime() <= Date.now()) {
+      throw new Error("No se pueden programar citas en el pasado.");
+    }
+
   // 1. Manage Prospect
   let prospectId = "";
   const existingProspects = await db
@@ -437,6 +442,36 @@ export async function createAppointment(data: {
     finalSellerId = await getEffectiveSellerId(db, finalSellerId, bookingDate);
   }
 
+  // Get seller details before inserting (needed for Google Calendar invite & email)
+  const sellerArr = await db.select().from(users).where(eq(users.id, finalSellerId));
+  const seller = sellerArr[0];
+
+  // Generate Google Meet Link if virtual
+  let meetLink: string | null = null;
+  if (data.type === "VIRTUAL") {
+    try {
+      const title = `Cita Virtual - ${data.prospectName} y ${seller?.name || "Asesor"}`;
+      const description = `Reunión virtual para conocer el proyecto ${config.company?.buildingName || "Residencial Océano Atlántico"}.\n\nAsesor: ${seller?.name || "Asesor Inmobiliario"} (${seller?.email || "N/A"})\nProspecto: ${data.prospectName} (${data.prospectEmail})`;
+      
+      meetLink = await createGoogleMeetEvent({
+        summary: title,
+        description,
+        startDate: bookingDate,
+        durationMinutes: 30,
+        prospectEmail: data.prospectEmail,
+        prospectName: data.prospectName,
+        sellerEmail: seller?.email || "",
+        sellerName: seller?.name || "Asesor Inmobiliario",
+      });
+    } catch (meetErr: any) {
+      // Degradación segura: si Google no está configurado o falla, la cita se
+      // agenda igual sin enlace y se notifica por correo como antes. Evita que
+      // una credencial ausente bloquee el agendamiento de prospectos reales.
+      console.error("Error al generar el enlace de Google Meet:", meetErr);
+      meetLink = null;
+    }
+  }
+
   // 4. Create Appointment
   const [newAppointment] = await db
     .insert(appointments)
@@ -451,15 +486,15 @@ export async function createAppointment(data: {
       prospectId,
       sendEmail: data.sendEmail,
       status: "SCHEDULED",
+      meetLink,
     })
     .returning();
 
-  // 5. Send Email Notifications
-  if (data.sendEmail) {
+  // 5. Send Email Notifications. Las citas VIRTUAL normalmente las notifica
+  // Google Calendar con su propia invitación; solo enviamos correo si no se
+  // pudo generar el Meet, para que el prospecto no se quede sin aviso.
+  if (data.sendEmail && (data.type === "IN_PERSON" || !meetLink)) {
     try {
-      const sellerArr = await db.select().from(users).where(eq(users.id, finalSellerId));
-      const seller = sellerArr[0];
-
       // Get unit identifiers of interest
       let unitIdentifiers: string[] = [];
       if (data.unitsOfInterest && data.unitsOfInterest.length > 0) {
@@ -475,13 +510,15 @@ export async function createAppointment(data: {
         const resend = new Resend(resendApiKey);
 
         // Sender Configuration (Fallback to default if project doesn't have custom config)
-        const fromEmail = "Santa Fe 190 <no-reply@kayen.work>";
+        // TODO: reemplazar kayen.work por el dominio propio de Océano Atlántico
+        // cuando esté definido y verificado en Resend.
+        const fromEmail = "Océano Atlántico <no-reply@kayen.work>";
 
         // Send to prospect
         await resend.emails.send({
           from: fromEmail,
           to: [data.prospectEmail.trim().toLowerCase()],
-          subject: `Confirmación de Cita - ${config.company?.buildingName || "Santa Fe 190"}`,
+          subject: `Confirmación de Cita - ${config.company?.buildingName || "Residencial Océano Atlántico"}`,
           headers: {
             "List-Unsubscribe": `<mailto:no-reply@kayen.work?subject=unsubscribe>`,
             "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
@@ -495,7 +532,7 @@ export async function createAppointment(data: {
             type: data.type,
             units: unitIdentifiers,
             sellerName: seller?.name || "Asesor Inmobiliario",
-            sellerEmail: seller?.email || "ventas@santafe.com",
+            sellerEmail: seller?.email || config.company.email,
             isForSeller: false,
           }),
         });

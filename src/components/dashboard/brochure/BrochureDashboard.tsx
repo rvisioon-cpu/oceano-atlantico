@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { uploadBrochure, setActiveBrochure, deleteBrochure, updateBrochure } from "@/app/actions/brochure";
-import { BookOpen, CheckCircle, Trash2, Upload, FileText, Loader2, AlertTriangle, Building, LayoutGrid, Edit2, X } from "lucide-react";
+import { BookOpen, CheckCircle, Check, Trash2, Upload, FileText, Loader2, AlertTriangle, Building, LayoutGrid, Edit2, X } from "lucide-react";
 import { type Floor } from "@/data/floors";
 
 type Brochure = {
@@ -37,6 +37,12 @@ export default function BrochureDashboard({ initialBrochures, floorsData, curren
   const [editUnitId, setEditUnitId] = useState<string>("");
   const [editFormError, setEditFormError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+
+  const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const showNotification = (type: "success" | "error", message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 4000);
+  };
 
   const selectedFloor = floorsData.find((f) => f.id === selectedFloorId);
   const editSelectedFloor = floorsData.find((f) => f.id === editFloorId);
@@ -167,7 +173,7 @@ export default function BrochureDashboard({ initialBrochures, floorsData, curren
         );
       } catch (error) {
         console.error("Error al activar brochure:", error);
-        alert("Ocurrió un error al cambiar el brochure activo.");
+        showNotification("error", "Ocurrió un error al cambiar el brochure activo.");
       }
     });
   };
@@ -181,13 +187,23 @@ export default function BrochureDashboard({ initialBrochures, floorsData, curren
         setBrochures((prev) => prev.filter((b) => b.id !== id));
       } catch (error) {
         console.error("Error al eliminar brochure:", error);
-        alert("Ocurrió un error al eliminar el brochure.");
+        showNotification("error", "Ocurrió un error al eliminar el brochure.");
       }
     });
   };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-6xl mx-auto animate-fade-in pb-12">
+      {notification && (
+        <div className="toast toast-top toast-end z-[100]">
+          <div className={`alert shadow-lg ${notification.type === "success" ? "alert-success text-white" : "alert-error text-white"}`}>
+            <div>
+              {notification.type === "success" ? <Check className="w-5 h-5 shrink-0" /> : <AlertTriangle className="w-5 h-5 shrink-0" />}
+              <span>{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Upper header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-5 border-base-300">
         <div>

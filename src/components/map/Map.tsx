@@ -64,11 +64,11 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
             let end: [number, number];
 
             if (destination && !origin) {
-                // Explore Mode: From Santa Fe TO Destination
+                // Explore Mode: From Océano Atlántico TO Destination
                 start = [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude];
                 end = destination;
             } else if (origin) {
-                // Search Mode: From Origin TO Santa Fe
+                // Search Mode: From Origin TO Océano Atlántico
                 start = origin;
                 end = [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude];
             } else {
@@ -309,7 +309,7 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
             </Marker>
         ))}
 
-        {/* Santa Fe Marker (Main Project) */}
+        {/* Océano Atlántico Marker (Main Project) */}
         <Marker longitude={INITIAL_VIEW_STATE.longitude} latitude={INITIAL_VIEW_STATE.latitude} anchor="bottom" style={{ zIndex: 9999 }}>
             <div className="relative flex flex-col items-center group cursor-pointer" style={{ zIndex: 9999 }}>
                  {/* Popup Card - Hover Only */}
@@ -318,7 +318,7 @@ export default function MapComponent({ destination, origin, padding, onMarkerCli
                         <img 
                             src={getAssetUrl('building/photos/face_0_daylight.png')} 
                             className="w-full h-full object-cover"
-                            alt="Santa Fe"
+                            alt="Océano Atlántico"
                         />
                         <div className="absolute top-2 left-2 px-2 py-0.5 bg-gray-900/80 backdrop-blur-sm rounded text-[8px] font-bold text-white uppercase tracking-wider">
                             Edificio Boutique

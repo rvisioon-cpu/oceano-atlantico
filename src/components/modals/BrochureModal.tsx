@@ -54,7 +54,7 @@ const BrochureModal = ({ unitId }: { unitId?: string }) => {
                         </div>
                         <div>
                             <h2 className="text-lg font-medium tracking-wide">Brochure Digital</h2>
-                            <p className="text-xs text-gray-400">Showroom Virtual Santa Fe</p>
+                            <p className="text-xs text-gray-400">Showroom Virtual Océano Atlántico</p>
                         </div>
                     </div>
                     

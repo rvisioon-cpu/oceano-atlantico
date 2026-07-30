@@ -21,7 +21,7 @@ export const advisersData: AdviserData[] = [
     role: "Asesora de Ventas",
     gender: 'female',
     phone: "+51959556125",
-    whatsappMessage: "Hola, vengo desde la web de Santa Fe 190, deseo más información."
+    whatsappMessage: "Hola, vengo desde la web de Océano Atlántico, deseo más información."
   },
   {
     id: 'pierre',
@@ -29,6 +29,6 @@ export const advisersData: AdviserData[] = [
     role: "Asesor de Ventas",
     gender: 'male',
     phone: "+51945656710",
-    whatsappMessage: "Hola, vengo desde la web de Santa Fe 190, deseo más información."
+    whatsappMessage: "Hola, vengo desde la web de Océano Atlántico, deseo más información."
   }
 ];

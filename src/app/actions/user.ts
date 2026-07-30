@@ -83,11 +83,25 @@ export async function createUser(data: any) {
 
 export async function deleteUser(id: string, transferToId?: string) {
   const session = await auth();
-  if (!session || session.user.role !== "SUPER_ADMIN") {
-    throw new Error("Unauthorized: Only Super Admin can delete users");
+  const role = session?.user?.role;
+  if (!session || (role !== "SUPER_ADMIN" && role !== "ADMIN")) {
+    throw new Error("Unauthorized: Only Super Admin or Admin can delete users");
   }
 
   const db = await getDb();
+
+  // Un ADMIN solo puede eliminar vendedores; el SUPER_ADMIN puede eliminar a
+  // cualquiera. Se valida contra la base de datos (no contra lo que envíe el
+  // cliente) para que la restriccion no dependa de la UI.
+  if (role === "ADMIN") {
+    const [target] = await db.select().from(users).where(eq(users.id, id));
+    if (!target) {
+      throw new Error("Usuario no encontrado");
+    }
+    if (target.role !== "SELLER") {
+      throw new Error("Unauthorized: Un administrador solo puede eliminar vendedores");
+    }
+  }
 
   if (transferToId) {
     await db

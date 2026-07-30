@@ -18,6 +18,7 @@ import {
   Box,
   Calendar,
   History,
+  FileText,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -33,6 +34,7 @@ export default function Sidebar({ role }: SidebarProps) {
   const navigation = [
     { name: "Métricas", href: "/dashboard", icon: LayoutDashboard, visible: true },
     { name: "Calendario", href: "/dashboard/calendar", icon: Calendar, visible: true },
+    { name: "Contenido", href: "/dashboard/content", icon: FileText, visible: isAdmin },
     { name: "Usuarios", href: "/dashboard/users", icon: Users, visible: isAdmin },
     { name: "Unidades", href: "/dashboard/units", icon: Building, visible: true },
     { name: "Multimedia", href: "/dashboard/media", icon: ImageIcon, visible: true },
@@ -54,7 +56,7 @@ export default function Sidebar({ role }: SidebarProps) {
       <div className="px-6 h-[72px] border-b flex items-center gap-3">
         <img 
           src="/identity/identity_logo_ISOTIPO.png" 
-          alt="Santa Fe Logo" 
+          alt="Océano Atlántico Logo" 
           className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(245,156,29,0.25)]"
         />
         <h2 className="text-lg font-bold font-primary tracking-wide text-base-content flex items-center">
