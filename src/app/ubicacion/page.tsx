@@ -23,9 +23,10 @@ const DirectionsPage = () => {
     // Video Transition State & References
     const videoRef = useRef<HTMLVideoElement>(null);
     const [viewMode, setViewMode] = useState<'video' | 'map'>('video');
-    // The "Explorar mapa" button only appears once the intro video has played
-    // all the way through once (afterwards the clip loops from the 8s mark).
+    // The "Explorar mapa" button appears once the intro video reaches the 9s
+    // mark, so it is offered well before the clip finishes its first pass.
     const [showExploreButton, setShowExploreButton] = useState(false);
+    const EXPLORE_BUTTON_AT_SECONDS = 9;
 
     const videoUrl = getAssetUrl('location/videos/video_mapa.mp4');
     const posterUrl = getAssetUrl('location/photos/FOTO_VISTA_PLANETA_PERU.webp');
@@ -41,6 +42,9 @@ const DirectionsPage = () => {
     const handleTimeUpdate = () => {
         const video = videoRef.current;
         if (!video) return;
+        if (video.currentTime >= EXPLORE_BUTTON_AT_SECONDS) {
+            setShowExploreButton(true);
+        }
         if (video.duration && video.currentTime >= video.duration - 0.15) {
             setShowExploreButton(true); // reached the end (loop restart preempts onEnded)
             video.currentTime = 8;
@@ -541,7 +545,7 @@ const DirectionsPage = () => {
                     />
 
                     {/* Floating Button to Switch to Interactive Map — revealed
-                        only after the intro video has finished its first play. */}
+                        once the intro video passes the 9s mark. */}
                     <div
                         className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-50 transition-all duration-700 ease-out ${showExploreButton ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}
                     >
