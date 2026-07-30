@@ -186,16 +186,16 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     );
 
     // ── FORCED LANDSCAPE (rotated frame): a true bottom bar can't be used because
-    // the frame is rotated 90°, so we use a full-screen ocean overlay — but with the
-    // same ocean gradient, wave crest and white-pill items as the desktop bottom bar.
+    // the frame is rotated 90°, so we use a full-screen ocean overlay with the same
+    // ocean gradient and white-pill items as the desktop bottom bar. Unlike desktop
+    // it carries no wave effect: neither the liquid canvas nor the crest, so mobile
+    // shows the plain configured background.
     if (isForcedLandscape) {
         return (
             <div
                 className={`fixed inset-0 z-[70] isolate overflow-hidden flex flex-col bg-gradient-to-b from-ocean-600/60 via-ocean-700/65 to-ocean-800/70 backdrop-blur-xl transition-opacity duration-400
                     ${isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
             >
-                {isOpen && <LiquidMenuBackground />}
-
                 <div className="relative z-10 flex flex-1 flex-col">
                     {/* Header strip (logo + close) capped by the same ocean wave crest.
                         The rotated frame has no room for a separate backdrop logo,
@@ -206,8 +206,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                             <X size={24} />
                         </button>
                     </div>
-                    <WaveCrest className="rotate-180 shrink-0 -mt-px" />
-
                     {/* Menu items */}
                     <div className="flex-1 flex items-center justify-center w-full px-6">
                         <ul className="grid grid-cols-5 gap-4 w-full max-w-4xl">

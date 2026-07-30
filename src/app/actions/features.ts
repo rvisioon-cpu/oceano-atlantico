@@ -41,10 +41,19 @@ export async function getFeatures(includeHidden = false): Promise<SidebarFeature
     } else {
       // Ensure all default features exist in dbFeatures, and align specific defaults like video and avance
       let changed = false;
-      defaultSidebarFeatures.forEach(defaultFeat => {
+      defaultSidebarFeatures.forEach((defaultFeat, defaultIdx) => {
         const idx = dbFeatures.findIndex((f: SidebarFeature) => f.id === defaultFeat.id);
         if (idx === -1) {
-          dbFeatures.push(defaultFeat);
+          // Insertar en la posición que ocupa en el default, no al final: de lo
+          // contrario una entrada nueva (p. ej. "video") aparece suelta después
+          // de Contacto en vez de en su lugar dentro del menú.
+          const anchor = defaultSidebarFeatures
+            .slice(0, defaultIdx)
+            .reduce((pos, prev) => {
+              const prevIdx = dbFeatures.findIndex((f: SidebarFeature) => f.id === prev.id);
+              return prevIdx === -1 ? pos : Math.max(pos, prevIdx + 1);
+            }, 0);
+          dbFeatures.splice(anchor, 0, defaultFeat);
           changed = true;
         } else {
           if ((defaultFeat.id === "video" || defaultFeat.id === "avance") && dbFeatures[idx].active !== defaultFeat.active) {
