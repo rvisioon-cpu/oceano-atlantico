@@ -47,3 +47,7 @@ next-env.d.ts
 
 # drive downloads
 public/drive-download-*
+# Videos fuente sueltos en public/: Cloudflare Pages rechaza cualquier asset
+# de más de 25 MiB y tumba el build. Los videos se sirven desde R2.
+public/*.mp4
+public/*.mov
