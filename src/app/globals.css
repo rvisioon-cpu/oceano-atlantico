@@ -246,3 +246,10 @@ html, body {
 
 
 
+
+/* El logo de Mapbox se oculta por pedido de diseño. La atribución
+   (© Mapbox / © OpenStreetMap) se deja visible a propósito: los términos de
+   Mapbox exigen mantenerla. */
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}

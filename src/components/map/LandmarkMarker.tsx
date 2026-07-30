@@ -51,10 +51,10 @@ export default function LandmarkMarker({ landmark, duration, active, onActiveCha
       onClick={(e) => {
         e.stopPropagation();
         onSelect(landmark);
-        // Touch has no hover, and the card would end up off-screen anyway once
-        // the map refits to the new route, so a tap goes straight to the clip.
-        if (window.matchMedia('(hover: hover)').matches) show();
-        else onOpen(landmark.slug);
+        // A click only picks the destination and opens the card with the travel
+        // time; the clip is reserved for "Ver más". Touch has no hover, so the
+        // tap is also the only way the card gets opened there.
+        show();
       }}
     >
       {/* Preview card */}
