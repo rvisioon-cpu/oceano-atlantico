@@ -14,6 +14,7 @@ const PROJECT_COORDS: [number, number] = [-76.974883, -12.080049];
 
 const DirectionsPage = () => {
     const isForcedLandscape = useStore(state => state.isForcedLandscape);
+    const setForcedLandscape = useStore(state => state.setForcedLandscape);
     const [locations, setLocations] = useState<any[]>([]);
     const [filter, setFilter] = useState('');
     const [selectedName, setSelectedName] = useState<string | null>(null);
@@ -27,6 +28,31 @@ const DirectionsPage = () => {
     // below, so it is offered well before the clip finishes its first pass.
     const [showExploreButton, setShowExploreButton] = useState(false);
     const EXPLORE_BUTTON_AT_SECONDS = 6;
+
+    // Control de orientación: forzar horizontal para el video introductorio en móviles en retrato, y volver a vertical al cambiar a mapa
+    useEffect(() => {
+        const checkAndApplyLandscape = () => {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 1024 && 'ontouchstart' in window);
+            const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+
+            if (viewMode === 'video' && isMobile && isPortrait) {
+                setForcedLandscape(true);
+            } else {
+                setForcedLandscape(false);
+            }
+        };
+
+        checkAndApplyLandscape();
+
+        window.addEventListener('resize', checkAndApplyLandscape);
+        window.addEventListener('orientationchange', checkAndApplyLandscape);
+
+        return () => {
+            window.removeEventListener('resize', checkAndApplyLandscape);
+            window.removeEventListener('orientationchange', checkAndApplyLandscape);
+            setForcedLandscape(false);
+        };
+    }, [viewMode, setForcedLandscape]);
 
     const videoUrl = getAssetUrl('location/videos/video_mapa.mp4');
     const posterUrl = getAssetUrl('location/photos/FOTO_VISTA_PLANETA_PERU.webp');
@@ -550,7 +576,10 @@ const DirectionsPage = () => {
                         className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-50 transition-all duration-700 ease-out ${showExploreButton ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-4 pointer-events-none'}`}
                     >
                         <button
-                            onClick={() => setViewMode('map')}
+                            onClick={() => {
+                                setViewMode('map');
+                                setForcedLandscape(false);
+                            }}
                             className="flex items-center gap-2 bg-brand-primary/90 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white px-8 py-3.5 rounded-full shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer uppercase tracking-wider text-xs lg:text-sm font-semibold font-secondary"
                         >
                             <MapIcon size={20} />

@@ -40,10 +40,12 @@ const UseLandscape = () => {
     }, []);
 
     useEffect(() => {
-        // Exclude dashboard, login, and ubicacion routes
+        // Exclude dashboard, login, and ubicacion routes from global overlay
         if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/login') || pathname?.startsWith('/ubicacion')) {
             setShowOverlay(false);
-            setForcedLandscape(false);
+            if (!pathname?.startsWith('/ubicacion')) {
+                setForcedLandscape(false);
+            }
             return;
         }
 
