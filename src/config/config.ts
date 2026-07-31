@@ -73,7 +73,7 @@ const config: ConfigProps = {
     name: "Residencial Océano Atlántico",
     address: "Company Address",
     buildingName: "Residencial Océano Atlántico",
-    buildingAddress: "Building Address",
+    buildingAddress: "Jirón Océano Atlántico 338-342, Surco, Lima",
     email: "info@rmpromotora.com",
     website: "https://rmpromotora.com",
     // El proyecto no tiene cuentas propias: se muestran las de RM Promotora.
@@ -81,8 +81,8 @@ const config: ConfigProps = {
       facebook: "https://www.facebook.com/profile.php?id=100063594609401&locale=es_LA",
       instagram: "https://www.instagram.com/rmpromotora/"
     },
-    realStateName: "RM Promotora Inmobiliaria",
-    realStateSlogan: "Slogan of the real estate company",
+    realStateName: "RM Promotora",
+    realStateSlogan: "Constructora e Inmobiliaria",
     realStateWebsite: "https://rmpromotora.com",
     realStateSocials: {
       facebook: "https://www.facebook.com/profile.php?id=100063594609401&locale=es_LA",
