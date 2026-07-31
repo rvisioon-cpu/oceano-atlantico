@@ -238,11 +238,24 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     <div className="shrink-0 px-6 pb-6 flex items-center justify-center gap-5">
                         <SocialLinks />
                         <div className="h-5 w-px bg-white/25" />
-                        <img src="/identity/logo_inmobiliaria_white.png" alt={config.company?.realStateName} className="h-7 w-auto object-contain opacity-90" />
+                        <a
+                            href={config.company?.realStateWebsite}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={config.company?.realStateName}
+                            className="transition-opacity hover:opacity-100 opacity-90"
+                        >
+                            <img src="/identity/logo_inmobiliaria_white.png" alt={config.company?.realStateName} className="h-7 w-auto object-contain" />
+                        </a>
                         <div className="hidden sm:block h-5 w-px bg-white/25" />
-                        <p className="hidden sm:block text-[10px] text-white/60 font-secondary select-none">
+                        <a
+                            href={config.company?.developerWebsite}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hidden sm:block text-[10px] text-white/60 hover:text-white/90 transition-colors font-secondary"
+                        >
                             {new Date().getFullYear()}© {config.company?.developer}
-                        </p>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -345,11 +358,24 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     <div className="relative z-10 mt-2 pt-2 border-t border-white/15 flex items-center justify-between gap-4">
                         <SocialLinks />
                         <div className="flex items-center gap-3">
-                            <img src="/identity/logo_inmobiliaria_white.png" alt={config.company?.realStateName} className="h-6 w-auto object-contain opacity-90" />
+                            <a
+                                href={config.company?.realStateWebsite}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={config.company?.realStateName}
+                                className="transition-opacity hover:opacity-100 opacity-90"
+                            >
+                                <img src="/identity/logo_inmobiliaria_white.png" alt={config.company?.realStateName} className="h-6 w-auto object-contain" />
+                            </a>
                             <div className="hidden sm:block h-4 w-px bg-white/20" />
-                            <p className="hidden sm:block text-[10px] text-white/55 font-secondary select-none whitespace-nowrap">
+                            <a
+                                href={config.company?.developerWebsite}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hidden sm:block text-[10px] text-white/55 hover:text-white/90 transition-colors font-secondary whitespace-nowrap"
+                            >
                                 {new Date().getFullYear()}© {config.company?.developer}
-                            </p>
+                            </a>
                         </div>
                     </div>
                 </div>

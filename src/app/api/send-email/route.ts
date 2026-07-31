@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import ContactEmail from '@/components/emails/ContactEmail';
 import { NextResponse } from 'next/server';
+import config from '@/config/config';
 
 export async function POST(request: Request) {
   try {
@@ -23,10 +24,8 @@ export async function POST(request: Request) {
 
     // Send email using Resend
     const { data, error } = await resend.emails.send({
-      // TODO: reemplazar kayen.work por el dominio propio de Océano Atlántico
-      // cuando esté definido y verificado en Resend.
-      from: 'Océano Atlántico <no-reply@kayen.work>',
-      to: ['ventas@kayeninmobiliaria.com'], // Updated recipient
+      from: config.resend.fromNoReply,
+      to: [config.resend.supportEmail],
       subject: `Nueva Solicitud: ${nombres} ${apellido}`,
       react: ContactEmail({
         nombres,

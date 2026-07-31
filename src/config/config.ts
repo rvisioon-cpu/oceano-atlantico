@@ -26,21 +26,24 @@ export interface ConfigProps {
     buildingSocials: {
       facebook: string;
       instagram: string;
-      tiktok: string;
+      // Opcional: si la cuenta no existe se omite y el ícono no se renderiza.
+      tiktok?: string;
     };
     realStateName: string;
     realStateSlogan: string;
+    realStateWebsite: string;
     realStateSocials: {
       facebook: string;
       instagram: string;
-      tiktok: string;
+      tiktok?: string;
     };
     developer: string;
     developerSlogan: string;
+    developerWebsite: string;
     developerSocials: {
       facebook: string;
       instagram: string;
-      tiktok: string;
+      tiktok?: string;
     };
   };
 }
@@ -48,11 +51,13 @@ export interface ConfigProps {
 const config: ConfigProps = {
   appName: "Residencial Océano Atlántico",
   appDescription: "Experiencia virtual del Residencial Océano Atlántico.",
-  domainName: "project-domain.com",
+  domainName: "rmpromotorainmobiliaria.com",
+  // Dominio verificado en Resend. Cualquier remitente debe pertenecer a él o
+  // el envío es rechazado.
   resend: {
-    fromNoReply: `Project Name <noreply@project-domain.com>`,
-    fromAdmin: `Admin at Project Name <admin@project-domain.com>`,
-    supportEmail: "support@project-domain.com",
+    fromNoReply: `Océano Atlántico <no-reply@rmpromotorainmobiliaria.com>`,
+    fromAdmin: `Océano Atlántico <admin@rmpromotorainmobiliaria.com>`,
+    supportEmail: "ventas@rmpromotorainmobiliaria.com",
   },
   colors: {
     theme: "light",
@@ -67,26 +72,27 @@ const config: ConfigProps = {
     address: "Company Address",
     buildingName: "Residencial Océano Atlántico",
     buildingAddress: "Building Address",
-    email: "sales@project-domain.com",
-    website: "https://project-domain.com/",
+    email: "ventas@rmpromotorainmobiliaria.com",
+    website: "https://rmpromotora.com",
+    // El proyecto no tiene cuentas propias: se muestran las de RM Promotora.
     buildingSocials: {
-      facebook: "https://facebook.com/project",
-      instagram: "https://instagram.com/project",
-      tiktok: "https://tiktok.com/@project"
+      facebook: "https://www.facebook.com/profile.php?id=100063594609401&locale=es_LA",
+      instagram: "https://www.instagram.com/rmpromotora/"
     },
     realStateName: "RM Promotora Inmobiliaria",
     realStateSlogan: "Slogan of the real estate company",
+    realStateWebsite: "https://rmpromotora.com",
     realStateSocials: {
-      facebook: "https://facebook.com/realestate",
-      instagram: "https://instagram.com/realestate",
-      tiktok: "https://tiktok.com/@realestate"
+      facebook: "https://www.facebook.com/profile.php?id=100063594609401&locale=es_LA",
+      instagram: "https://www.instagram.com/rmpromotora/"
     },
     developer: "Rvisioon",
     developerSlogan: "Creamos experiencias visuales que conectan, inspiran y venden.",
+    developerWebsite: "https://rvisioon.pe/",
     developerSocials: {
-      facebook: "https://facebook.com/rvisioon",
-      instagram: "https://instagram.com/rvisioon",
-      tiktok: "https://tiktok.com/@rvisioon"
+      facebook: "https://www.facebook.com/profile.php?id=61585009776159",
+      instagram: "https://www.instagram.com/rvisioon/",
+      tiktok: "https://www.tiktok.com/@rvisioon"
     }
   }
 };

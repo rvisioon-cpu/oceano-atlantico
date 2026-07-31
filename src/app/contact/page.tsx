@@ -1133,7 +1133,9 @@ const Contact = () => {
         {/* Footer info */}
         <div className="px-8 pb-4 mt-auto space-y-4 bg-gray-50/50">
              <div>
-                <h3 className="text-gray-800 text-xs font-bold uppercase mb-2">{config.company?.realStateName}</h3>
+                <a href={config.company?.realStateWebsite} target="_blank" rel="noopener noreferrer" className="inline-block">
+                    <h3 className="text-gray-800 hover:text-brand-primary transition-colors text-xs font-bold uppercase mb-2">{config.company?.realStateName}</h3>
+                </a>
                 <p className="text-gray-500 text-[10px] leading-relaxed mb-2">
                     {config.company?.realStateSlogan}
                 </p>
@@ -1151,7 +1153,9 @@ const Contact = () => {
              </div>
 
              <div>
-                <h3 className="text-gray-800 text-xs font-bold uppercase mb-2">{config.company?.developer}</h3>
+                <a href={config.company?.developerWebsite} target="_blank" rel="noopener noreferrer" className="inline-block">
+                    <h3 className="text-gray-800 hover:text-brand-primary transition-colors text-xs font-bold uppercase mb-2">{config.company?.developer}</h3>
+                </a>
                 <p className="text-gray-500 text-[10px] leading-relaxed mb-2">
                     {config.company?.developerSlogan}
                 </p>

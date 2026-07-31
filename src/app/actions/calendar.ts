@@ -509,20 +509,20 @@ export async function createAppointment(data: {
       if (resendApiKey) {
         const resend = new Resend(resendApiKey);
 
-        // Sender Configuration (Fallback to default if project doesn't have custom config)
-        // TODO: reemplazar kayen.work por el dominio propio de Océano Atlántico
-        // cuando esté definido y verificado en Resend.
-        const fromEmail = "Océano Atlántico <no-reply@kayen.work>";
+        // Remitente y dirección de baja salen de la config, que apunta al
+        // dominio verificado en Resend.
+        const fromEmail = config.resend.fromNoReply;
+        const unsubscribeHeaders = {
+          "List-Unsubscribe": `<mailto:no-reply@${config.domainName}?subject=unsubscribe>`,
+          "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+        };
 
         // Send to prospect
         await resend.emails.send({
           from: fromEmail,
           to: [data.prospectEmail.trim().toLowerCase()],
           subject: `Confirmación de Cita - ${config.company?.buildingName || "Residencial Océano Atlántico"}`,
-          headers: {
-            "List-Unsubscribe": `<mailto:no-reply@kayen.work?subject=unsubscribe>`,
-            "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-          },
+          headers: unsubscribeHeaders,
           react: AppointmentEmail({
             prospectName: data.prospectName,
             prospectEmail: data.prospectEmail,
@@ -543,10 +543,7 @@ export async function createAppointment(data: {
             from: fromEmail,
             to: [seller.email],
             subject: `Nueva Cita Asignada - ${data.prospectName}`,
-            headers: {
-              "List-Unsubscribe": `<mailto:no-reply@kayen.work?subject=unsubscribe>`,
-              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-            },
+            headers: unsubscribeHeaders,
             react: AppointmentEmail({
               prospectName: data.prospectName,
               prospectEmail: data.prospectEmail,

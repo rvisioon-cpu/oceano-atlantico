@@ -36,6 +36,8 @@ interface AIGeneratorProps {
   templateLayout?: { version: number; texts: Array<{ text: string; color: string; fontSize: number; x: number; y: number }> } | null;
   onBackToMedia: () => void;
   onFinish: () => void;
+  /** Avisa al módulo para que recargue el contador mensual de imágenes. */
+  onQuotaChange?: () => void;
 }
 
 export default function AIGenerator({
@@ -46,7 +48,8 @@ export default function AIGenerator({
   modo,
   templateLayout,
   onBackToMedia,
-  onFinish
+  onFinish,
+  onQuotaChange
 }: AIGeneratorProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [inputText, setInputText] = useState("");
@@ -160,11 +163,22 @@ export default function AIGenerator({
         })
       });
 
+      const data = await response.json();
+
+      // 429: se agotó el tope mensual de imágenes. No es un fallo técnico, así
+      // que se muestra el aviso del servidor en el chat en vez de un error.
+      if (response.status === 429 && data?.quotaExceeded) {
+        setMessages(prev => [
+          ...prev,
+          { id: `ai-${Date.now()}`, sender: "AI", text: data.error, createdAt: new Date() }
+        ]);
+        onQuotaChange?.();
+        return;
+      }
+
       if (!response.ok) {
         throw new Error("Failed to generate content");
       }
-
-      const data = await response.json();
 
       if (data.success) {
         if (isManualMode) {
@@ -197,6 +211,7 @@ export default function AIGenerator({
               createdAt: new Date()
             }
           ]);
+          onQuotaChange?.();
         }
       }
     } catch (error) {

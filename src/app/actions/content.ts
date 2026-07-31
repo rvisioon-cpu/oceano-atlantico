@@ -1,10 +1,16 @@
 "use server";
 
 import { getDb } from "@/lib/db";
-import { socialContent, socialContentMessages, buildingFaces } from "@/lib/db/schema";
-import { eq, isNull, desc, and } from "drizzle-orm";
+import { socialContent, socialContentMessages, buildingFaces, imageGenerations } from "@/lib/db/schema";
+import { eq, isNull, desc, and, gte, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import {
+  MONTHLY_IMAGE_LIMIT,
+  currentPeriodStart,
+  nextPeriodStart,
+  periodLabel,
+} from "@/lib/content/quota";
 
 // Verificar si el rol es SUPER_ADMIN o ADMIN
 async function verifyAdminAccess() {
@@ -17,6 +23,35 @@ async function verifyAdminAccess() {
     throw new Error("Unauthorized: Solo administradores tienen acceso a este módulo.");
   }
   return session.user;
+}
+
+export type ImageQuota = {
+  used: number;
+  limit: number;
+  remaining: number;
+  period: string;
+  resetsOn: string;
+};
+
+// Consumo de imágenes del mes en curso. Lo usa la UI del módulo de Contenido
+// y también el endpoint de generación para cortar antes de llamar a OpenAI.
+export async function getImageQuota(): Promise<ImageQuota> {
+  await verifyAdminAccess();
+  const db = await getDb();
+
+  const [row] = await db
+    .select({ total: count() })
+    .from(imageGenerations)
+    .where(gte(imageGenerations.createdAt, currentPeriodStart()));
+
+  const used = Number(row?.total || 0);
+  return {
+    used,
+    limit: MONTHLY_IMAGE_LIMIT,
+    remaining: Math.max(0, MONTHLY_IMAGE_LIMIT - used),
+    period: periodLabel(),
+    resetsOn: nextPeriodStart().toLocaleDateString("es-PE", { day: "numeric", month: "long" }),
+  };
 }
 
 export async function getSocialContents() {

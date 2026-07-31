@@ -12,7 +12,9 @@ import {
   createSocialContent,
   updateSocialContentReferences,
   deleteSocialContent,
-  getSocialContentById
+  getSocialContentById,
+  getImageQuota,
+  type ImageQuota
 } from "@/app/actions/content";
 import { getCanvasTemplates, createCanvasTemplate, deleteCanvasTemplate, CanvasTemplateLayout } from "@/app/actions/templates";
 
@@ -77,6 +79,16 @@ export default function ContentDashboard({ initialContentList }: ContentDashboar
   // Plantillas de lienzo guardadas por el usuario ("Mis Plantillas")
   const [customTemplates, setCustomTemplates] = useState<any[]>([]);
   const [templateLayout, setTemplateLayout] = useState<CanvasTemplateLayout | null>(null);
+
+  // Consumo mensual de imágenes: se lee al entrar al módulo y tras cada
+  // generación, para que el contador refleje lo que queda disponible.
+  const [quota, setQuota] = useState<ImageQuota | null>(null);
+  const refreshQuota = () => {
+    getImageQuota()
+      .then(setQuota)
+      .catch((err) => console.error("Error loading image quota:", err));
+  };
+  useEffect(refreshQuota, []);
 
   // Cargar las plantillas guardadas al entrar al paso de selección
   useEffect(() => {
@@ -533,13 +545,36 @@ export default function ContentDashboard({ initialContentList }: ContentDashboar
               </h1>
               <p className="text-gray-500 text-sm mt-1">Crea y gestiona creatividades publicitarias automatizadas con Inteligencia Artificial.</p>
             </div>
-            <button 
-              onClick={handleStartCreation}
-              className="btn bg-brand-orange hover:bg-brand-dark-orange text-white border-0"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Crear nuevo
-            </button>
+            <div className="flex items-center gap-4">
+              {quota && (
+                <div
+                  className="hidden sm:flex flex-col items-end gap-1 pr-4 border-r border-base-300"
+                  title={`Se reinicia el ${quota.resetsOn}`}
+                >
+                  <div className="flex items-baseline gap-1.5">
+                    <span className={`text-lg font-bold leading-none ${quota.remaining === 0 ? "text-error" : "text-brand-orange"}`}>
+                      {quota.used}
+                    </span>
+                    <span className="text-xs text-gray-400 font-medium">/ {quota.limit} imágenes</span>
+                  </div>
+                  <progress
+                    className={`progress w-32 h-1.5 ${quota.remaining === 0 ? "progress-error" : "progress-warning"}`}
+                    value={quota.used}
+                    max={quota.limit}
+                  />
+                  <span className="text-[10px] text-gray-400 capitalize">
+                    {quota.remaining === 0 ? `Sin cupo · reinicia el ${quota.resetsOn}` : `${quota.remaining} restantes en ${quota.period}`}
+                  </span>
+                </div>
+              )}
+              <button
+                onClick={handleStartCreation}
+                className="btn bg-brand-orange hover:bg-brand-dark-orange text-white border-0"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Crear nuevo
+              </button>
+            </div>
           </div>
 
           {/* Renderizado de lista o empty state */}
@@ -891,6 +926,7 @@ export default function ContentDashboard({ initialContentList }: ContentDashboar
               templateLayout={templateLayout}
               onBackToMedia={() => setFlowStep("media")}
               onFinish={handleFinishFlow}
+              onQuotaChange={refreshQuota}
             />
           )}
         </div>

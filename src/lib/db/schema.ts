@@ -258,6 +258,16 @@ export const canvasTemplates = sqliteTable('canvas_templates', {
   deletedAt: integer('deleted_at', { mode: 'timestamp' }),
 });
 
+// Una fila por imagen realmente generada con IA (los fallbacks no cuentan).
+// Es la fuente del tope mensual: se cuentan las filas del mes en curso.
+export const imageGenerations = sqliteTable('image_generations', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  socialContentId: text('social_content_id').references(() => socialContent.id),
+  engine: text('engine').notNull(), // 'openai' | 'gemini'
+  createdBy: text('created_by').references(() => users.id),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+});
+
 export const socialContentMessages = sqliteTable('social_content_messages', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   socialContentId: text('social_content_id').references(() => socialContent.id).notNull(),
