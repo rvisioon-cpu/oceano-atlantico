@@ -13,7 +13,6 @@ import PathBuilder from '@/components/floor/PathBuilder';
 import { preloadImages } from '@/utils/preload';
 import { useStore } from '@/store/useStore';
 import { getAssetUrl } from '@/utils/assets';
-import { Compass } from 'lucide-react';
 
 const FloorContent = () => {
   const params = useParams();
@@ -273,24 +272,11 @@ const FloorContent = () => {
         </span>
       </div>
 
-      {/* Floor Badge & Coordinate Drawer Tool Toggle */}
+      {/* Floor Badge */}
       <div className="fixed top-20 left-6 z-40 flex items-center gap-2">
         <div className="bg-gray-800 text-white px-4 py-2 rounded-md shadow-md text-sm font-medium uppercase tracking-wider whitespace-nowrap border border-white/10">
           <span>Planta {floor.name.replace(/Piso\s+/gi, '')}</span>
         </div>
-
-        <button
-          onClick={() => setIsDrawingMode(!isDrawingMode)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-md shadow-md text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer ${
-            isDrawingMode
-              ? 'bg-amber-500 text-gray-950 ring-2 ring-amber-300 animate-pulse'
-              : 'bg-gray-800 hover:bg-gray-700 text-gray-200 border border-white/10'
-          }`}
-          title="Activar herramienta para obtener o dibujar coordenadas del piso"
-        >
-          <Compass className="w-4 h-4" />
-          <span>{isDrawingMode ? 'Coordenadas (ACTIVO)' : 'Dibujar Coordenadas'}</span>
-        </button>
       </div>
 
       <div className="fixed top-6 right-6 z-50">
