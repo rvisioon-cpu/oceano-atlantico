@@ -60,8 +60,8 @@ export default function Sidebar({ role }: SidebarProps) {
           className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(245,156,29,0.25)]"
         />
         <h2 className="text-lg font-bold font-primary tracking-wide text-base-content flex items-center">
-          <span className="opacity-70 font-light mr-1">Santa</span>
-          <span className="font-extrabold text-brand-orange">Fe</span>
+          <span className="opacity-70 font-light mr-1">Océano</span>
+          <span className="font-extrabold text-brand-orange">Atlántico</span>
         </h2>
       </div>
       <div className="flex-1 overflow-y-auto py-4">

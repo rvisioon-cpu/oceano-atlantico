@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Upload, FileImage, Check, Loader2, Image as ImageIcon } from "lucide-react";
+import { ArrowLeft, Upload, FileImage, Check, Loader2, Trash2, HardDrive, Image as ImageIcon } from "lucide-react";
 import { getMedia } from "@/app/actions/media";
-import { getContentImageSources } from "@/app/actions/content";
+import { getContentImageSources, getContentStorage, deleteReferenceImage, type ContentStorage } from "@/app/actions/content";
 import { getAssetUrl } from "@/utils/assets";
 
 interface MediaSelectorProps {
@@ -90,6 +90,33 @@ export default function MediaSelector({ template, modo, onBack, onContinue }: Me
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadError, setUploadError] = useState("");
+
+  // Espacio ocupado por el módulo (referencias, piezas generadas y plantillas)
+  const [storage, setStorage] = useState<ContentStorage | null>(null);
+  const [deletingRefId, setDeletingRefId] = useState<string | null>(null);
+
+  const refreshStorage = () => {
+    getContentStorage()
+      .then(setStorage)
+      .catch((err) => console.error("Error leyendo el almacenamiento:", err));
+  };
+  useEffect(refreshStorage, []);
+
+  const handleDeleteReference = async (id: string, url: string) => {
+    setDeletingRefId(id);
+    setUploadError("");
+    try {
+      await deleteReferenceImage(id);
+      setReferenceImages((prev) => prev.filter((r) => r.id !== id));
+      // Si estaba elegida para el lienzo, se quita también de la selección
+      setSelectedUrls((prev) => prev.filter((u) => u !== url));
+      refreshStorage();
+    } catch (err: any) {
+      setUploadError(err?.message || "No se pudo eliminar la referencia.");
+    } finally {
+      setDeletingRefId(null);
+    }
+  };
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fuentes de imágenes: tabla media (amenidades y otras subidas) + renders de
@@ -198,15 +225,22 @@ export default function MediaSelector({ template, modo, onBack, onContinue }: Me
           body: formData,
         });
 
-        if (!res.ok) {
-          throw new Error("Error al subir imagen");
+        const data = await res.json();
+
+        // 413: se agotó el espacio del módulo. El mensaje del servidor ya
+        // explica cuánto se usa y qué hacer, así que se muestra tal cual.
+        if (res.status === 413 && data?.storageExceeded) {
+          setUploadError(data.error);
+          break;
         }
 
-        const data = await res.json();
-        
+        if (!res.ok) {
+          throw new Error(data?.error || "Error al subir imagen");
+        }
+
         if (data.success) {
           const newRef = {
-            id: data.key,
+            id: data.mediaId || data.key,
             url: data.url,
             name: file.name
           };
@@ -219,6 +253,7 @@ export default function MediaSelector({ template, modo, onBack, onContinue }: Me
       setUploadError(err.message || "Error al subir una o más imágenes.");
     } finally {
       setIsUploading(false);
+      refreshStorage();
     }
   };
 
@@ -397,14 +432,33 @@ export default function MediaSelector({ template, modo, onBack, onContinue }: Me
                     : "border-base-300 hover:border-gray-400 bg-gray-50/50"
                 }`}
               >
-                <input 
+                <input
                   ref={fileInputRef}
-                  type="file" 
-                  multiple 
-                  className="hidden" 
+                  type="file"
+                  multiple
+                  className="hidden"
                   onChange={handleFileChange}
                   accept="image/*"
                 />
+
+                {storage && (
+                  <div className="w-full max-w-sm mb-1" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center justify-between text-[11px] mb-1">
+                      <span className="flex items-center gap-1.5 text-gray-500 font-semibold">
+                        <HardDrive className="w-3.5 h-3.5" />
+                        Almacenamiento
+                      </span>
+                      <span className={storage.percent >= 90 ? "text-error font-bold" : "text-gray-400"}>
+                        {storage.usedLabel} / {storage.limitLabel}
+                      </span>
+                    </div>
+                    <progress
+                      className={`progress w-full h-1.5 ${storage.percent >= 90 ? "progress-error" : "progress-warning"}`}
+                      value={storage.percent}
+                      max={100}
+                    />
+                  </div>
+                )}
                 
                 {isUploading ? (
                   <div className="flex flex-col items-center gap-2">
@@ -416,7 +470,10 @@ export default function MediaSelector({ template, modo, onBack, onContinue }: Me
                     <Upload className="w-8 h-8 text-gray-400" />
                     <div>
                       <p className="text-sm font-bold text-gray-700">Arrastra tus referencias aquí o haz clic para subir</p>
-                      <p className="text-xs text-gray-400 mt-1">Soporta JPG, PNG (se subirá directamente al bucket de almacenamiento R2)</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        Soporta JPG y PNG (las imágenes se almacenarán en tu espacio
+                        {storage ? `: ${storage.usedLabel} de ${storage.limitLabel} usados` : ""})
+                      </p>
                     </div>
                   </>
                 )}
@@ -451,6 +508,24 @@ export default function MediaSelector({ template, modo, onBack, onContinue }: Me
                           }`}>
                             {isSelected && <Check className="w-2.5 h-2.5" />}
                           </div>
+
+                          {/* Borrar la referencia libera espacio en R2 */}
+                          <button
+                            type="button"
+                            title="Eliminar referencia"
+                            disabled={deletingRefId === img.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteReference(img.id, img.url);
+                            }}
+                            className="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-white/90 hover:bg-error hover:text-white text-error shadow flex items-center justify-center transition-colors disabled:opacity-50"
+                          >
+                            {deletingRefId === img.id ? (
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                            ) : (
+                              <Trash2 className="w-3 h-3" />
+                            )}
+                          </button>
                         </div>
                       );
                     })}

@@ -1,7 +1,9 @@
 // ============================================================================
-// HISTORICAL STATIC DATA — DO NOT USE IN PRODUCTION
-// This file is kept as a reference. The source of truth is the D1 database.
-// See: src/lib/db/schema.ts and seed.sql for the database schema and seed data.
+// Asesores que se muestran en "Elige tu asesor" de la página de contacto.
+// Ojo: pese a lo que decía el encabezado anterior, esta lista SÍ se usa en
+// producción — src/app/contact/page.tsx la importa directamente. Los usuarios
+// de la tabla `users` (rol SELLER) son otra cosa: sirven para asignar citas
+// en el calendario, no para este listado público.
 // ============================================================================
 
 export interface AdviserData {
@@ -16,19 +18,19 @@ export interface AdviserData {
 
 export const advisersData: AdviserData[] = [
   {
-    id: 'rocio',
-    name: "Rocio Granja",
-    role: "Asesora de Ventas",
-    gender: 'female',
-    phone: "+51959556125",
+    id: 'nicolas',
+    name: "Nicolás Matamoros Bosleman",
+    role: "Asesor de Ventas",
+    gender: 'male',
+    phone: "+51964281172",
     whatsappMessage: "Hola, vengo desde la web de Océano Atlántico, deseo más información."
   },
   {
-    id: 'pierre',
-    name: "Pierre Gurbillon",
+    id: 'raul',
+    name: "Raul Matamoros Vega",
     role: "Asesor de Ventas",
     gender: 'male',
-    phone: "+51945656710",
+    phone: "+51997171543",
     whatsappMessage: "Hola, vengo desde la web de Océano Atlántico, deseo más información."
   }
 ];

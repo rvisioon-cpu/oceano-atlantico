@@ -14,7 +14,9 @@ import {
   deleteSocialContent,
   getSocialContentById,
   getImageQuota,
-  type ImageQuota
+  getContentStorage,
+  type ImageQuota,
+  type ContentStorage
 } from "@/app/actions/content";
 import { getCanvasTemplates, createCanvasTemplate, deleteCanvasTemplate, CanvasTemplateLayout } from "@/app/actions/templates";
 
@@ -83,10 +85,14 @@ export default function ContentDashboard({ initialContentList }: ContentDashboar
   // Consumo mensual de imágenes: se lee al entrar al módulo y tras cada
   // generación, para que el contador refleje lo que queda disponible.
   const [quota, setQuota] = useState<ImageQuota | null>(null);
+  const [storage, setStorage] = useState<ContentStorage | null>(null);
   const refreshQuota = () => {
     getImageQuota()
       .then(setQuota)
       .catch((err) => console.error("Error loading image quota:", err));
+    getContentStorage()
+      .then(setStorage)
+      .catch((err) => console.error("Error loading content storage:", err));
   };
   useEffect(refreshQuota, []);
 
@@ -565,6 +571,22 @@ export default function ContentDashboard({ initialContentList }: ContentDashboar
                   <span className="text-[10px] text-gray-400 capitalize">
                     {quota.remaining === 0 ? `Sin cupo · reinicia el ${quota.resetsOn}` : `${quota.remaining} restantes en ${quota.period}`}
                   </span>
+                </div>
+              )}
+              {storage && (
+                <div className="hidden md:flex flex-col items-end gap-1 pr-4 border-r border-base-300">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className={`text-lg font-bold leading-none ${storage.percent >= 90 ? "text-error" : "text-brand-orange"}`}>
+                      {storage.usedLabel}
+                    </span>
+                    <span className="text-xs text-gray-400 font-medium">/ {storage.limitLabel}</span>
+                  </div>
+                  <progress
+                    className={`progress w-32 h-1.5 ${storage.percent >= 90 ? "progress-error" : "progress-warning"}`}
+                    value={storage.percent}
+                    max={100}
+                  />
+                  <span className="text-[10px] text-gray-400">Almacenamiento usado</span>
                 </div>
               )}
               <button

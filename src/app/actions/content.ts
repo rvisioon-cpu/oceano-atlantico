@@ -1,12 +1,15 @@
 "use server";
 
 import { getDb } from "@/lib/db";
-import { socialContent, socialContentMessages, buildingFaces, imageGenerations } from "@/lib/db/schema";
+import { socialContent, socialContentMessages, buildingFaces, imageGenerations, canvasTemplates, media } from "@/lib/db/schema";
 import { eq, isNull, desc, and, gte, count } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import {
   MONTHLY_IMAGE_LIMIT,
+  STORAGE_LIMIT_BYTES,
+  formatBytes,
   currentPeriodStart,
   nextPeriodStart,
   periodLabel,
@@ -52,6 +55,104 @@ export async function getImageQuota(): Promise<ImageQuota> {
     period: periodLabel(),
     resetsOn: nextPeriodStart().toLocaleDateString("es-PE", { day: "numeric", month: "long" }),
   };
+}
+
+// Prefijos de R2 que ocupan el espacio del módulo de Contenido: las
+// referencias que sube el usuario y las piezas generadas con IA.
+const STORAGE_PREFIXES = ["media/social_reference/", "media/social_content/"];
+
+export type ContentStorage = {
+  usedBytes: number;
+  limitBytes: number;
+  usedLabel: string;
+  limitLabel: string;
+  percent: number;
+};
+
+/**
+ * Espacio ocupado por el módulo de Contenido, leído directamente de R2 para
+ * que refleje el peso real de los archivos (la tabla `media` no lo guarda).
+ * Es un contador global del proyecto, no por usuario.
+ */
+export async function getContentStorage(): Promise<ContentStorage> {
+  await verifyAdminAccess();
+
+  let usedBytes = 0;
+  try {
+    const { env } = (await getCloudflareContext({ async: true })) as any;
+    if (env?.R2) {
+      for (const prefix of STORAGE_PREFIXES) {
+        let cursor: string | undefined = undefined;
+        do {
+          const listed: any = await env.R2.list({ prefix, cursor, limit: 1000 });
+          for (const obj of listed.objects || []) {
+            usedBytes += obj.size || 0;
+          }
+          cursor = listed.truncated ? listed.cursor : undefined;
+        } while (cursor);
+      }
+    }
+
+    // Las plantillas son JSON en D1; pesan poco pero cuentan para el total.
+    const db = await getDb();
+    const templates = await db
+      .select({ layout: canvasTemplates.layout })
+      .from(canvasTemplates)
+      .where(isNull(canvasTemplates.deletedAt));
+    for (const t of templates) {
+      usedBytes += new TextEncoder().encode(JSON.stringify(t.layout ?? "")).length;
+    }
+  } catch (error) {
+    console.error("Error midiendo el almacenamiento de contenido:", error);
+  }
+
+  return {
+    usedBytes,
+    limitBytes: STORAGE_LIMIT_BYTES,
+    usedLabel: formatBytes(usedBytes),
+    limitLabel: formatBytes(STORAGE_LIMIT_BYTES),
+    percent: Math.min(100, Math.round((usedBytes / STORAGE_LIMIT_BYTES) * 100)),
+  };
+}
+
+/** Extrae la clave de R2 a partir de la URL guardada (proxy en dev, dominio público en prod). */
+function r2KeyFromUrl(url: string): string | null {
+  if (!url) return null;
+  if (url.startsWith("/api/r2/")) return url.slice("/api/r2/".length);
+  const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "";
+  if (publicUrl && url.startsWith(publicUrl)) return url.slice(publicUrl.length).replace(/^\//, "");
+  if (url.startsWith("http")) return null;
+  return url.replace(/^\//, "");
+}
+
+/**
+ * Borra una imagen de referencia. A diferencia de deleteMedia (SUPER_ADMIN y
+ * solo marca la fila), aquí también se elimina el objeto de R2: si no, el
+ * espacio nunca se liberaría y el indicador quedaría inflado.
+ */
+export async function deleteReferenceImage(id: string) {
+  await verifyAdminAccess();
+  const db = await getDb();
+
+  const [row] = await db.select().from(media).where(eq(media.id, id));
+  if (!row) throw new Error("La referencia no existe.");
+  if (row.category !== "SOCIAL_REFERENCE") {
+    throw new Error("Solo se pueden eliminar imágenes de la sección Mis Referencias.");
+  }
+
+  const key = r2KeyFromUrl(row.url);
+  if (key) {
+    try {
+      const { env } = (await getCloudflareContext({ async: true })) as any;
+      if (env?.R2) await env.R2.delete(key);
+    } catch (error) {
+      console.error("Error eliminando el objeto de R2:", error);
+    }
+  }
+
+  await db.update(media).set({ deletedAt: new Date(), isActive: false }).where(eq(media.id, id));
+  revalidatePath("/dashboard/content");
+  return { success: true };
 }
 
 export async function getSocialContents() {

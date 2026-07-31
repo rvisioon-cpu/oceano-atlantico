@@ -57,7 +57,9 @@ const config: ConfigProps = {
   resend: {
     fromNoReply: `Océano Atlántico <no-reply@rmpromotorainmobiliaria.com>`,
     fromAdmin: `Océano Atlántico <admin@rmpromotorainmobiliaria.com>`,
-    supportEmail: "ventas@rmpromotorainmobiliaria.com",
+    // Buzón que recibe los formularios de contacto. Es un dominio distinto al
+    // de envío: Resend solo exige el dominio verificado en el remitente.
+    supportEmail: "info@rmpromotora.com",
   },
   colors: {
     theme: "light",
@@ -72,7 +74,7 @@ const config: ConfigProps = {
     address: "Company Address",
     buildingName: "Residencial Océano Atlántico",
     buildingAddress: "Building Address",
-    email: "ventas@rmpromotorainmobiliaria.com",
+    email: "info@rmpromotora.com",
     website: "https://rmpromotora.com",
     // El proyecto no tiene cuentas propias: se muestran las de RM Promotora.
     buildingSocials: {

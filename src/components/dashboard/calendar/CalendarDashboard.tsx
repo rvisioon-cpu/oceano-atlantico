@@ -39,6 +39,7 @@ import {
   getProspects,
 } from "@/app/actions/calendar";
 import { getUnits } from "@/app/actions/units";
+import { getBookingEnabled, setBookingEnabled as setBookingEnabledAction } from "@/app/actions/booking";
 import config from "@/config/config";
 
 interface CalendarDashboardProps {
@@ -138,6 +139,36 @@ export default function CalendarDashboard({
   const showNotification = (type: "success" | "error", message: string) => {
     setNotification({ type, message });
     setTimeout(() => setNotification(null), 4000);
+  };
+
+  // Estado del agendamiento público (se refleja en la página de contacto)
+  const [bookingEnabled, setBookingEnabled] = useState(false);
+  const [savingBooking, setSavingBooking] = useState(false);
+
+  useEffect(() => {
+    getBookingEnabled()
+      .then(setBookingEnabled)
+      .catch((err) => console.error("Error leyendo el estado de citas:", err));
+  }, []);
+
+  const handleToggleBooking = async (next: boolean) => {
+    setSavingBooking(true);
+    const previous = bookingEnabled;
+    setBookingEnabled(next); // optimista: el toggle responde de inmediato
+    try {
+      await setBookingEnabledAction(next);
+      showNotification(
+        "success",
+        next
+          ? "Las citas ya están disponibles en la web pública."
+          : "Se ocultó el agendamiento de citas en la web pública."
+      );
+    } catch (error: any) {
+      setBookingEnabled(previous);
+      showNotification("error", error.message || "No se pudo cambiar el estado de las citas.");
+    } finally {
+      setSavingBooking(false);
+    }
   };
 
   // Synchronize availability editor state
@@ -904,6 +935,27 @@ export default function CalendarDashboard({
 
         {/* Global Loading Spinner */}
         {isPending && <span className="loading loading-spinner text-primary"></span>}
+
+        {/* Interruptor del agendamiento público: mientras esté apagado, la
+            página de contacto no ofrece "Fija una cita con nosotros". */}
+        {isUserAdmin && (
+          <div className="flex items-center gap-3 bg-base-100 border border-base-300 rounded-xl px-4 py-2">
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-gray-700 leading-tight">Activar citas</span>
+              <span className="text-[10px] text-gray-400 leading-tight">
+                {bookingEnabled ? "Visible en la web pública" : "Oculto en la web pública"}
+              </span>
+            </div>
+            <input
+              type="checkbox"
+              className="toggle toggle-sm toggle-primary"
+              checked={bookingEnabled}
+              disabled={savingBooking}
+              onChange={(e) => handleToggleBooking(e.target.checked)}
+              aria-label="Activar el agendamiento de citas en la web pública"
+            />
+          </div>
+        )}
 
         {/* Filters & Actions for Calendar Tab */}
         {activeTab === "calendar" && (

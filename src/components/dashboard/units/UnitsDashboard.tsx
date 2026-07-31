@@ -34,6 +34,7 @@ import {
   deleteUnit,
   updateUnitState,
 } from "@/app/actions/units";
+import { uploadBrochure } from "@/app/actions/brochure";
 
 // Floor and Unit Typings
 interface Floor {
@@ -172,6 +173,35 @@ export default function UnitsDashboard({
         });
     }
   }, [selectedUnit, activeDetailTab]);
+
+  const [uploadingUnitBrochure, setUploadingUnitBrochure] = useState(false);
+  const [unitBrochureError, setUnitBrochureError] = useState("");
+
+  // Sube un PDF y lo deja activo para la unidad abierta. uploadBrochure ya
+  // valida el rol y el formato en el servidor; aquí solo se refleja el estado.
+  const handleUploadUnitBrochure = async (file: File) => {
+    if (!selectedUnit) return;
+    setUnitBrochureError("");
+    setUploadingUnitBrochure(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("title", `Brochure ${selectedUnit.identifier}`);
+      formData.append("type", "UNIT");
+      formData.append("unitId", selectedUnit.id);
+
+      await uploadBrochure(formData);
+
+      const res = await fetch(`/api/brochure/active?unitId=${selectedUnit.id}`);
+      const data: any = await res.json();
+      setUnitBrochureUrl(data?.url || null);
+    } catch (err: any) {
+      console.error("Error subiendo el brochure de la unidad:", err);
+      setUnitBrochureError(err?.message || "No se pudo subir el brochure.");
+    } finally {
+      setUploadingUnitBrochure(false);
+    }
+  };
 
   const getAbsoluteAssetUrl = (url: string | null) => {
     if (!url) return "";
@@ -1717,7 +1747,41 @@ export default function UnitsDashboard({
                       <p className="text-sm text-gray-500 mt-2">Cargando brochure...</p>
                     </div>
                   ) : !unitBrochureUrl ? (
-                    <div className="text-gray-400">Brochure digital no configurado para esta unidad.</div>
+                    <div className="w-full max-w-md flex flex-col items-center gap-4">
+                      <div className="text-gray-400">Brochure digital no configurado para esta unidad.</div>
+
+                      {/* Carga directa del brochure de esta unidad, para no tener
+                          que ir al módulo Brochure a asociarlo a mano. */}
+                      {isSupervisor && (
+                        <div className="w-full border-2 border-dashed border-base-300 rounded-xl p-5 flex flex-col items-center gap-3 bg-base-100">
+                          <input
+                            id="unit-brochure-input"
+                            type="file"
+                            accept="application/pdf"
+                            className="file-input file-input-bordered file-input-sm w-full"
+                            disabled={uploadingUnitBrochure}
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) handleUploadUnitBrochure(file);
+                              e.target.value = "";
+                            }}
+                          />
+                          {uploadingUnitBrochure ? (
+                            <span className="text-xs text-gray-500 flex items-center gap-2">
+                              <span className="loading loading-spinner loading-xs" />
+                              Subiendo brochure...
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400">
+                              Solo PDF. Quedará asociado a la unidad {selectedUnit?.identifier}.
+                            </span>
+                          )}
+                          {unitBrochureError && (
+                            <span className="text-xs text-error">{unitBrochureError}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <div className="w-full max-w-3xl flex flex-col gap-4">
                       <div className="relative w-full h-[500px] rounded-xl overflow-hidden shadow-md border-2 border-base-300 bg-white">

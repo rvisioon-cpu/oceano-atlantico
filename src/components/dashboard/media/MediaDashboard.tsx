@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, Trash2, Download, Upload, Loader2, FileText, Image as ImageIcon, FileVideo, File, Search, Check, AlertTriangle } from "lucide-react";
+import { Plus, Trash2, Download, Share2, Upload, Loader2, FileText, Image as ImageIcon, FileVideo, File, Search, Check, AlertTriangle } from "lucide-react";
 import { uploadMedia, toggleMediaActive, deleteMedia } from "@/app/actions/media";
+import { getAssetUrl } from "@/utils/assets";
 
 type MediaItem = {
   id: string;
@@ -62,6 +63,7 @@ export default function MediaDashboard({ initialMedia, currentUserRole = "SELLER
   const [selectedTypologyFilter, setSelectedTypologyFilter] = useState("TODOS");
   const [selectedSubTypologyFilter, setSelectedSubTypologyFilter] = useState("TODOS");
 
+  const [copiedUrl, setCopiedUrl] = useState<string | null>(null);
   const [notification, setNotification] = useState<{ type: "success" | "error"; message: string } | null>(null);
   const showNotification = (type: "success" | "error", message: string) => {
     setNotification({ type, message });
@@ -171,6 +173,35 @@ export default function MediaDashboard({ initialMedia, currentUserRole = "SELLER
     } catch (e) {
       console.error(e);
       window.open(url, "_blank");
+    }
+  };
+
+  // Compartir enlace del medio. Se usa el diálogo nativo del sistema cuando
+  // existe (móvil) y, si no, se copia la URL absoluta al portapapeles.
+  const handleShare = async (url: string, title: string) => {
+    const resolved = getAssetUrl(url);
+    const absoluteUrl = resolved.startsWith("http")
+      ? resolved
+      : `${window.location.origin}${resolved.startsWith("/") ? "" : "/"}${resolved}`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, url: absoluteUrl });
+        return;
+      } catch (e: any) {
+        // El usuario canceló el diálogo: no es un error que deba avisarse.
+        if (e?.name === "AbortError") return;
+      }
+    }
+
+    try {
+      await navigator.clipboard.writeText(absoluteUrl);
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(null), 2500);
+      showNotification("success", "Enlace copiado al portapapeles.");
+    } catch (e) {
+      console.error(e);
+      showNotification("error", "No se pudo copiar el enlace.");
     }
   };
 
@@ -374,14 +405,25 @@ export default function MediaDashboard({ initialMedia, currentUserRole = "SELLER
                               </span>
                             </div>
 
-                            {/* Hover Overlay - Download */}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            {/* Hover Overlay - Descargar y compartir enlace */}
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                               <button
                                 onClick={() => handleDownload(mediaItem.url, mediaItem.title)}
                                 className="btn btn-circle bg-white hover:bg-gray-100 text-brand-orange shadow-lg border-0"
                                 title="Descargar"
                               >
                                 <Download className="w-5 h-5" />
+                              </button>
+                              <button
+                                onClick={() => handleShare(mediaItem.url, mediaItem.title)}
+                                className="btn btn-circle bg-white hover:bg-gray-100 text-brand-orange shadow-lg border-0"
+                                title="Compartir enlace"
+                              >
+                                {copiedUrl === mediaItem.url ? (
+                                  <Check className="w-5 h-5 text-success" />
+                                ) : (
+                                  <Share2 className="w-5 h-5" />
+                                )}
                               </button>
                             </div>
                           </div>

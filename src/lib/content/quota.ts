@@ -6,6 +6,22 @@
 // coincida con el cambio de mes que ve el equipo comercial.
 export const MONTHLY_IMAGE_LIMIT = 100;
 
+// Espacio máximo del módulo de Contenido en R2: referencias subidas, piezas
+// generadas y plantillas guardadas. Es un tope global del proyecto.
+export const STORAGE_LIMIT_BYTES = 3 * 1024 * 1024 * 1024; // 3 GB
+
+export function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  const units = ["KB", "MB", "GB", "TB"];
+  let value = bytes / 1024;
+  let i = 0;
+  while (value >= 1024 && i < units.length - 1) {
+    value /= 1024;
+    i++;
+  }
+  return `${value.toFixed(value >= 10 || i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
 const LIMA_OFFSET_MS = 5 * 60 * 60 * 1000;
 
 /** Inicio del mes en curso (hora de Lima) expresado en tiempo real UTC. */

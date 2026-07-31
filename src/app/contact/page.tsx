@@ -9,6 +9,7 @@ import Adviser from '@/components/Adviser';
 import { advisersData } from '@/data/advisers';
 import { homepageData } from '@/data/homepage';
 import { getUnits, getFloors } from '@/app/actions/units';
+import { getBookingEnabled } from '@/app/actions/booking';
 
 const TikTokIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
     <svg 
@@ -31,6 +32,9 @@ const Contact = () => {
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const [tempTime, setTempTime] = useState({ hour: '09', minute: '00', period: 'AM' });
   const [activeSection, setActiveSection] = useState<'form' | 'advisers' | 'booking'>('form');
+  // El agendamiento de citas se activa desde el módulo Calendario del panel.
+  // Mientras esté apagado, el botón no se muestra y la sección es inalcanzable.
+  const [bookingEnabled, setBookingEnabled] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -135,6 +139,12 @@ const Contact = () => {
         setUnitsList(uniqueFiltered);
       })
       .catch(err => console.error("Error loading units:", err));
+  }, []);
+
+  useEffect(() => {
+    getBookingEnabled()
+      .then(setBookingEnabled)
+      .catch((err) => console.error('Error leyendo el estado de citas:', err));
   }, []);
 
   // Fetch Available Days when month/year/meeting type changes
@@ -845,13 +855,15 @@ const Contact = () => {
                           {isSubmitting ? 'Enviando...' : 'Enviar respuesta'}
                       </button>
 
-                      <button 
-                          type="button"
-                          onClick={() => setActiveSection('booking')}
-                          className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-secondary font-bold text-xs uppercase tracking-widest py-4 rounded-full transition-all shadow-lg flex items-center justify-center gap-2"
-                      >
-                          <CalendarIcon size={14} /> Fija una cita con nosotros
-                      </button>
+                      {bookingEnabled && (
+                        <button
+                            type="button"
+                            onClick={() => setActiveSection('booking')}
+                            className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white font-secondary font-bold text-xs uppercase tracking-widest py-4 rounded-full transition-all shadow-lg flex items-center justify-center gap-2"
+                        >
+                            <CalendarIcon size={14} /> Fija una cita con nosotros
+                        </button>
+                      )}
 
                       <button 
                           type="button"
@@ -866,7 +878,7 @@ const Contact = () => {
           )}
 
           {/* SECTION 2: DYNAMIC CALENDAR BOOKING FORM (PHASE 2) */}
-          {activeSection === 'booking' && (
+          {activeSection === 'booking' && bookingEnabled && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pb-10">
               <h2 className="text-gray-800 font-extrabold mb-4 text-sm uppercase tracking-wider text-primary">Fija una cita con nosotros</h2>
               
