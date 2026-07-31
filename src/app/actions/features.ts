@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { getSetting, updateSetting } from "@/app/actions/settings";
 import defaultFeaturesJson from "@/data/features.json";
+import { getDb } from "@/lib/db";
+import { constructionProgress } from "@/lib/db/schema";
+import { count, isNull } from "drizzle-orm";
 
 export type SidebarFeature = {
   id: string;
@@ -18,6 +21,21 @@ export type SidebarFeature = {
 const defaultSidebarFeatures = defaultFeaturesJson as SidebarFeature[];
 
 import { connection } from "next/server";
+
+/** ¿Hay al menos un avance de obra publicado (no eliminado)? */
+async function hasConstructionProgress(): Promise<boolean> {
+  try {
+    const db = await getDb();
+    const [row] = await db
+      .select({ total: count() })
+      .from(constructionProgress)
+      .where(isNull(constructionProgress.deletedAt));
+    return Number(row?.total || 0) > 0;
+  } catch (error) {
+    console.error("Error comprobando los avances de obra:", error);
+    return false;
+  }
+}
 
 /**
  * Returns the sidebar features list.
@@ -70,18 +88,24 @@ export async function getFeatures(includeHidden = false): Promise<SidebarFeature
       }
     }
     
-    // Force active state for video and avance directly in memory to ensure immediate visual change
-    // without depending on DB write permissions during public visits
+    // "Avance de obra" se muestra solo si hay algo que enseñar: aparece en el
+    // menú en cuanto se publica el primer avance y se oculta si se borran
+    // todos. Así nadie llega a una página vacía.
+    const hasProgress = await hasConstructionProgress();
+
+    // El estado se fuerza en memoria (no en base) para que el cambio se vea de
+    // inmediato sin depender de permisos de escritura en visitas públicas.
     dbFeatures = dbFeatures.map((f: SidebarFeature) => {
       if (f.id === "video") return { ...f, active: true };
-      if (f.id === "avance") return { ...f, active: false };
+      if (f.id === "avance") return { ...f, active: includeHidden ? true : hasProgress };
       return f;
     });
 
     return dbFeatures;
   } catch (error) {
     console.error("Error reading features from DB:", error);
-    // En caso de error en el sidebar público, nos aseguramos de que video esté activo y avance inactivo
+    // Si no se puede leer la base, se oculta "avance de obra": es preferible no
+    // ofrecer la entrada a mandar al visitante a una página posiblemente vacía.
     const fallbackFeatures = defaultSidebarFeatures.map((f: SidebarFeature) => {
       if (f.id === "video") return { ...f, active: true };
       if (f.id === "avance") return { ...f, active: false };
