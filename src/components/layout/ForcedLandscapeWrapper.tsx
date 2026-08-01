@@ -10,26 +10,24 @@ export default function ForcedLandscapeWrapper({ children }: { children: React.R
   // Exclude dashboard and login routes from rotation
   const isExcluded = pathname?.startsWith('/dashboard') || pathname?.startsWith('/login');
 
-  if (isForcedLandscape && !isExcluded) {
-    return (
-      <div 
-        className="w-screen h-screen relative"
-        style={{
-          width: '100vh',
-          height: '100vw',
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%) rotate(90deg)',
-          zIndex: 1,
-          overflow: 'hidden',
-          backgroundColor: 'black'
-        }}
-      >
-        {children}
-      </div>
-    );
-  }
+  const shouldForceLandscape = isForcedLandscape && !isExcluded;
 
-  return <>{children}</>;
+  return (
+    <div 
+      className={shouldForceLandscape ? "w-screen h-screen relative" : "w-full h-full relative"}
+      style={shouldForceLandscape ? {
+        width: '100vh',
+        height: '100vw',
+        position: 'fixed',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%) rotate(90deg)',
+        zIndex: 1,
+        overflow: 'hidden',
+        backgroundColor: 'black'
+      } : undefined}
+    >
+      {children}
+    </div>
+  );
 }
