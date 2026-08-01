@@ -49,6 +49,10 @@ const Homepage = () => {
     const tl = gsap.timeline({ defaults: { ease: "power2.out" }, paused: false });
     tlRef.current = tl;
 
+    // Determine vertical offset based on screen height/width (short height in forced landscape needs compact offset)
+    const isShortHeight = typeof window !== 'undefined' && (window.innerHeight < 500 || window.innerWidth < 600);
+    const moveUpY = isShortHeight ? '-18vh' : '-25vh';
+
     // Initial Setup
     gsap.set(textRefs.current, { y: 20, autoAlpha: 0 });
 
@@ -56,7 +60,7 @@ const Homepage = () => {
     tl.to({}, { duration: 3 })
 
       .to(logoRef.current, {
-        y: window.innerWidth < 600 ? '-14vh' : '-25vh',
+        y: moveUpY,
         duration: 2,
         ease: "power3.inOut"
       }, "moveUp")
@@ -156,7 +160,7 @@ const Homepage = () => {
       {/* Stays below the sidebar backdrop (z-60): when the menu is open the page
           blurs behind it and the hero logo is hidden, so the menu's own centered
           logo stands alone instead of ghosting over a blurred duplicate. */}
-      <div className="relative z-10 flex-1 flex flex-col justify-between p-6 lg:p-12 text-white">
+      <div className="relative z-10 flex-1 flex flex-col justify-between p-4 sm:p-6 lg:p-12 text-white">
 
         {/* Header */}
         <div className="flex justify-between items-start shrink-0">
@@ -188,7 +192,7 @@ const Homepage = () => {
               ref={logoRef} // Ref moved to image for independent animation
               src={homepageData.hero.logo}
               alt="Logo"
-              className="w-[180px] lg:w-full max-w-xl object-contain drop-shadow-2xl opacity-90"
+              className="w-[140px] sm:w-[180px] lg:w-full max-w-xl object-contain drop-shadow-2xl opacity-90"
             />
           </div>
 
@@ -197,7 +201,7 @@ const Homepage = () => {
             ref={buttonRef}
             onClick={handleStartIntro}
             disabled={isPlayingIntro || isSidebarOpen}
-            className={`absolute bottom-[8%] lg:bottom-[10%] left-1/2 -translate-x-1/2 z-20 group px-8 lg:px-12 py-3 lg:py-4 bg-brand-primary/80 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white text-xs lg:text-sm font-medium tracking-widest uppercase rounded-full overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl font-secondary
+            className={`absolute bottom-[5%] sm:bottom-[8%] lg:bottom-[10%] left-1/2 -translate-x-1/2 z-20 group px-6 sm:px-8 lg:px-12 py-2.5 sm:py-3 lg:py-4 bg-brand-primary/80 hover:bg-brand-primary backdrop-blur-xl border border-white/20 text-white text-[11px] sm:text-xs lg:text-sm font-medium tracking-widest uppercase rounded-full overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer shadow-lg hover:shadow-xl font-secondary
                     ${(isPlayingIntro || isSidebarOpen) ? 'opacity-0 pointer-events-none' : 'opacity-100'}
                 `}
           >
@@ -207,18 +211,18 @@ const Homepage = () => {
           </button>
 
           {/* Presentation Text Container */}
-          <div className={`absolute top-[32%] lg:top-[55%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 h-[220px] lg:h-[260px] px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
+          <div className={`absolute top-[46%] lg:top-[55%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 min-h-[160px] sm:h-[220px] lg:h-[260px] px-3 sm:px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
 
             {homepageData.slides.map((slide, index) => (
               <p
                 key={index}
                 ref={el => { textRefs.current[index] = el }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full lg:w-fit bg-black/40 backdrop-blur-md rounded-2xl p-6 lg:p-10 text-center text-lg lg:text-3xl font-light tracking-wide opacity-0 text-white drop-shadow-lg max-w-4xl mx-auto flex flex-col gap-2"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] sm:w-full lg:w-fit bg-black/40 backdrop-blur-md rounded-2xl p-4 sm:p-6 lg:p-10 text-center text-sm sm:text-lg lg:text-3xl font-light tracking-wide opacity-0 text-white drop-shadow-lg max-w-2xl lg:max-w-4xl mx-auto flex flex-col gap-1.5 sm:gap-2"
               >
                 {slide.highlight ? (
                   <>
-                    <span className="font-bold block text-lg lg:text-2xl uppercase tracking-wider text-white">{slide.highlight}</span>
-                    <span className="text-sm lg:text-base font-light leading-relaxed block max-w-2xl mx-auto normal-case">{slide.text.replace('{{highlight}}', '').trim()}</span>
+                    <span className="font-bold block text-sm sm:text-lg lg:text-2xl uppercase tracking-wider text-white">{slide.highlight}</span>
+                    <span className="text-xs sm:text-sm lg:text-base font-light leading-relaxed block max-w-2xl mx-auto normal-case">{slide.text.replace('{{highlight}}', '').trim()}</span>
                   </>
                 ) : (
                   slide.text

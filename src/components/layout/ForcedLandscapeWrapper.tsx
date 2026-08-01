@@ -7,8 +7,8 @@ export default function ForcedLandscapeWrapper({ children }: { children: React.R
   const isForcedLandscape = useStore((state) => state.isForcedLandscape);
   const pathname = usePathname();
 
-  // Exclude dashboard and login routes from rotation
-  const isExcluded = pathname?.startsWith('/dashboard') || pathname?.startsWith('/login');
+  // Exclude dashboard, login, and ubicacion routes from rotation
+  const isExcluded = pathname?.startsWith('/dashboard') || pathname?.startsWith('/login') || pathname?.startsWith('/ubicacion');
 
   const shouldForceLandscape = isForcedLandscape && !isExcluded;
 
