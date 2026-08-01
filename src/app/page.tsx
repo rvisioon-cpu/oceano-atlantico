@@ -211,7 +211,7 @@ const Homepage = () => {
           </button>
 
           {/* Presentation Text Container */}
-          <div className={`absolute top-[46%] lg:top-[55%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 min-h-[160px] sm:h-[220px] lg:h-[260px] px-3 sm:px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
+          <div className={`absolute top-[37%] lg:top-[55%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 min-h-[160px] sm:h-[220px] lg:h-[260px] px-3 sm:px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
 
             {homepageData.slides.map((slide, index) => (
               <p
