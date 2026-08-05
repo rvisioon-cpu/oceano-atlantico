@@ -211,13 +211,13 @@ const Homepage = () => {
           </button>
 
           {/* Presentation Text Container */}
-          <div className={`absolute top-[37%] lg:top-[55%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 min-h-[160px] sm:h-[220px] lg:h-[260px] px-3 sm:px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
+          <div className={`absolute top-[50%] sm:top-[52%] lg:top-[55%] left-0 right-0 -translate-y-1/2 flex flex-col items-center justify-center pointer-events-none z-10 min-h-[160px] sm:h-[220px] lg:h-[260px] px-3 sm:px-4 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0' : 'opacity-100'}`}>
 
             {homepageData.slides.map((slide, index) => (
               <p
                 key={index}
                 ref={el => { textRefs.current[index] = el }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] sm:w-full lg:w-fit bg-black/40 backdrop-blur-md rounded-2xl p-4 sm:p-6 lg:p-10 text-center text-sm sm:text-lg lg:text-3xl font-light tracking-wide opacity-0 text-white drop-shadow-lg max-w-2xl lg:max-w-4xl mx-auto flex flex-col gap-1.5 sm:gap-2"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[92%] sm:w-full lg:w-fit bg-black/40 backdrop-blur-md rounded-2xl p-3.5 sm:p-6 lg:p-10 text-center text-sm sm:text-lg lg:text-3xl font-light tracking-wide opacity-0 text-white drop-shadow-lg max-w-2xl lg:max-w-4xl mx-auto flex flex-col gap-1.5 sm:gap-2"
               >
                 {slide.highlight ? (
                   <>
