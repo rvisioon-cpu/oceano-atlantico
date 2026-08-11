@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/lib/db";
 import { buildingFaces } from "@/lib/db/schema";
@@ -144,7 +145,7 @@ const defaultFacesSeed = [
   }
 ];
 
-export async function getBuildingFacesData(): Promise<BuildingFace[]> {
+export const getBuildingFacesData = cache(async function getBuildingFacesData(): Promise<BuildingFace[]> {
   const db = await getDb();
   
   let rows = await db
@@ -173,7 +174,7 @@ export async function getBuildingFacesData(): Promise<BuildingFace[]> {
   }
 
   return rows.map(mapDbRowToBuildingFace);
-}
+});
 
 export async function getRawBuildingFaces() {
   const session = await auth();

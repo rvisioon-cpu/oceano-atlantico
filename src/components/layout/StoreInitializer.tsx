@@ -23,24 +23,28 @@ export default function StoreInitializer({ initialFloorsData, initialBuildingFac
     initialized.current = true;
   }
 
-  // Background sync for real-time updates when mounting
+  // Background sync only if initial SSR data was empty
   useEffect(() => {
-    getFloorsData()
-      .then((data) => {
-        useStore.setState({ floorsData: data as Floor[] });
-      })
-      .catch((err) => {
-        console.error("Failed to sync floor data in background:", err);
-      });
+    if (!initialFloorsData || initialFloorsData.length === 0) {
+      getFloorsData()
+        .then((data) => {
+          useStore.setState({ floorsData: data as Floor[] });
+        })
+        .catch((err) => {
+          console.error("Failed to sync floor data in background:", err);
+        });
+    }
 
-    getBuildingFacesData()
-      .then((data) => {
-        useStore.setState({ buildingFacesData: data as any[] });
-      })
-      .catch((err) => {
-        console.error("Failed to sync building faces data in background:", err);
-      });
-  }, []);
+    if (!initialBuildingFacesData || initialBuildingFacesData.length === 0) {
+      getBuildingFacesData()
+        .then((data) => {
+          useStore.setState({ buildingFacesData: data as any[] });
+        })
+        .catch((err) => {
+          console.error("Failed to sync building faces data in background:", err);
+        });
+    }
+  }, [initialFloorsData, initialBuildingFacesData]);
 
   return null;
 }

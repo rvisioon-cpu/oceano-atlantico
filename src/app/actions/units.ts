@@ -1,5 +1,6 @@
 "use server";
 
+import { cache } from "react";
 import { getDb } from "@/lib/db";
 import { floors, units, logs } from "@/lib/db/schema";
 import { eq, and, isNull, inArray } from "drizzle-orm";
@@ -39,7 +40,7 @@ export async function getFloors() {
     .orderBy(floors.level);
 }
 
-export async function getFloorsData() {
+export const getFloorsData = cache(async function getFloorsData() {
   let isSuperAdmin = false;
   try {
     const session = await auth();
@@ -132,7 +133,7 @@ export async function getFloorsData() {
       units: floorUnits,
     };
   });
-}
+});
 
 export async function createFloor(data: {
   name: string;
