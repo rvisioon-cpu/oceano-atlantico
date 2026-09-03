@@ -134,7 +134,7 @@ const GalleryViewer: React.FC<GalleryViewerProps> = ({ images, initialIndex, isO
         
         {/* Prev Arrow */}
          <button 
-             className="absolute left-6 z-40 w-12 h-12 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/80 transition-all backdrop-blur-sm border border-white/10 translate-x-[-200%] group-hover:translate-x-0 duration-300"
+             className="absolute left-6 z-40 w-12 h-12 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/80 transition-all backdrop-blur-sm border border-white/10 duration-300"
              onClick={handlePrev}
          >
              <ChevronLeft size={24} />
@@ -172,7 +172,7 @@ const GalleryViewer: React.FC<GalleryViewerProps> = ({ images, initialIndex, isO
 
          {/* Next Arrow */}
          <button 
-             className="absolute right-6 z-40 w-12 h-12 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/80 transition-all backdrop-blur-sm border border-white/10 translate-x-[200%] group-hover:translate-x-0 duration-300"
+             className="absolute right-6 z-40 w-12 h-12 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/80 transition-all backdrop-blur-sm border border-white/10 duration-300"
              onClick={handleNext}
          >
              <ChevronRight size={24} />
