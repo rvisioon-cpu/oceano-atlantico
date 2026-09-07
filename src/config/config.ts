@@ -79,14 +79,14 @@ const config: ConfigProps = {
   },
   company: {
     name: "Residencial Océano Atlántico",
-    address: "Company Address",
+    address: "Calle Las Gencianas 150 Int. 511, Urb. Los Recaudadores - Ate, Lima, Perú",
     buildingName: "Residencial Océano Atlántico",
     buildingAddress: "Jirón Océano Atlántico 338-342, Surco, Lima",
     email: "info@rmpromotora.com",
     website: "https://rmpromotora.com",
     city: "Lima",
     country: "Perú",
-    phone: "",
+    phone: "997 171 543",
     // El proyecto no tiene cuentas propias: se muestran las de RM Promotora.
     buildingSocials: {
       facebook: "https://www.facebook.com/profile.php?id=100063594609401&locale=es_LA",
