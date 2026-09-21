@@ -165,6 +165,12 @@ export const privacyPolicySections: LegalSection[] = [
  * ninguna empresa, dirección ni provincia en duro.
  */
 export const termsAndConditionsSections: LegalSection[] = [
++  {
+    title: '1. CARÁCTER REFERENCIAL DE RENDERS, ACABADOS Y MATERIALES',
+    body: [
+      'Las imágenes, renders, acabados, mobiliario, equipamiento y demás contenido visual presentado en el showroom virtual tienen carácter referencial y han sido desarrollados con fines ilustrativos y comerciales, por lo que podrán presentar variaciones respecto del producto final. La inmobiliaria se reserva el derecho de realizar modificaciones en materiales, acabados, marcas, tonalidades, texturas u otros elementos cuando existan razones de disponibilidad, desabastecimiento, discontinuidad de productos, condiciones de mercado u otras circunstancias que así lo requieran. En dichos casos, cualquier material o acabado sustituido será reemplazado por otro de características, calidad y valor equivalente o superior al inicialmente considerado, procurando mantener el estándar y la calidad general del proyecto, sin que ello implique necesariamente una reproducción exacta de lo mostrado en los renders o contenidos visuales.',
+    ],
+  },
   {
     title: '2. Aceptación de los Términos',
     body: [
@@ -207,12 +213,6 @@ export const termsAndConditionsSections: LegalSection[] = [
     ],
     footer: [
       'Las condiciones definitivas de cada unidad serán únicamente las que consten en el contrato de compraventa y sus anexos, documentos que prevalecen sobre cualquier información contenida en este sitio.',
-    ],
-  },
-  {
-    title: '1. CARÁCTER REFERENCIAL DE RENDERS, ACABADOS Y MATERIALES',
-    body: [
-      'Las imágenes, renders, acabados, mobiliario, equipamiento y demás contenido visual presentado en el showroom virtual tienen carácter referencial y han sido desarrollados con fines ilustrativos y comerciales, por lo que podrán presentar variaciones respecto del producto final. La inmobiliaria se reserva el derecho de realizar modificaciones en materiales, acabados, marcas, tonalidades, texturas u otros elementos cuando existan razones de disponibilidad, desabastecimiento, discontinuidad de productos, condiciones de mercado u otras circunstancias que así lo requieran. En dichos casos, cualquier material o acabado sustituido será reemplazado por otro de características, calidad y valor equivalente o superior al inicialmente considerado, procurando mantener el estándar y la calidad general del proyecto, sin que ello implique necesariamente una reproducción exacta de lo mostrado en los renders o contenidos visuales.',
     ],
   },
   {
