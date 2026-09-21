@@ -166,19 +166,19 @@ export const privacyPolicySections: LegalSection[] = [
  */
 export const termsAndConditionsSections: LegalSection[] = [
   {
-    title: '1. Aceptación de los Términos',
+    title: '2. Aceptación de los Términos',
     body: [
       `El presente documento regula el acceso y uso del sitio web de ${config.company.buildingName}, operado por ${companyName}, con domicilio en ${fullAddress}. Al navegar por este sitio, usar el showroom virtual o enviarnos sus datos a través de cualquiera de nuestros formularios, usted declara haber leído y aceptado estos Términos y Condiciones. Si no está de acuerdo con ellos, le pedimos abstenerse de utilizar el sitio.`,
     ],
   },
   {
-    title: '2. Objeto del Sitio Web',
+    title: '3. Objeto del Sitio Web',
     body: [
       `Este sitio tiene una finalidad exclusivamente informativa y comercial: dar a conocer el proyecto ${config.company.buildingName} y permitir que los interesados soliciten información o coordinen una cita con un asesor. El sitio no constituye un canal de venta en línea ni permite formalizar la compra, reserva o separación de una unidad inmobiliaria.`,
     ],
   },
   {
-    title: '3. Uso Permitido',
+    title: '4. Uso Permitido',
     body: ['Al utilizar este sitio web, usted se compromete a:'],
     bullets: [
       'Proporcionar información veraz, exacta y actualizada en los formularios de contacto.',
@@ -189,13 +189,13 @@ export const termsAndConditionsSections: LegalSection[] = [
     ],
   },
   {
-    title: '4. Propiedad Intelectual',
+    title: '5. Propiedad Intelectual',
     body: [
       `Todos los contenidos de este sitio —incluyendo textos, planos, renders, imágenes, videos, recorridos virtuales, logotipos, marcas y el diseño del sitio— son propiedad de ${companyName} o de terceros que han autorizado su uso, y están protegidos por la legislación peruana sobre derechos de autor y propiedad industrial. Queda prohibida su reproducción, distribución, comunicación pública o transformación total o parcial sin autorización previa y por escrito de su titular.`,
     ],
   },
   {
-    title: '5. Carácter Referencial de la Información',
+    title: '6. Carácter Referencial de la Información',
     body: [
       'La información publicada en este sitio tiene carácter estrictamente referencial y no constituye una oferta contractual. En particular:',
     ],
@@ -210,7 +210,7 @@ export const termsAndConditionsSections: LegalSection[] = [
     ],
   },
   {
-    title: '6. CARÁCTER REFERENCIAL DE RENDERS, ACABADOS Y MATERIALES',
+    title: '1. CARÁCTER REFERENCIAL DE RENDERS, ACABADOS Y MATERIALES',
     body: [
       'Las imágenes, renders, acabados, mobiliario, equipamiento y demás contenido visual presentado en el showroom virtual tienen carácter referencial y han sido desarrollados con fines ilustrativos y comerciales, por lo que podrán presentar variaciones respecto del producto final. La inmobiliaria se reserva el derecho de realizar modificaciones en materiales, acabados, marcas, tonalidades, texturas u otros elementos cuando existan razones de disponibilidad, desabastecimiento, discontinuidad de productos, condiciones de mercado u otras circunstancias que así lo requieran. En dichos casos, cualquier material o acabado sustituido será reemplazado por otro de características, calidad y valor equivalente o superior al inicialmente considerado, procurando mantener el estándar y la calidad general del proyecto, sin que ello implique necesariamente una reproducción exacta de lo mostrado en los renders o contenidos visuales.',
     ],
