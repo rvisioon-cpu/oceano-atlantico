@@ -210,49 +210,55 @@ export const termsAndConditionsSections: LegalSection[] = [
     ],
   },
   {
-    title: '6. Precios y Disponibilidad',
+    title: '6. CARÁCTER REFERENCIAL DE RENDERS, ACABADOS Y MATERIALES',
+    body: [
+      'Las imágenes, renders, acabados, mobiliario, equipamiento y demás contenido visual presentado en el showroom virtual tienen carácter referencial y han sido desarrollados con fines ilustrativos y comerciales, por lo que podrán presentar variaciones respecto del producto final. La inmobiliaria se reserva el derecho de realizar modificaciones en materiales, acabados, marcas, tonalidades, texturas u otros elementos cuando existan razones de disponibilidad, desabastecimiento, discontinuidad de productos, condiciones de mercado u otras circunstancias que así lo requieran. En dichos casos, cualquier material o acabado sustituido será reemplazado por otro de características, calidad y valor equivalente o superior al inicialmente considerado, procurando mantener el estándar y la calidad general del proyecto, sin que ello implique necesariamente una reproducción exacta de lo mostrado en los renders o contenidos visuales.',
+    ],
+  },
+  {
+    title: '7. Precios y Disponibilidad',
     body: [
       'Los precios y la disponibilidad de las unidades son referenciales, pueden variar sin previo aviso y no obligan a la empresa hasta que se suscriba el documento contractual correspondiente. La disponibilidad mostrada en el sitio puede no reflejar en tiempo real las unidades ya separadas o vendidas.',
     ],
   },
   {
-    title: '7. Formularios de Contacto y Citas',
+    title: '8. Formularios de Contacto y Citas',
     body: [
       `Los formularios de este sitio y la agenda de citas están destinados a canalizar consultas comerciales. Al enviarlos, usted autoriza a ${companyName} a contactarlo por los medios que haya indicado. Nos reservamos el derecho de no atender solicitudes que contengan datos manifiestamente falsos, incompletos o que resulten abusivas.`,
     ],
   },
   {
-    title: '8. Protección de Datos Personales',
+    title: '9. Protección de Datos Personales',
     body: [
       'El tratamiento de los datos personales que usted nos facilite se rige por nuestra Política de Privacidad, que forma parte integrante de estos Términos y Condiciones y que le recomendamos leer antes de enviarnos cualquier información.',
     ],
   },
   {
-    title: '9. Enlaces a Sitios de Terceros',
+    title: '10. Enlaces a Sitios de Terceros',
     body: [
       'Este sitio puede contener enlaces a páginas de terceros, incluidas redes sociales y plataformas de recorridos virtuales. No controlamos dichos sitios ni respondemos por sus contenidos, políticas o prácticas. El acceso a ellos se realiza bajo su exclusiva responsabilidad.',
     ],
   },
   {
-    title: '10. Disponibilidad del Servicio y Limitación de Responsabilidad',
+    title: '11. Disponibilidad del Servicio y Limitación de Responsabilidad',
     body: [
       `${companyName} procura mantener el sitio operativo y su información actualizada, pero no garantiza su disponibilidad ininterrumpida ni la ausencia de errores. En la medida permitida por la ley, no seremos responsables por daños derivados de la imposibilidad de acceder al sitio, de interrupciones del servicio, ni de decisiones adoptadas por el usuario basándose exclusivamente en la información referencial aquí publicada.`,
     ],
   },
   {
-    title: '11. Modificaciones a los Términos',
+    title: '12. Modificaciones a los Términos',
     body: [
       `${companyName} se reserva el derecho de modificar en cualquier momento estos Términos y Condiciones, así como los contenidos y servicios del sitio. Las modificaciones entrarán en vigencia desde su publicación. Le recomendamos revisar esta página periódicamente.`,
     ],
   },
   {
-    title: '12. Legislación Aplicable y Jurisdicción',
+    title: '13. Legislación Aplicable y Jurisdicción',
     body: [
       `Estos Términos y Condiciones se rigen por las leyes de la República del ${config.company.country === 'Perú' ? 'Perú' : config.company.country}. Cualquier controversia derivada de su interpretación o ejecución se someterá a los jueces y tribunales competentes, sin perjuicio de los derechos que la normativa de protección al consumidor reconoce al usuario.`,
     ],
   },
   {
-    title: '13. Contacto',
+    title: '14. Contacto',
     body: [
       'Para cualquier consulta relacionada con estos Términos y Condiciones puede escribirnos a:',
     ],
